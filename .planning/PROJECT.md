@@ -23,18 +23,17 @@ across sources without a single source-specific branch.
 
 <!-- Shipped and confirmed valuable. -->
 
-(None yet — this repository currently holds design docs only; no code has been
-committed. Ship to validate.)
+- ✓ Shared foundation: TTL cache, `getJson()` HTTP client (retry + stale
+      fallback), and the normalized output contract, proven by a Hacker News
+      reference server — Phase 1 (FOUND-01..05, OUT-01, OUT-03; 64 tests)
+- ✓ Credential + auth infrastructure: env-only `credentials.js`, `auth.js`
+      token exchange (optional Reddit grant, Lemmy login), `.mcpb` keychain
+      pattern — Phase 1 (CRED-01..04)
 
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
-- [ ] Shared foundation: TTL cache, `getJson()` HTTP client (retry + stale
-      fallback), and the normalized output contract, proven by a Hacker News
-      reference server
-- [ ] Credential + auth infrastructure: env-only `credentials.js`, `auth.js`
-      token exchange (Reddit grant, Lemmy login), `.mcpb` keychain pattern
 - [ ] Source servers, each conforming exactly to the contract: Stack Exchange
       (network via `site`), Lobsters, Lemmy, Hashnode, Dev.to, GitHub
       (repos + issues/discussions), Libraries.io, Product Hunt
@@ -118,4 +117,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-01 after initialization*
+*Last updated: 2026-07-01 after Phase 1 (Foundation & Credential Infrastructure) completion*
