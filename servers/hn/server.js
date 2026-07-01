@@ -12,6 +12,22 @@
 //   created_at->created_utc, url->url, _tags->type, story_text/comment_text->text.
 // Job stories carry null points/num_comments -> null score/num_comments.
 
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { pathToFileURL } from "node:url";
+import { z } from "zod";
+import { getJson } from "../../shared/http_client.js";
+import {
+  buildListEnvelope,
+  buildDetailEnvelope,
+  listEnvelopeShape,
+  detailEnvelopeShape,
+  toolResult,
+} from "../../shared/contract.js";
+
+const ALGOLIA = "https://hn.algolia.com/api/v1";
+const SOURCE = "hackernews";
+
 // --- HN-only field mapping (the ONLY HN-specific logic) ------------------
 
 // _tags values worth surfacing to the reader; internal author_*/story_* noise
@@ -96,4 +112,89 @@ export function mapHnItem(detail) {
     text: c.text ?? null,
   }));
   return { item, comments };
+}
+
+// --- MCP wiring (identical across servers except URL construction) -------
+//
+// registerTool at SDK 1.29.0 takes RAW Zod shapes for inputSchema/outputSchema
+// (NOT z.object(...) — RESEARCH Pitfall 1). Every handler fetches through
+// getJson (never fetch directly — CLAUDE.md), maps via the helpers above,
+// assembles the envelope with the shared factories, and returns toolResult()
+// so both structuredContent and JSON-text content are emitted (FOUND-05).
+
+export const server = new McpServer({ name: "hn", version: "1.0.0" });
+
+server.registerTool(
+  "hn_front_page",
+  {
+    title: "Hacker News front page",
+    description: "Current Hacker News front-page stories, normalized.",
+    inputSchema: {
+      limit: z.number().int().min(1).max(50).optional(),
+    },
+    outputSchema: listEnvelopeShape,
+  },
+  async ({ limit = 20 }) => {
+    const raw = await getJson(
+      `${ALGOLIA}/search?tags=front_page&hitsPerPage=${limit}`,
+    );
+    const env = buildListEnvelope({
+      source: SOURCE,
+      query: null, // front page has no query
+      results: (raw.hits ?? []).map(mapHnHit),
+    });
+    return toolResult(env);
+  },
+);
+
+server.registerTool(
+  "hn_search",
+  {
+    title: "Hacker News search",
+    description: "Search Hacker News stories by relevance.",
+    inputSchema: {
+      query: z.string(),
+      limit: z.number().int().min(1).max(50).optional(),
+    },
+    outputSchema: listEnvelopeShape,
+  },
+  async ({ query, limit = 20 }) => {
+    const raw = await getJson(
+      `${ALGOLIA}/search?query=${encodeURIComponent(query)}&tags=story&hitsPerPage=${limit}`,
+    );
+    const env = buildListEnvelope({
+      source: SOURCE,
+      query,
+      results: (raw.hits ?? []).map(mapHnHit),
+    });
+    return toolResult(env);
+  },
+);
+
+server.registerTool(
+  "hn_get_item",
+  {
+    title: "Hacker News item detail",
+    description:
+      "Fetch one Hacker News item with its top-level comments, normalized.",
+    inputSchema: {
+      id: z.union([z.string(), z.number()]),
+    },
+    outputSchema: detailEnvelopeShape,
+  },
+  async ({ id }) => {
+    const detail = await getJson(`${ALGOLIA}/items/${encodeURIComponent(id)}`);
+    const { item, comments } = mapHnItem(detail);
+    const env = buildDetailEnvelope({ source: SOURCE, item, comments });
+    return toolResult(env);
+  },
+);
+
+// Connect over stdio only when run directly (`node servers/hn/server.js`), so
+// importing this module for tests does NOT start a live transport.
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+  await server.connect(new StdioServerTransport());
 }

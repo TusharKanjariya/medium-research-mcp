@@ -14,7 +14,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-import { mapHnHit, mapHnItem } from "../servers/hn/server.js";
+import { mapHnHit, mapHnItem, server } from "../servers/hn/server.js";
 import {
   buildListEnvelope,
   buildDetailEnvelope,
@@ -166,4 +166,22 @@ test("mapHnItem builds a detail envelope that parses against the contract schema
     ...mapHnItem(item),
   });
   assert.doesNotThrow(() => DetailEnvelopeSchema.parse(env));
+});
+
+// --- registration smoke (Task 2, FOUND-05) ------------------------------
+
+test("hn server registers exactly hn_front_page, hn_search, hn_get_item", () => {
+  // Tools register at import time; importing does NOT connect a transport
+  // (connect is guarded to direct execution), so this stays offline.
+  const names = Object.keys(server._registeredTools ?? {}).sort();
+  assert.deepEqual(names, ["hn_front_page", "hn_get_item", "hn_search"]);
+});
+
+test("each hn tool declares an outputSchema (contract validation on return)", () => {
+  for (const name of ["hn_front_page", "hn_search", "hn_get_item"]) {
+    assert.ok(
+      server._registeredTools[name].outputSchema,
+      `${name} has an outputSchema`,
+    );
+  }
 });
