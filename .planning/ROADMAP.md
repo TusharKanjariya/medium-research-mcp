@@ -37,7 +37,7 @@ in addition to the phase's own success criteria:
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Foundation & Credential Infrastructure** - Shared cache/HTTP layer, the output contract, the HN reference server, and env-only credential + token-auth infrastructure
+- [x] **Phase 1: Foundation & Credential Infrastructure** - Shared cache/HTTP layer, the output contract, the HN reference server, and env-only credential + token-auth infrastructure (completed 2026-07-01)
 - [ ] **Phase 2: Keyless Source Breadth** - Stack Exchange, Lobsters, Lemmy, Hashnode, and Dev.to servers, proving the copy-a-folder pattern at breadth
 - [ ] **Phase 3: Keyed Ecosystem & Launch Sources** - GitHub, Libraries.io, and Product Hunt servers, exercising optional-PAT and required-credential paths
 - [ ] **Phase 4: RSS Multiplier & Output Proof** - Generic RSS/Atom fetcher (incl. subreddit `.rss`), a real 5+-source uniform run, and the Python YouTube→blog wrapper
@@ -62,12 +62,12 @@ in addition to the phase's own success criteria:
 Plans:
 **Wave 1**
 
-- [ ] 01-01-PLAN.md — Project scaffold + shared `cache.js`/`http_client.js` `getJson()` (TTL cache, retry/backoff/stale) + output-contract module (wave 1)
+- [x] 01-01-PLAN.md — Project scaffold + shared `cache.js`/`http_client.js` `getJson()` (TTL cache, retry/backoff/stale) + output-contract module (wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02-PLAN.md — Hacker News reference server (`hn_front_page`, `hn_search`, `hn_get_item`) with unit-tested field-mapping helpers (wave 2)
-- [ ] 01-03-PLAN.md — `credentials.js`, `auth.js`, `.env.example`, and the `.mcpb` `user_config`/keychain pattern (wave 2)
+- [x] 01-02-PLAN.md — Hacker News reference server (`hn_front_page`, `hn_search`, `hn_get_item`) with unit-tested field-mapping helpers (wave 2)
+- [x] 01-03-PLAN.md — `credentials.js`, `auth.js`, `.env.example`, and the `.mcpb` `user_config`/keychain pattern (wave 2)
 
 ### Phase 2: Keyless Source Breadth
 
@@ -153,7 +153,7 @@ Phase 1 and may run in parallel; Phase 4 depends on both).
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Credential Infrastructure | 0/3 | Not started | - |
+| 1. Foundation & Credential Infrastructure | 3/3 | Complete    | 2026-07-01 |
 | 2. Keyless Source Breadth | 0/3 | Not started | - |
 | 3. Keyed Ecosystem & Launch Sources | 0/2 | Not started | - |
 | 4. RSS Multiplier & Output Proof | 0/3 | Not started | - |

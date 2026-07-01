@@ -9,18 +9,18 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Foundation
 
-- [ ] **FOUND-01**: Shared `cache.js` provides an in-memory ~15-min TTL cache with stale-entry retention
-- [ ] **FOUND-02**: Shared `http_client.js` `getJson()` performs all HTTP with cache + retry/backoff (0.5s/1s/2s, never on 4xx) + stale-cache fallback; servers never call `fetch` directly
-- [ ] **FOUND-03**: Normalized output contract is defined and enforced — lists return `{ source, query, count, results[] }`, details return `{ source, item }`, item schema per ARCHITECTURE §4; `score`/`num_comments` may be null but never renamed
-- [ ] **FOUND-04**: Hacker News reference server exposes `hn_front_page`, `hn_search`, `hn_get_item` and proves the pattern end-to-end
-- [ ] **FOUND-05**: Every tool returns an object so the SDK emits both `structuredContent` and JSON-text `content`
+- [x] **FOUND-01**: Shared `cache.js` provides an in-memory ~15-min TTL cache with stale-entry retention
+- [x] **FOUND-02**: Shared `http_client.js` `getJson()` performs all HTTP with cache + retry/backoff (0.5s/1s/2s, never on 4xx) + stale-cache fallback; servers never call `fetch` directly
+- [x] **FOUND-03**: Normalized output contract is defined and enforced — lists return `{ source, query, count, results[] }`, details return `{ source, item }`, item schema per ARCHITECTURE §4; `score`/`num_comments` may be null but never renamed
+- [x] **FOUND-04**: Hacker News reference server exposes `hn_front_page`, `hn_search`, `hn_get_item` and proves the pattern end-to-end
+- [x] **FOUND-05**: Every tool returns an object so the SDK emits both `structuredContent` and JSON-text `content`
 
 ### Credentials & Auth
 
-- [ ] **CRED-01**: `credentials.js` is the single source of truth for env-var names, reads only from `process.env`, and exposes per-service helpers (`stackExchangeParams`, `githubHeaders`, `librariesIoParams`, `productHuntHeaders`)
-- [ ] **CRED-02**: `auth.js` exchanges username/password for a cached token (Reddit OAuth2 password grant, Lemmy `/api/v3/user/login`); passwords never logged, persisted, or sent per request
-- [ ] **CRED-03**: `.env.example` documents all variables; `.mcpb` `user_config` maps secrets into `mcp_config.env` with `"sensitive": true` (OS keychain)
-- [ ] **CRED-04**: Required-credential sources (Libraries.io, Product Hunt) fail with a clear "set X" error; keyless-capable sources (Stack Exchange, GitHub, Reddit reads) degrade to anonymous mode
+- [x] **CRED-01**: `credentials.js` is the single source of truth for env-var names, reads only from `process.env`, and exposes per-service helpers (`stackExchangeParams`, `githubHeaders`, `librariesIoParams`, `productHuntHeaders`)
+- [x] **CRED-02**: `auth.js` exchanges username/password for a cached token (Reddit OAuth2 password grant, Lemmy `/api/v3/user/login`); passwords never logged, persisted, or sent per request
+- [x] **CRED-03**: `.env.example` documents all variables; `.mcpb` `user_config` maps secrets into `mcp_config.env` with `"sensitive": true` (OS keychain)
+- [x] **CRED-04**: Required-credential sources (Libraries.io, Product Hunt) fail with a clear "set X" error; keyless-capable sources (Stack Exchange, GitHub, Reddit reads) degrade to anonymous mode
 
 ### Source Servers
 
@@ -36,9 +36,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Output & Consumer
 
-- [ ] **OUT-01**: Every server conforms to the output contract exactly, verified against ARCHITECTURE §4
+- [x] **OUT-01**: Every server conforms to the output contract exactly, verified against ARCHITECTURE §4
 - [ ] **OUT-02**: A single research run pulls from 5+ sources and returns a uniform list the skill ranks/filters with no per-source branches
-- [ ] **OUT-03**: Tool output is trimmed and LLM-readable — only fields that matter, HTML stripped from text
+- [x] **OUT-03**: Tool output is trimmed and LLM-readable — only fields that matter, HTML stripped from text
 
 ### Wrapper
 
@@ -76,15 +76,15 @@ Which phases cover which requirements. Finalized during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase 1 | Pending |
-| FOUND-02 | Phase 1 | Pending |
-| FOUND-03 | Phase 1 | Pending |
-| FOUND-04 | Phase 1 | Pending |
-| FOUND-05 | Phase 1 | Pending |
-| CRED-01 | Phase 1 | Pending |
-| CRED-02 | Phase 1 | Pending |
-| CRED-03 | Phase 1 | Pending |
-| CRED-04 | Phase 1 | Pending |
+| FOUND-01 | Phase 1 | Complete |
+| FOUND-02 | Phase 1 | Complete |
+| FOUND-03 | Phase 1 | Complete |
+| FOUND-04 | Phase 1 | Complete |
+| FOUND-05 | Phase 1 | Complete |
+| CRED-01 | Phase 1 | Complete |
+| CRED-02 | Phase 1 | Complete |
+| CRED-03 | Phase 1 | Complete |
+| CRED-04 | Phase 1 | Complete |
 | SRC-01 | Phase 2 | Pending |
 | SRC-02 | Phase 2 | Pending |
 | SRC-03 | Phase 2 | Pending |
@@ -94,12 +94,13 @@ Which phases cover which requirements. Finalized during roadmap creation.
 | SRC-07 | Phase 3 | Pending |
 | SRC-08 | Phase 3 | Pending |
 | SRC-09 | Phase 4 | Pending |
-| OUT-01 | Phase 1 | Pending |
+| OUT-01 | Phase 1 | Complete |
 | OUT-02 | Phase 4 | Pending |
-| OUT-03 | Phase 1 | Pending |
+| OUT-03 | Phase 1 | Complete |
 | YT-01 | Phase 4 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 22 total
 - Mapped to phases: 22
 - Unmapped: 0 ✓
