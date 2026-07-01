@@ -1,0 +1,107 @@
+// shared/credentials.js — the ONE and ONLY module that reads process.env (CRED-01;
+// CLAUDE.md "never read process.env in a server"). Every server and auth.js resolves
+// credentials through these helpers so variable names live in exactly one place and no
+// secret is ever hardcoded.
+//
+// ENV_VAR is the single source of truth: logical name -> environment variable name.
+// A private get(name) is the only place process.env is touched in the entire repo
+// (grep-verifiable: `grep -rn "process.env" shared servers` should match only here).
+//
+// Split of responsibilities (ARCHITECTURE §6, CRED-04):
+//   - REQUIRED sources (Libraries.io, Product Hunt) build on requireCred() and throw a
+//     clear "set <ENV_VAR>" error when unset — fail loudly, never call an API unauthed.
+//   - OPTIONAL sources (Stack Exchange, GitHub, Reddit, Lemmy) DEGRADE: they return {}
+//     / undefined when unset so the caller falls back to keyless/anonymous access.
+//
+// Security: no credential value is ever logged here; errors name only the ENV_VAR.
+
+const ENV_VAR = {
+  stackExchangeKey: "STACKEXCHANGE_KEY",
+  githubToken: "GITHUB_TOKEN",
+  librariesIoKey: "LIBRARIESIO_KEY",
+  productHuntToken: "PRODUCTHUNT_TOKEN",
+  redditClientId: "REDDIT_CLIENT_ID",
+  redditClientSecret: "REDDIT_CLIENT_SECRET",
+  redditUsername: "REDDIT_USERNAME",
+  redditPassword: "REDDIT_PASSWORD",
+  lemmyInstance: "LEMMY_INSTANCE",
+  lemmyUsername: "LEMMY_USERNAME",
+  lemmyPassword: "LEMMY_PASSWORD",
+  userAgent: "MCP_USER_AGENT",
+};
+
+// The single process.env access point in the repo. Treats empty string as absent so a
+// blank env var never masquerades as a real credential.
+const get = (name) => process.env[ENV_VAR[name]] || undefined;
+
+/**
+ * Resolve a REQUIRED credential or throw a clear, actionable error (CRED-04).
+ * The message names the missing ENV_VAR (never the value) so operators know exactly
+ * what to set.
+ * @param {keyof typeof ENV_VAR} name logical credential name
+ * @returns {string} the credential value
+ */
+export function requireCred(name) {
+  const value = get(name);
+  if (!value) throw new Error(`Missing credential: set ${ENV_VAR[name]}`);
+  return value;
+}
+
+// --- Per-service request fragments (CRED-01) ---------------------------------
+// Scaffolded now; most are consumed by the source servers built in Phase 2/3.
+
+/** OPTIONAL: Stack Exchange API key as a query-param fragment; {} when unset. */
+export const stackExchangeParams = () => {
+  const key = get("stackExchangeKey");
+  return key ? { key } : {};
+};
+
+/** OPTIONAL: GitHub PAT as an Authorization header fragment; {} when unset. */
+export const githubHeaders = () => {
+  const token = get("githubToken");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+/** REQUIRED: Libraries.io API key as a query-param fragment; throws when unset. */
+export const librariesIoParams = () => ({ api_key: requireCred("librariesIoKey") });
+
+/** REQUIRED: Product Hunt token as an Authorization header; throws when unset. */
+export const productHuntHeaders = () => ({
+  Authorization: `Bearer ${requireCred("productHuntToken")}`,
+});
+
+/**
+ * User-Agent string for outbound requests. Reddit REQUIRES a real, non-blank UA or it
+ * returns 429/403, so this always resolves to a usable default when MCP_USER_AGENT is
+ * unset.
+ */
+export const userAgent = () =>
+  get("userAgent") ||
+  "medium-research-mcp/1.0 (+https://github.com/TusharRedlioDesigns/medium-research-mcp)";
+
+/**
+ * OPTIONAL Reddit OAuth2 password-grant credentials (D-04). Returns an object ONLY when
+ * all four of client_id, client_secret, username, and password are present; otherwise
+ * returns undefined so Reddit degrades to keyless www.reddit.com/.json reads (D-03).
+ * @returns {{ id:string, secret:string, user:string, pass:string } | undefined}
+ */
+export function redditCreds() {
+  const id = get("redditClientId");
+  const secret = get("redditClientSecret");
+  const user = get("redditUsername");
+  const pass = get("redditPassword");
+  return id && secret && user && pass ? { id, secret, user, pass } : undefined;
+}
+
+/**
+ * OPTIONAL Lemmy login credentials (D-05). Returns an object ONLY when instance,
+ * username, and password are all present; otherwise undefined (no login, no app needed
+ * for Lemmy — just username + password).
+ * @returns {{ instance:string, user:string, pass:string } | undefined}
+ */
+export function lemmyCreds() {
+  const instance = get("lemmyInstance");
+  const user = get("lemmyUsername");
+  const pass = get("lemmyPassword");
+  return instance && user && pass ? { instance, user, pass } : undefined;
+}
