@@ -746,23 +746,21 @@ no default/sample secret value ships in `.env.example` (names + comments only).
 
 **If a claim above is load-bearing for a locked decision, confirm before executing.**
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Retry on 429/408?**
-   - Known: §8 says "never retry 4xx"; 429/408 are 4xx but are the sensible exceptions.
-   - Unclear: whether the user wants strict §8 or a `Retry-After`-aware refinement.
-   - Recommendation: default strict (no 429 retry); planner adds a one-line note so it's
-     a conscious choice, not silent.
-2. **Bundled Node version in the target Claude Desktop.**
-   - Known: dev machine is Node 25; global `fetch`/`AbortController` present. SDK/`fetch`
-     need Node ≥18.
-   - Unclear: exact Node the target Claude Desktop ships.
-   - Recommendation: target the Node 18 API baseline (no Node ≥20-only APIs); document
-     `engines: { node: ">=18" }` in `package.json`.
-3. **`tags` curation for HN.**
-   - Known: `_tags` includes internal `author_*`/`story_*` noise.
-   - Recommendation (discretion): filter to human-meaningful tags
-     (`story`/`front_page`/`ask_hn`/`show_hn`), or `[]` — planner's call per D-01.
+1. **Retry on 429/408?** — **RESOLVED: strict, per user decision 2026-07-01.**
+   `getJson()` retries transient/5xx only (0.5s/1s/2s backoff); it does **not** retry
+   any 4xx, including 429 and 408. This matches ARCHITECTURE §8, REQUIREMENTS FOUND-02,
+   and ROADMAP Phase 1 Success Criterion 2 ("4xx is never retried") verbatim — no
+   Retry-After refinement in Phase 1. Rate-limit cushioning comes from the TTL cache +
+   stale-cache fallback. (429-aware handling may be revisited later as a deliberate,
+   doc-updating change; it is explicitly out of scope now.)
+2. **Bundled Node version in the target Claude Desktop.** — **RESOLVED.**
+   Target the Node 18 API baseline (no Node ≥20-only APIs); declare
+   `engines: { node: ">=18" }` in `package.json`. Dev machine is Node 25.
+3. **`tags` curation for HN.** — **RESOLVED (planner discretion per D-01).**
+   Filter `_tags` to human-meaningful values (`story`/`front_page`/`ask_hn`/`show_hn`),
+   dropping internal `author_*`/`story_*` noise; empty array when none apply.
 
 ## Environment Availability
 
