@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Local credentials — dev only, never commit (see .env.example, added in plan 01-03)
+.env
+
+# Build artifacts
+*.mcpb
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db

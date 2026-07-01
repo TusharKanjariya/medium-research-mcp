@@ -1,0 +1,17 @@
+{
+  "name": "medium-research-mcp",
+  "version": "1.0.0",
+  "description": "A suite of MCP servers pulling normalized blog-topic research from developer sources",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.4"
+  }
+}
