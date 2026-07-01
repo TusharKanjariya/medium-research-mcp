@@ -1,0 +1,133 @@
+# Roadmap: medium-research-mcp
+
+## Overview
+
+Build a suite of single-purpose MCP servers that each wrap one developer-community
+source and emit the **same normalized JSON shape**, so `medium-blog-pro` can pull
+blog-topic research from many sources with zero per-source logic. The journey runs
+foundation-first: prove the shared cache/HTTP layer, the output contract, and the
+credential/auth infrastructure against a Hacker News reference server; then fan out
+across keyless sources to validate the copy-a-folder pattern at breadth; then add the
+keyed ecosystem/launch sources that exercise required-credential handling; and finally
+land the generic RSS/Atom multiplier, prove a real 5+-source uniform run, and add the
+structurally different Python YouTube→blog wrapper last. Sources within a phase are
+largely independent and may be built in parallel.
+
+## Universal Server Bar
+
+Every source-server phase (2, 3, 4) must satisfy this bar for each server it adds,
+in addition to the phase's own success criteria:
+
+- Tools register and are callable in the MCP Inspector.
+- `normalize*()` helpers are unit-tested against representative source payloads.
+- Output matches the contract in ARCHITECTURE §4 exactly — lists return
+  `{ source, query, count, results[] }`, details return `{ source, item }`, item schema
+  intact; `score`/`num_comments` may be `null` but are never renamed or dropped.
+- All HTTP goes through `shared/http_client.js` `getJson()` — no direct `fetch`, and no
+  `process.env` reads outside `shared/credentials.js`.
+- Keyless-fallback / required-credential behavior is correct: optional-key sources
+  degrade to anonymous mode; required-key sources fail with a clear "set X" error.
+
+## Phases
+
+**Phase Numbering:**
+- Integer phases (1, 2, 3): Planned milestone work
+- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+
+- [ ] **Phase 1: Foundation & Credential Infrastructure** - Shared cache/HTTP layer, the output contract, the HN reference server, and env-only credential + token-auth infrastructure
+- [ ] **Phase 2: Keyless Source Breadth** - Stack Exchange, Lobsters, Lemmy, Hashnode, and Dev.to servers, proving the copy-a-folder pattern at breadth
+- [ ] **Phase 3: Keyed Ecosystem & Launch Sources** - GitHub, Libraries.io, and Product Hunt servers, exercising optional-PAT and required-credential paths
+- [ ] **Phase 4: RSS Multiplier & Output Proof** - Generic RSS/Atom fetcher (incl. subreddit `.rss`), a real 5+-source uniform run, and the Python YouTube→blog wrapper
+
+## Phase Details
+
+### Phase 1: Foundation & Credential Infrastructure
+**Goal**: Establish the shared plumbing and prove the normalized output contract end-to-end with a Hacker News reference server, plus the credential/auth infrastructure every later source copies.
+**Depends on**: Nothing (first phase)
+**Requirements**: FOUND-01, FOUND-02, FOUND-03, FOUND-04, FOUND-05, CRED-01, CRED-02, CRED-03, CRED-04, OUT-01, OUT-03
+**Success Criteria** (what must be TRUE):
+  1. Calling `hn_front_page`, `hn_search`, and `hn_get_item` in the MCP Inspector returns data in the exact contract shape (list envelope, detail `{ source, item }`), with both `structuredContent` and JSON-text `content` present.
+  2. A transient/5xx failure is retried with backoff (0.5s/1s/2s), a repeated call inside the TTL window is served from cache, and a total failure falls back to a stale cache entry rather than hard-erroring; 4xx is never retried.
+  3. `credentials.js` is the only place `process.env` is read, exposing per-service helpers; a missing required credential produces a clear "set X" error while optional-key sources run anonymously.
+  4. `auth.js` exchanges username/password for a cached token (Reddit password grant, Lemmy login) with passwords never logged, persisted, or sent per request; `.env.example` and the `.mcpb` `user_config` (secrets marked `"sensitive": true`) are documented.
+  5. Tool output is trimmed and LLM-readable — HTML stripped from `text`, only contract fields present.
+**Plans**: TBD
+
+Plans:
+- [ ] 01-01: Shared `cache.js` + `http_client.js` `getJson()` (TTL cache, retry/backoff, stale fallback) and the normalized output-contract module
+- [ ] 01-02: Hacker News reference server (`hn_front_page`, `hn_search`, `hn_get_item`) with unit-tested `normalize*()` helpers
+- [ ] 01-03: `credentials.js`, `auth.js`, `.env.example`, and the `.mcpb` `user_config`/keychain pattern
+
+### Phase 2: Keyless Source Breadth
+**Goal**: Fan out across the keyless (and optional-auth) sources, proving that adding a source is a mechanical copy of the Phase 1 pattern and that the contract holds across very different payloads.
+**Depends on**: Phase 1
+**Requirements**: SRC-01, SRC-02, SRC-03, SRC-04, SRC-05
+**Success Criteria** (what must be TRUE):
+  1. Stack Exchange tools (`so_hot_questions`, `so_search`, `so_get_question`) work across the network via a `site` param and use `STACKEXCHANGE_KEY` when present, keyless otherwise.
+  2. Lobsters (`lobsters_hottest`, `lobsters_tag`, `lobsters_get`) and Dev.to servers return contract-shaped results with no auth.
+  3. Lemmy tools (`lemmy_hot`, `lemmy_search`, `lemmy_post`) work on public reads and auto-authenticate when `LEMMY_*` is set, exercising the `auth.js` username/password path end-to-end.
+  4. Hashnode tools return trending-by-tag, search, and article results via the public GraphQL API with reactions mapped to `score` and responses to `num_comments`.
+  5. All five servers pass the Universal Server Bar.
+**Plans**: TBD
+
+Plans:
+- [ ] 02-01: Stack Exchange server (network-wide via `site`, optional key)
+- [ ] 02-02: Lobsters + Lemmy servers (Lemmy validates the auth path)
+- [ ] 02-03: Hashnode + Dev.to servers (GraphQL / REST content platforms)
+
+### Phase 3: Keyed Ecosystem & Launch Sources
+**Goal**: Add the ecosystem-signal and launch sources that exercise optional-PAT and required-credential handling, surfacing pain-point and momentum signal for blog topics.
+**Depends on**: Phase 1
+**Requirements**: SRC-06, SRC-07, SRC-08
+**Success Criteria** (what must be TRUE):
+  1. GitHub server returns trending repos (Search API, stars→`score`) and issues/discussions for pain-point mining (reactions→`score`, comments→`num_comments`), using a PAT when present and running anonymously otherwise.
+  2. Libraries.io server returns rising/most-depended packages and fails with a clear "set LIBRARIES_IO_KEY" error when its required key is missing.
+  3. Product Hunt server returns today/this-week launches by topic and fails with a clear "set X" error when its required token is missing.
+  4. All three servers pass the Universal Server Bar, with required-credential error behavior explicitly verified.
+**Plans**: TBD
+
+Plans:
+- [ ] 03-01: GitHub server (trending repos + issues/discussions, optional PAT)
+- [ ] 03-02: Libraries.io + Product Hunt servers (required-credential path)
+
+### Phase 4: RSS Multiplier & Output Proof
+**Goal**: Land the generic RSS/Atom fetcher (the biggest coverage-per-line multiplier, including read-only subreddit `.rss`), prove a real multi-source research run, and add the structurally different Python YouTube→blog wrapper last.
+**Depends on**: Phase 2, Phase 3
+**Requirements**: SRC-09, OUT-02, YT-01
+**Success Criteria** (what must be TRUE):
+  1. The generic RSS/Atom fetcher ingests any feed URL — newsletters, dev blogs, and a subreddit `.rss` recipe — emitting contract-shaped feed items with `score`/`num_comments` null.
+  2. A single research run pulls from 5+ sources and returns one uniform list the consumer ranks/filters with zero per-source branches.
+  3. The Python YouTube→blog wrapper implements the async job pattern (`start_youtube_job` → id, `check_job_status(id)`) around the existing Tesseract OCR script and runs local-only.
+  4. The RSS fetcher passes the Universal Server Bar.
+**Plans**: TBD
+
+Plans:
+- [ ] 04-01: Generic RSS/Atom fetcher (incl. subreddit `.rss` recipe)
+- [ ] 04-02: 5+-source uniform-run verification harness (OUT-02)
+- [ ] 04-03: Python YouTube→blog wrapper (async job pattern, separate repo)
+
+## Future / Deferred (v2)
+
+Not part of the numbered v1 phases. Tracked for a later milestone.
+
+- **SRC-10 — Discourse generic fetcher**: `/latest.json` on any public instance; a
+  multiplier across Rust/Swift/Elixir/Docker communities. Mechanical copy of the pattern.
+- **SRC-11 — Mastodon server**: public + hashtag timelines where the instance allows
+  unauthenticated reads (favourites+reblogs→`score`, replies→`num_comments`).
+- **SRC-12 — Bluesky (AT Protocol)**: public feed reads; revisit if fediverse coverage
+  proves valuable.
+- **PKG-01 — `.mcpb` distribution**: per-server `build-mcpb.sh` + `npm install --omit=dev`
+  + `mcpb pack` bundles worth one-click installing/sharing.
+
+## Progress
+
+**Execution Order:**
+Phases execute in numeric order: 1 → 2 → 3 → 4 (Phases 2 and 3 both depend only on
+Phase 1 and may run in parallel; Phase 4 depends on both).
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Foundation & Credential Infrastructure | 0/3 | Not started | - |
+| 2. Keyless Source Breadth | 0/3 | Not started | - |
+| 3. Keyed Ecosystem & Launch Sources | 0/2 | Not started | - |
+| 4. RSS Multiplier & Output Proof | 0/3 | Not started | - |

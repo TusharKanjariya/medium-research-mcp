@@ -88,16 +88,16 @@ Which phases cover which requirements. Finalized during roadmap creation.
 | SRC-01 | Phase 2 | Pending |
 | SRC-02 | Phase 2 | Pending |
 | SRC-03 | Phase 2 | Pending |
-| SRC-04 | Phase 3 | Pending |
-| SRC-05 | Phase 3 | Pending |
-| SRC-06 | Phase 4 | Pending |
-| SRC-07 | Phase 4 | Pending |
-| SRC-08 | Phase 4 | Pending |
-| SRC-09 | Phase 5 | Pending |
+| SRC-04 | Phase 2 | Pending |
+| SRC-05 | Phase 2 | Pending |
+| SRC-06 | Phase 3 | Pending |
+| SRC-07 | Phase 3 | Pending |
+| SRC-08 | Phase 3 | Pending |
+| SRC-09 | Phase 4 | Pending |
 | OUT-01 | Phase 1 | Pending |
-| OUT-02 | Phase 5 | Pending |
+| OUT-02 | Phase 4 | Pending |
 | OUT-03 | Phase 1 | Pending |
-| YT-01 | Phase 5 | Pending |
+| YT-01 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 22 total
@@ -106,4 +106,4 @@ Which phases cover which requirements. Finalized during roadmap creation.
 
 ---
 *Requirements defined: 2026-07-01*
-*Last updated: 2026-07-01 after initial definition*
+*Last updated: 2026-07-01 after roadmap creation (traceability aligned to 4 coarse phases)*
