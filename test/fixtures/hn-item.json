@@ -1,0 +1,54 @@
+{
+  "id": 16582136,
+  "title": "Stephen Hawking has died",
+  "author": "Cogito",
+  "points": 6015,
+  "url": "http://www.bbc.com/news/uk-43396008",
+  "text": null,
+  "type": "story",
+  "created_at_i": 1520999430,
+  "children": [
+    {
+      "id": 16582152,
+      "author": "klinskyc",
+      "text": "Aw man. I don&#x27;t have anything profound, but I always smile when I read this XKCD - <a href=\"https:&#x2F;&#x2F;xkcd.com&#x2F;799&#x2F;\" rel=\"nofollow\">https:&#x2F;&#x2F;xkcd.com&#x2F;799&#x2F;</a>",
+      "type": "comment",
+      "created_at_i": 1520999618,
+      "children": []
+    },
+    {
+      "id": 16582170,
+      "author": "sus_007",
+      "text": "Do we know what killed him? All of these articles have very little information. Was it the natural progression of ALS or some other kind of disease?",
+      "type": "comment",
+      "created_at_i": 1520999732,
+      "children": [
+        {
+          "id": 16582191,
+          "author": "labster",
+          "text": "Like black holes, very little information ever escapes death.",
+          "type": "comment",
+          "created_at_i": 1520999960,
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": 16582194,
+      "author": "jaequery",
+      "text": "He was a living triumph. Lived and achieved beyond what his body would allow.",
+      "type": "comment",
+      "created_at_i": 1520999991,
+      "children": [
+        {
+          "id": 16582228,
+          "author": "fermienrico",
+          "text": "What a beautiful mind. He played a big role in who I am today - I majored in Physics and later in engineering because of his book. He inspired me to understand science and use it to improve the world.",
+          "type": "comment",
+          "created_at_i": 1521000342,
+          "children": []
+        }
+      ]
+    }
+  ]
+}

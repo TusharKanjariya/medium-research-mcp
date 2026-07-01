@@ -1,0 +1,31 @@
+{
+  "_highlightResult": {
+    "author": {
+      "matchLevel": "none",
+      "matchedWords": [],
+      "value": "justin"
+    },
+    "title": {
+      "matchLevel": "none",
+      "matchedWords": [],
+      "value": "Justin.tv is looking for a designer who loves working on product!"
+    },
+    "url": {
+      "matchLevel": "none",
+      "matchedWords": [],
+      "value": "http://www.justin.tv/jobs?s#productdesigner"
+    }
+  },
+  "_tags": [
+    "job",
+    "author_justin"
+  ],
+  "author": "justin",
+  "created_at": "2009-12-16T23:29:05Z",
+  "created_at_i": 1261006145,
+  "job_text": "",
+  "objectID": "999984",
+  "title": "Justin.tv is looking for a designer who loves working on product!",
+  "updated_at": "2024-09-19T16:53:57Z",
+  "url": "http://www.justin.tv/jobs?s#productdesigner"
+}
