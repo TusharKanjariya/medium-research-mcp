@@ -1,0 +1,109 @@
+# Requirements: medium-research-mcp
+
+**Defined:** 2026-07-01
+**Core Value:** Uniform normalized output across every source, so `medium-blog-pro` consumes any source with zero per-source logic.
+
+## v1 Requirements
+
+Requirements for initial release. Each maps to roadmap phases.
+
+### Foundation
+
+- [ ] **FOUND-01**: Shared `cache.js` provides an in-memory ~15-min TTL cache with stale-entry retention
+- [ ] **FOUND-02**: Shared `http_client.js` `getJson()` performs all HTTP with cache + retry/backoff (0.5s/1s/2s, never on 4xx) + stale-cache fallback; servers never call `fetch` directly
+- [ ] **FOUND-03**: Normalized output contract is defined and enforced — lists return `{ source, query, count, results[] }`, details return `{ source, item }`, item schema per ARCHITECTURE §4; `score`/`num_comments` may be null but never renamed
+- [ ] **FOUND-04**: Hacker News reference server exposes `hn_front_page`, `hn_search`, `hn_get_item` and proves the pattern end-to-end
+- [ ] **FOUND-05**: Every tool returns an object so the SDK emits both `structuredContent` and JSON-text `content`
+
+### Credentials & Auth
+
+- [ ] **CRED-01**: `credentials.js` is the single source of truth for env-var names, reads only from `process.env`, and exposes per-service helpers (`stackExchangeParams`, `githubHeaders`, `librariesIoParams`, `productHuntHeaders`)
+- [ ] **CRED-02**: `auth.js` exchanges username/password for a cached token (Reddit OAuth2 password grant, Lemmy `/api/v3/user/login`); passwords never logged, persisted, or sent per request
+- [ ] **CRED-03**: `.env.example` documents all variables; `.mcpb` `user_config` maps secrets into `mcp_config.env` with `"sensitive": true` (OS keychain)
+- [ ] **CRED-04**: Required-credential sources (Libraries.io, Product Hunt) fail with a clear "set X" error; keyless-capable sources (Stack Exchange, GitHub, Reddit reads) degrade to anonymous mode
+
+### Source Servers
+
+- [ ] **SRC-01**: Stack Exchange server (`so_hot_questions`, `so_search`, `so_get_question`) generalized to the network via a `site` param; optional `STACKEXCHANGE_KEY`
+- [ ] **SRC-02**: Lobsters server (`lobsters_hottest`, `lobsters_tag`, `lobsters_get`), no auth
+- [ ] **SRC-03**: Lemmy server (`lemmy_hot`, `lemmy_search`, `lemmy_post`); auto-auth when `LEMMY_*` present — exercises the username/password path
+- [ ] **SRC-04**: Hashnode server (trending by tag, search, article) via public GraphQL, no auth
+- [ ] **SRC-05**: Dev.to server (trending by tag, search, article), no auth
+- [ ] **SRC-06**: GitHub server — trending repos (Search API) + issues/discussions pain-point mining; optional PAT
+- [ ] **SRC-07**: Libraries.io server (rising/most-depended packages); required key
+- [ ] **SRC-08**: Product Hunt server (today/this-week launches by topic); required token
+- [ ] **SRC-09**: Generic RSS/Atom fetcher (any feed → newsletters, dev blogs, and read-only subreddit `.rss`); emits feed-items with `score`/`num_comments` null
+
+### Output & Consumer
+
+- [ ] **OUT-01**: Every server conforms to the output contract exactly, verified against ARCHITECTURE §4
+- [ ] **OUT-02**: A single research run pulls from 5+ sources and returns a uniform list the skill ranks/filters with no per-source branches
+- [ ] **OUT-03**: Tool output is trimmed and LLM-readable — only fields that matter, HTML stripped from text
+
+### Wrapper
+
+- [ ] **YT-01**: YouTube→blog wrapper (Python, separate repo) uses the async job pattern (`start_youtube_job` → id, `check_job_status(id)`), wrapping the existing Tesseract OCR script
+
+## v2 Requirements
+
+Deferred to future release. Tracked but not in current roadmap.
+
+### Additional Sources
+
+- **SRC-10**: Discourse generic fetcher (`/latest.json` on any public instance) — multiplier across Rust/Swift/Elixir/Docker/etc. communities
+- **SRC-11**: Mastodon server (public + hashtag timelines), no auth where the instance allows unauthenticated reads
+- **SRC-12**: Bluesky (AT Protocol public feed reads) — revisit if fediverse coverage proves valuable
+
+### Distribution
+
+- **PKG-01**: `.mcpb` bundles built per server worth one-click installing/sharing (`build-mcpb.sh`, `npm install --omit=dev`, `mcpb pack`)
+
+## Out of Scope
+
+Explicitly excluded. Documented to prevent scope creep.
+
+| Feature | Reason |
+|---------|--------|
+| General-purpose Reddit/social client (posting, account actions) | Read-only topic research only |
+| Writing/drafting posts (except YouTube wrapper) | Drafting is the `medium-blog-pro` skill's job |
+| Scraping sources without a usable API (Quora, Indie Hackers, Tildes) | Brittle; violates "mechanical to add" |
+| Real-time / streaming | Cached research bursts are sufficient |
+| Reddit OAuth app path | Still karma-gated; Lemmy + subreddit `.rss` replace it |
+
+## Traceability
+
+Which phases cover which requirements. Finalized during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| FOUND-01 | Phase 1 | Pending |
+| FOUND-02 | Phase 1 | Pending |
+| FOUND-03 | Phase 1 | Pending |
+| FOUND-04 | Phase 1 | Pending |
+| FOUND-05 | Phase 1 | Pending |
+| CRED-01 | Phase 1 | Pending |
+| CRED-02 | Phase 1 | Pending |
+| CRED-03 | Phase 1 | Pending |
+| CRED-04 | Phase 1 | Pending |
+| SRC-01 | Phase 2 | Pending |
+| SRC-02 | Phase 2 | Pending |
+| SRC-03 | Phase 2 | Pending |
+| SRC-04 | Phase 3 | Pending |
+| SRC-05 | Phase 3 | Pending |
+| SRC-06 | Phase 4 | Pending |
+| SRC-07 | Phase 4 | Pending |
+| SRC-08 | Phase 4 | Pending |
+| SRC-09 | Phase 5 | Pending |
+| OUT-01 | Phase 1 | Pending |
+| OUT-02 | Phase 5 | Pending |
+| OUT-03 | Phase 1 | Pending |
+| YT-01 | Phase 5 | Pending |
+
+**Coverage:**
+- v1 requirements: 22 total
+- Mapped to phases: 22
+- Unmapped: 0 ✓
+
+---
+*Requirements defined: 2026-07-01*
+*Last updated: 2026-07-01 after initial definition*
