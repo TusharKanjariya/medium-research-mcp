@@ -51,12 +51,12 @@ in addition to the phase's own success criteria:
   3. `credentials.js` is the only place `process.env` is read, exposing per-service helpers; a missing required credential produces a clear "set X" error while optional-key sources run anonymously.
   4. `auth.js` exchanges username/password for a cached token (Reddit password grant, Lemmy login) with passwords never logged, persisted, or sent per request; `.env.example` and the `.mcpb` `user_config` (secrets marked `"sensitive": true`) are documented.
   5. Tool output is trimmed and LLM-readable — HTML stripped from `text`, only contract fields present.
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: Shared `cache.js` + `http_client.js` `getJson()` (TTL cache, retry/backoff, stale fallback) and the normalized output-contract module
-- [ ] 01-02: Hacker News reference server (`hn_front_page`, `hn_search`, `hn_get_item`) with unit-tested `normalize*()` helpers
-- [ ] 01-03: `credentials.js`, `auth.js`, `.env.example`, and the `.mcpb` `user_config`/keychain pattern
+- [ ] 01-01-PLAN.md — Project scaffold + shared `cache.js`/`http_client.js` `getJson()` (TTL cache, retry/backoff/stale) + output-contract module (wave 1)
+- [ ] 01-02-PLAN.md — Hacker News reference server (`hn_front_page`, `hn_search`, `hn_get_item`) with unit-tested field-mapping helpers (wave 2)
+- [ ] 01-03-PLAN.md — `credentials.js`, `auth.js`, `.env.example`, and the `.mcpb` `user_config`/keychain pattern (wave 2)
 
 ### Phase 2: Keyless Source Breadth
 **Goal**: Fan out across the keyless (and optional-auth) sources, proving that adding a source is a mechanical copy of the Phase 1 pattern and that the contract holds across very different payloads.
