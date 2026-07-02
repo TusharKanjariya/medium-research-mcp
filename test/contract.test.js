@@ -5,6 +5,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { z } from "zod";
 import {
+  TYPE,
   itemShape,
   ItemSchema,
   listEnvelopeShape,
@@ -59,6 +60,68 @@ test("normalizeItem strips HTML from text", () => {
 test("normalizeItem output parses cleanly against ItemSchema", () => {
   const item = normalizeItem({ id: 1, type: "story", score: 42, num_comments: null });
   assert.doesNotThrow(() => ItemSchema.parse(item));
+});
+
+// --- TYPE enum: Phase 3 additive extension (Pitfall 1 BLOCKER) -----------
+// GitHub issues -> "issue", Libraries.io packages -> "package", Product Hunt
+// launches -> "launch". toolResult() validates structuredContent against
+// z.enum(TYPE) on every return, so these values MUST be in the enum or every
+// Phase 3 source call fails SDK output validation. The extension is additive:
+// the nine prior values keep parsing (no removal/reorder that breaks callers).
+
+test("TYPE includes the Phase 3 additive values issue, package, launch", () => {
+  for (const t of ["issue", "package", "launch"]) {
+    assert.ok(TYPE.includes(t), `TYPE must include "${t}"`);
+  }
+});
+
+test("TYPE keeps every pre-existing value (additive change, no removals/reorder)", () => {
+  const priorNine = [
+    "story",
+    "ask",
+    "show",
+    "question",
+    "article",
+    "repo",
+    "comment",
+    "post",
+    "job",
+  ];
+  for (const t of priorNine) {
+    assert.ok(TYPE.includes(t), `TYPE must still include prior value "${t}"`);
+  }
+  // the original nine remain the leading prefix, in order (appended, not reordered)
+  assert.deepEqual(TYPE.slice(0, priorNine.length), priorNine);
+});
+
+test("ItemSchema parses items typed issue, package, and launch", () => {
+  for (const t of ["issue", "package", "launch"]) {
+    const item = normalizeItem({ id: 1, type: t, title: "x" });
+    assert.doesNotThrow(
+      () => ItemSchema.parse(item),
+      `an item typed "${t}" must parse`,
+    );
+    assert.equal(item.type, t);
+  }
+});
+
+test("a buildListEnvelope round-trip accepts issue/package/launch items", () => {
+  const env = buildListEnvelope({
+    source: "github",
+    query: "flaky tests",
+    results: [
+      { id: 1, type: "issue", title: "i" },
+      { id: 2, type: "package", title: "p" },
+      { id: 3, type: "launch", title: "l" },
+    ],
+  });
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env));
+  assert.equal(env.count, 3);
+});
+
+test("a bogus type is still rejected by ItemSchema (enum stays closed)", () => {
+  const bogus = normalizeItem({ id: 1, type: "not_a_real_type", title: "x" });
+  assert.throws(() => ItemSchema.parse(bogus), /invalid|enum/i);
 });
 
 // --- stripHtml -----------------------------------------------------------
