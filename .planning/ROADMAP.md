@@ -104,12 +104,16 @@ Plans:
   3. Product Hunt server returns today/this-week launches by topic and fails with a clear "set X" error when its required token is missing.
   4. All three servers pass the Universal Server Bar, with required-credential error behavior explicitly verified.
 
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
+**Wave 1**
 
-- [ ] 03-01: GitHub server (trending repos + issues/discussions, optional PAT)
-- [ ] 03-02: Libraries.io + Product Hunt servers (required-credential path)
+- [ ] 03-01-PLAN.md — Extend shared `TYPE` enum (issue/package/launch, phase prerequisite) + GitHub server (`gh_trending_repos`, `gh_search_issues`, `gh_get_item`; optional PAT) [SRC-06] (wave 1)
+
+**Wave 2** *(depends on 03-01 — shared `contract.js` TYPE extension must land first)*
+
+- [ ] 03-02-PLAN.md — Libraries.io (`librariesio_search`/`_get`, required key) + Product Hunt (`producthunt_launches`/`_get`, GraphQL, required token) — the required-credential pair [SRC-07, SRC-08] (wave 2)
 
 ### Phase 4: RSS Multiplier & Output Proof
 
