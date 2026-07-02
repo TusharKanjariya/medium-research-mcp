@@ -199,6 +199,33 @@ test("seUrl emits no key param at all when STACKEXCHANGE_KEY is unset (keyless d
   }
 });
 
+// --- WR-02: so_search honors its advertised `sort` -----------------------
+
+test("so_search passes the chosen sort through to the SE URL (no longer hardcoded relevance, WR-02)", () => {
+  const { url } = seUrl("/search/advanced", {
+    site: "stackoverflow",
+    q: "rust",
+    sort: "votes",
+    order: "desc",
+    pagesize: "20",
+  });
+  assert.ok(url.includes("sort=votes"), "the requested sort reaches the request URL");
+});
+
+test("so_search advertises only /search/advanced-valid sorts and rejects hot-question-only sorts (WR-02)", () => {
+  const schema = server._registeredTools["so_search"].inputSchema;
+  for (const s of ["relevance", "votes", "activity", "creation"]) {
+    assert.doesNotThrow(
+      () => schema.parse({ query: "x", sort: s }),
+      `search sort "${s}" is accepted`,
+    );
+  }
+  // "hot"/"week"/"month" are valid for so_hot_questions but NOT for search — the
+  // surface no longer advertises a sort it would silently drop.
+  assert.throws(() => schema.parse({ query: "x", sort: "hot" }), "search rejects hot");
+  assert.throws(() => schema.parse({ query: "x", sort: "week" }), "search rejects week");
+});
+
 // --- registration smoke (FOUND-05) --------------------------------------
 
 test("stackexchange server registers exactly so_get_question, so_hot_questions, so_search", () => {

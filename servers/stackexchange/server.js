@@ -122,6 +122,12 @@ export const server = new McpServer({ name: "stackexchange", version: "1.0.0" })
 
 const SORT = z.enum(["hot", "votes", "week", "month", "activity"]);
 
+// /search/advanced supports a DIFFERENT sort set than /questions (WR-02): the
+// `hot`/`week`/`month` values valid for hot questions are NOT valid search sorts,
+// so search advertises only the sorts the endpoint actually honors. This keeps the
+// tool surface honest — a declared `sort` is passed through, never silently dropped.
+const SEARCH_SORT = z.enum(["relevance", "votes", "activity", "creation"]);
+
 server.registerTool(
   "so_hot_questions",
   {
@@ -160,22 +166,23 @@ server.registerTool(
   {
     title: "Stack Exchange search",
     description:
-      "Search a Stack Exchange network site by relevance (native SE search). " +
+      "Search a Stack Exchange network site (native SE /search/advanced). " +
       "`site` defaults to \"stackoverflow\"; pass any SE network site string to " +
-      "target it.",
+      "target it. `sort` defaults to \"relevance\" (overridable: " +
+      "votes/activity/creation).",
     inputSchema: {
       query: z.string(),
       limit: z.number().int().min(1).max(50).optional(),
       site: z.string().optional(),
-      sort: SORT.optional(),
+      sort: SEARCH_SORT.optional(),
     },
     outputSchema: listEnvelopeShape,
   },
-  async ({ query, limit = 20, site = "stackoverflow" }) => {
+  async ({ query, limit = 20, site = "stackoverflow", sort = "relevance" }) => {
     const { url, cacheKey } = seUrl("/search/advanced", {
       site,
       q: query,
-      sort: "relevance",
+      sort,
       order: "desc",
       pagesize: String(limit),
     });
