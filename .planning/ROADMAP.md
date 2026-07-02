@@ -104,12 +104,12 @@ Plans:
   3. Product Hunt server returns today/this-week launches by topic and fails with a clear "set X" error when its required token is missing.
   4. All three servers pass the Universal Server Bar, with required-credential error behavior explicitly verified.
 
-**Plans**: 2 plans
+**Plans**: 1/2 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Extend shared `TYPE` enum (issue/package/launch, phase prerequisite) + GitHub server (`gh_trending_repos`, `gh_search_issues`, `gh_get_item`; optional PAT) [SRC-06] (wave 1)
+- [x] 03-01-PLAN.md — Extend shared `TYPE` enum (issue/package/launch, phase prerequisite) + GitHub server (`gh_trending_repos`, `gh_search_issues`, `gh_get_item`; optional PAT) [SRC-06] (wave 1)
 
 **Wave 2** *(depends on 03-01 — shared `contract.js` TYPE extension must land first)*
 
@@ -161,5 +161,5 @@ Phase 1 and may run in parallel; Phase 4 depends on both).
 |-------|----------------|--------|-----------|
 | 1. Foundation & Credential Infrastructure | 3/3 | Complete    | 2026-07-01 |
 | 2. Keyless Source Breadth | 3/3 | Complete    | 2026-07-02 |
-| 3. Keyed Ecosystem & Launch Sources | 0/2 | Not started | - |
+| 3. Keyed Ecosystem & Launch Sources | 1/2 | In Progress|  |
 | 4. RSS Multiplier & Output Proof | 0/3 | Not started | - |
