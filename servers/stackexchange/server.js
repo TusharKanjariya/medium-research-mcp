@@ -8,7 +8,7 @@
 // in the shared modules and is imported here.
 //
 // Source: Stack Exchange API 2.3 (https://api.stackexchange.com/2.3), network-wide
-// via the `site` param (default "stockoverflow", D-03), optional STACKEXCHANGE_KEY
+// via the `site` param (default "stackoverflow", D-03), optional STACKEXCHANGE_KEY
 // for higher quota (D-04/CRED-04 — degrades to keyless when unset).
 //
 // Field map verified against live responses (02-RESEARCH SRC-01 §5, fixtures under
