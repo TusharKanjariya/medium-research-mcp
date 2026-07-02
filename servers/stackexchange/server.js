@@ -76,6 +76,24 @@ export function mapSeQuestion(q) {
 }
 
 /**
+ * Guard the not-found case (CR-01). Stack Exchange returns HTTP 200 with an empty
+ * `items` array for a question id that does not exist (it does NOT 404), so the
+ * mapper would otherwise dereference `undefined` and throw an uncaught TypeError
+ * on ordinary stale/typo'd input — violating the "a tool call never hard-errors"
+ * resilience contract. We surface a clear, actionable not-found error instead of
+ * the WR-03 bogus-placeholder pattern (`?? {}` yields a junk `id: "undefined"`
+ * item that misrepresents absence as a real, empty question).
+ */
+export function requireSeQuestion(question, id, site) {
+  if (question == null) {
+    throw new Error(
+      `stackexchange: question ${id} not found on site ${site}`,
+    );
+  }
+  return question;
+}
+
+/**
  * Map a raw SE question + its answers onto { item, comments }. Only the top-level
  * answers become comments (SE answers carry no nested reply tree here); text
  * stripping happens downstream in buildDetailEnvelope.
@@ -214,13 +232,15 @@ server.registerTool(
     const encId = encodeURIComponent(id);
     const q = seUrl(`/questions/${encId}`, { site });
     const raw = await getJson(q.url, { cacheKey: q.cacheKey });
+    // SE answers HTTP 200 { items: [] } for a missing id — guard before mapping.
+    const question = requireSeQuestion(raw.items?.[0], id, site);
     const a = seUrl(`/questions/${encId}/answers`, {
       site,
       sort: "votes",
       order: "desc",
     });
     const answers = await getJson(a.url, { cacheKey: a.cacheKey });
-    const { item, comments } = mapSeDetail(raw.items?.[0], answers.items ?? []);
+    const { item, comments } = mapSeDetail(question, answers.items ?? []);
     const env = buildDetailEnvelope({ source: SOURCE, item, comments });
     return toolResult(env);
   },

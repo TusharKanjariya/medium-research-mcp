@@ -19,6 +19,7 @@ import { fileURLToPath } from "node:url";
 import {
   mapSeQuestion,
   mapSeDetail,
+  requireSeQuestion,
   seUrl,
   server,
 } from "../servers/stackexchange/server.js";
@@ -167,6 +168,33 @@ test("mapSeDetail builds a detail envelope that parses against the contract sche
     ...mapSeDetail(detailQuestion, answers.items),
   });
   assert.doesNotThrow(() => DetailEnvelopeSchema.parse(env));
+});
+
+// --- CR-01: not-found guard (SE returns 200 { items: [] } for a bad id) ---
+
+test("requireSeQuestion throws a clear not-found error for an absent question (CR-01)", () => {
+  // SE returns HTTP 200 with an empty items array -> raw.items?.[0] is undefined.
+  assert.throws(
+    () => requireSeQuestion(undefined, "999999999", "stackoverflow"),
+    /question 999999999 not found on site stackoverflow/,
+  );
+  // and never lets a null masquerade as a real question
+  assert.throws(() => requireSeQuestion(null, "1", "serverfault"), /not found/);
+});
+
+test("requireSeQuestion returns the question unchanged when present (CR-01 happy path)", () => {
+  const q = { question_id: 42, title: "t" };
+  assert.equal(requireSeQuestion(q, "42", "stackoverflow"), q);
+});
+
+test("so_get_question no longer TypeErrors on an empty items array — it not-founds cleanly (CR-01)", () => {
+  // Regression for the original crash class: mapSeDetail(raw.items?.[0], ...) on
+  // an empty response used to dereference undefined. The guard now intercepts it.
+  const emptyResponse = { items: [] };
+  assert.throws(
+    () => requireSeQuestion(emptyResponse.items?.[0], "42", "stackoverflow"),
+    /not found/,
+  );
 });
 
 // --- WR-01: API key never enters the cache key ---------------------------
