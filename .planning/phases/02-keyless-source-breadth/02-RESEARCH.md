@@ -456,16 +456,19 @@ query Post($id: ID!) {
 - Hashnode `storiesFeed` / `api.hashnode.com` (old GraphQL host) — replaced by `gql.hashnode.com`.
 - Reddit OAuth app path — deferred (RSS `.rss` covers Reddit in Phase 4).
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Hashnode global `hashnode_search` strategy** — native search is publication-scoped only.
    - Known: `feed` (global, filterable client-side) exists; `searchPostsOfPublication` needs a publication id.
    - Unclear: whether the consumer wants global-window filtering (D-01) or a `publication` param.
    - Recommendation: default to D-01 client-side filter over the featured `feed` window; note the limitation in the tool description. Surface to discuss-phase if a true global search is required.
+   - **RESOLVED:** 02-03 uses the D-01 client-side feed-window filter over the featured `feed`; the tool description states the global-window limitation. No `publication` param added.
 2. **Hashnode trending-by-tag** — `FeedFilter.tags` needs ObjectIds.
    - Recommendation: fetch featured `feed` and client-side-filter on `tags[].slug` for the tag tool; avoids a tag-id resolution round-trip.
+   - **RESOLVED:** 02-03 client-side-filters on `tags[].slug`, avoiding ObjectId resolution (Pitfall 5); no tag-id round-trip.
 3. **Whether to add optional `*_search` to Lobsters** — roadmap fixes only hottest/tag/get for Lobsters; D-01 mandates a uniform `_search` surface across sources.
    - Recommendation: include `lobsters_search` as a client-side filter over `/hottest.json` for surface uniformity, matching D-01's intent; confirm the roadmap tool set isn't strictly closed.
+   - **RESOLVED:** 02-02 adds `lobsters_search` as a D-01 client-side filter over `/hottest.json` for surface uniformity.
 
 ## Sources
 
