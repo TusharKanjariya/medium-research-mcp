@@ -18,7 +18,7 @@
       "type": "string",
       "title": "Lemmy username",
       "description": "Optional — enables authenticated reads. Authenticated reads require LEMMY_INSTANCE to be set explicitly (even to the default https://programming.dev) together with LEMMY_USERNAME/LEMMY_PASSWORD; username/password alone (LEMMY_INSTANCE unset) yields anonymous reads with no error.",
-      "sensitive": false,
+      "sensitive": true,
       "required": false
     },
     "lemmy_password": {
