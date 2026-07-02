@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 02
 current_phase_name: keyless-source-breadth
 status: executing
-stopped_at: Phase 2 context gathered
-last_updated: "2026-07-02T06:11:40.563Z"
+stopped_at: Completed 02-02-PLAN.md (Lobsters + Lemmy servers)
+last_updated: "2026-07-02T12:00:00.000Z"
 last_activity: 2026-07-02
-last_activity_desc: Phase 02 execution started
+last_activity_desc: Completed Plan 02-02 — Lobsters (SRC-02) + Lemmy (SRC-03) servers
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 6
-  completed_plans: 4
-  percent: 25
+  completed_plans: 5
+  percent: 33
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-07-01)
 ## Current Position
 
 Phase: 02 (keyless-source-breadth) — EXECUTING
-Plan: 2 of 3
-Status: Ready to execute
-Last activity: 2026-07-02 — Phase 02 execution started
+Plan: 3 of 3
+Status: 02-02 complete; 02-03 remaining
+Last activity: 2026-07-02 — Completed Plan 02-02 (Lobsters + Lemmy servers)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████░░░░] 67% (2 of 3 plans)
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 02 P01 | 1min | 2 tasks | 6 files |
+| Phase 02 P02 | 15min | 3 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,8 @@ Recent decisions affecting current work:
 - Init: Normalized output contract is the linchpin — every server conforms exactly.
 - Init: Coarse granularity, parallel execution (Phases 2 and 3 can run in parallel after Phase 1).
 - [Phase ?]: SE text mapped from body_markdown ?? body: built-in withbody filter returns HTML body not body_markdown (A1 corrected); stripHtml cleans downstream
+- [Phase 02 P02]: Lemmy authenticated reads require LEMMY_INSTANCE set explicitly (even to the default programming.dev) alongside LEMMY_USERNAME/LEMMY_PASSWORD — lemmyCreds() needs all three; username/password alone degrade to anonymous with no error. Documented in manifest + tool descriptions and asserted by tests.
+- [Phase 02 P02]: Lobsters author = plain-string submitter_user (Pitfall 6); Lemmy permalink = post.ap_id (federation URL); Lemmy posts have no tags (tags: []).
 
 ### Pending Todos
 
@@ -88,6 +91,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-02T06:11:40.547Z
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-keyless-source-breadth/02-CONTEXT.md
+Last session: 2026-07-02T12:00:00.000Z
+Stopped at: Completed 02-02-PLAN.md (Lobsters + Lemmy servers)
+Resume file: .planning/phases/02-keyless-source-breadth/02-03-PLAN.md
