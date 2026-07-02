@@ -27,8 +27,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **SRC-01**: Stack Exchange server (`so_hot_questions`, `so_search`, `so_get_question`) generalized to the network via a `site` param; optional `STACKEXCHANGE_KEY`
 - [ ] **SRC-02**: Lobsters server (`lobsters_hottest`, `lobsters_tag`, `lobsters_get`), no auth
 - [ ] **SRC-03**: Lemmy server (`lemmy_hot`, `lemmy_search`, `lemmy_post`); auto-auth when `LEMMY_*` present — exercises the username/password path
-- [ ] **SRC-04**: Hashnode server (trending by tag, search, article) via public GraphQL, no auth
-- [ ] **SRC-05**: Dev.to server (trending by tag, search, article), no auth
+- [x] **SRC-04**: Hashnode server (trending by tag, search, article) via public GraphQL, no auth
+- [x] **SRC-05**: Dev.to server (trending by tag, search, article), no auth
 - [ ] **SRC-06**: GitHub server — trending repos (Search API) + issues/discussions pain-point mining; optional PAT
 - [ ] **SRC-07**: Libraries.io server (rising/most-depended packages); required key
 - [ ] **SRC-08**: Product Hunt server (today/this-week launches by topic); required token
@@ -88,8 +88,8 @@ Which phases cover which requirements. Finalized during roadmap creation.
 | SRC-01 | Phase 2 | Complete |
 | SRC-02 | Phase 2 | Pending |
 | SRC-03 | Phase 2 | Pending |
-| SRC-04 | Phase 2 | Pending |
-| SRC-05 | Phase 2 | Pending |
+| SRC-04 | Phase 2 | Complete |
+| SRC-05 | Phase 2 | Complete |
 | SRC-06 | Phase 3 | Pending |
 | SRC-07 | Phase 3 | Pending |
 | SRC-08 | Phase 3 | Pending |

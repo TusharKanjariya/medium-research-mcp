@@ -6,15 +6,15 @@ current_phase: 02
 current_phase_name: keyless-source-breadth
 status: executing
 stopped_at: Completed 02-02-PLAN.md (Lobsters + Lemmy servers)
-last_updated: "2026-07-02T12:00:00.000Z"
+last_updated: "2026-07-02T07:25:50.043Z"
 last_activity: 2026-07-02
-last_activity_desc: Completed Plan 02-02 — Lobsters (SRC-02) + Lemmy (SRC-03) servers
+last_activity_desc: Completed Plan 02-02 (Lobsters + Lemmy servers)
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 6
-  completed_plans: 5
-  percent: 33
+  completed_plans: 6
+  percent: 50
 ---
 
 # Project State
@@ -57,6 +57,7 @@ Progress: [██████░░░░] 67% (2 of 3 plans)
 *Updated after each plan completion*
 | Phase 02 P01 | 1min | 2 tasks | 6 files |
 | Phase 02 P02 | 15min | 3 tasks | 12 files |
+| Phase 02 P03 | 25min | 3 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,9 @@ Recent decisions affecting current work:
 - [Phase ?]: SE text mapped from body_markdown ?? body: built-in withbody filter returns HTML body not body_markdown (A1 corrected); stripHtml cleans downstream
 - [Phase 02 P02]: Lemmy authenticated reads require LEMMY_INSTANCE set explicitly (even to the default programming.dev) alongside LEMMY_USERNAME/LEMMY_PASSWORD — lemmyCreds() needs all three; username/password alone degrade to anonymous with no error. Documented in manifest + tool descriptions and asserted by tests.
 - [Phase 02 P02]: Lobsters author = plain-string submitter_user (Pitfall 6); Lemmy permalink = post.ap_id (federation URL); Lemmy posts have no tags (tags: []).
+- [Phase ?]: [Phase 02 P03]: Hashnode public GraphQL endpoint is gql.hashnode.com/public (root now serves a Vercel app); live origin was down (522) so fixtures built from cited schema, flagged for one live-call A2 verification.
+- [Phase ?]: [Phase 02 P03]: postJson() cache key = url+sha1(body) via node:crypto so distinct GraphQL queries to one URL never collide; key stays a non-secret logical key.
+- [Phase ?]: [Phase 02 P03]: Dev.to tag_list is array on list, comma-string on detail; toTags() normalizes both so contract tags:string[] always holds.
 
 ### Pending Todos
 
@@ -91,6 +95,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-02T12:00:00.000Z
+Last session: 2026-07-02T07:23:14.185Z
 Stopped at: Completed 02-02-PLAN.md (Lobsters + Lemmy servers)
 Resume file: .planning/phases/02-keyless-source-breadth/02-03-PLAN.md

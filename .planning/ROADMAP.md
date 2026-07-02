@@ -38,7 +38,7 @@ in addition to the phase's own success criteria:
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Foundation & Credential Infrastructure** - Shared cache/HTTP layer, the output contract, the HN reference server, and env-only credential + token-auth infrastructure (completed 2026-07-01)
-- [ ] **Phase 2: Keyless Source Breadth** - Stack Exchange, Lobsters, Lemmy, Hashnode, and Dev.to servers, proving the copy-a-folder pattern at breadth
+- [x] **Phase 2: Keyless Source Breadth** - Stack Exchange, Lobsters, Lemmy, Hashnode, and Dev.to servers, proving the copy-a-folder pattern at breadth (completed 2026-07-02)
 - [ ] **Phase 3: Keyed Ecosystem & Launch Sources** - GitHub, Libraries.io, and Product Hunt servers, exercising optional-PAT and required-credential paths
 - [ ] **Phase 4: RSS Multiplier & Output Proof** - Generic RSS/Atom fetcher (incl. subreddit `.rss`), a real 5+-source uniform run, and the Python YouTube→blog wrapper
 
@@ -82,14 +82,14 @@ Plans:
   4. Hashnode tools return trending-by-tag, search, and article results via the public GraphQL API with reactions mapped to `score` and responses to `num_comments`.
   5. All five servers pass the Universal Server Bar.
 
-**Plans**: 2/3 plans executed
+**Plans**: 3/3 plans complete
 
 Plans:
 **Wave 1** *(all three plans are independent — disjoint files — and run in parallel)*
 
 - [x] 02-01-PLAN.md — Stack Exchange server (network-wide via `site` D-03, optional `STACKEXCHANGE_KEY` D-04, `filter=withbody`) [SRC-01] (wave 1)
 - [x] 02-02-PLAN.md — `lemmyInstance()` helper + Lobsters + Lemmy servers (Lemmy exercises the auth path D-06) [SRC-02, SRC-03] (wave 1)
-- [ ] 02-03-PLAN.md — `postJson()` shared POST path + Hashnode (GraphQL) + Dev.to (Forem REST) servers [SRC-04, SRC-05] (wave 1)
+- [x] 02-03-PLAN.md — `postJson()` shared POST path + Hashnode (GraphQL) + Dev.to (Forem REST) servers [SRC-04, SRC-05] (wave 1)
 
 ### Phase 3: Keyed Ecosystem & Launch Sources
 
@@ -155,6 +155,6 @@ Phase 1 and may run in parallel; Phase 4 depends on both).
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Credential Infrastructure | 3/3 | Complete    | 2026-07-01 |
-| 2. Keyless Source Breadth | 2/3 | In Progress|  |
+| 2. Keyless Source Breadth | 3/3 | Complete   | 2026-07-02 |
 | 3. Keyed Ecosystem & Launch Sources | 0/2 | Not started | - |
 | 4. RSS Multiplier & Output Proof | 0/3 | Not started | - |
