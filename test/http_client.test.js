@@ -203,6 +203,68 @@ test("on total failure a previously cached (now stale) value is returned instead
   assert.equal(fetchImpl.calls, 4, "retries were attempted before falling back to stale");
 });
 
+// --- WR-04: a hard 4xx must NOT be served from stale cache ----------------
+test("a 404 is NOT served from stale cache even when a stale entry exists — it throws (WR-04)", async () => {
+  cacheSet("http:stale-404", { cached: "deleted-resource" }, -1000); // expired seed
+  const fetchImpl = fetchStub([res(404, null)]); // resource now gone
+  const sleep = sleepSpy();
+  await assert.rejects(
+    () =>
+      getJson("https://example.test/gone", {
+        fetchImpl,
+        sleep,
+        cacheKey: "http:stale-404",
+      }),
+    /404/,
+    "a definitive 404 must surface, not serve a stale (deleted) body forever",
+  );
+  assert.equal(fetchImpl.calls, 1, "404 not retried");
+});
+
+test("a 400 is NOT served from stale cache either (WR-04)", async () => {
+  cacheSet("http:stale-400", { cached: "old" }, -1000);
+  const fetchImpl = fetchStub([res(400, null)]);
+  const sleep = sleepSpy();
+  await assert.rejects(
+    () =>
+      getJson("https://example.test/bad", {
+        fetchImpl,
+        sleep,
+        cacheKey: "http:stale-400",
+      }),
+    /400/,
+  );
+});
+
+test("a still-transient 5xx STILL serves stale (WR-04 preserves the resilience contract)", async () => {
+  cacheSet("http:stale-5xx", { cached: "good" }, -1000);
+  const fetchImpl = fetchStub([res(503, null)]);
+  const sleep = sleepSpy();
+  const out = await getJson("https://example.test/blip", {
+    fetchImpl,
+    sleep,
+    cacheKey: "http:stale-5xx",
+  });
+  assert.deepEqual(out, { cached: "good" }, "transient 5xx still falls back to stale");
+});
+
+test("postJson does NOT serve stale on a hard 400 (WR-04 parity)", async () => {
+  cacheSet("post:stale-400", { data: { cached: "old" } }, -1000);
+  const fetchImpl = fetchStub([res(400, null)]);
+  const sleep = sleepSpy();
+  await assert.rejects(
+    () =>
+      postJson("https://gql.test/gone", {
+        fetchImpl,
+        sleep,
+        body: { q: 1 },
+        cacheKey: "post:stale-400",
+      }),
+    /400/,
+  );
+  assert.equal(fetchImpl.calls, 1);
+});
+
 // --- non-JSON body -------------------------------------------------------
 test("a non-JSON body (res.json throws) is a failed attempt — retried, never an uncaught crash", async () => {
   const fetchImpl = fetchStub([res(200, null, { throwJson: true })]); // always bad body

@@ -83,6 +83,12 @@ export async function getJson(url, opts = {}) {
   if (fresh !== undefined) return fresh;
 
   let lastError;
+  // WR-04: the stale fallback is for TRANSIENT upstream failures only
+  // (5xx/network/timeout/non-JSON). A hard 4xx (incl. 404/400) is a definitive
+  // "the resource is gone/bad" answer — serving stale for it would surface a
+  // deleted resource forever (the cache never evicts). Track whether the TERMINAL
+  // failure was transient so only that path may fall back to stale.
+  let transientFailure = false;
 
   for (let attempt = 0; attempt <= BACKOFF_MS.length; attempt++) {
     try {
@@ -111,8 +117,10 @@ export async function getJson(url, opts = {}) {
         throw new RetryableError(`getJson: HTTP ${status} from ${redactUrl(url)}`);
       }
 
-      // Any 4xx (incl. 429/408) or other non-retryable status: do NOT retry.
+      // Any 4xx (incl. 429/408) or other non-retryable status: do NOT retry, and
+      // do NOT serve stale — this is a definitive client-error terminal state.
       lastError = new Error(`getJson: HTTP ${status} from ${redactUrl(url)}`);
+      transientFailure = false;
       break;
     } catch (err) {
       lastError = err;
@@ -121,18 +129,24 @@ export async function getJson(url, opts = {}) {
       const isNetwork = err instanceof TypeError;
       const isRetryable = err instanceof RetryableError || isTimeout || isNetwork;
 
-      if (!isRetryable) break; // non-retryable — stop immediately
+      if (!isRetryable) {
+        transientFailure = false;
+        break; // non-retryable — stop immediately
+      }
 
       if (attempt < BACKOFF_MS.length) {
         await sleep(BACKOFF_MS[attempt]);
         continue;
       }
-      // retries exhausted — fall through to stale/throw below
+      // Retries exhausted on a transient failure — stale fallback is allowed.
+      transientFailure = true;
     }
   }
 
-  const stale = getStale(cacheKey);
-  if (stale !== undefined) return stale;
+  if (transientFailure) {
+    const stale = getStale(cacheKey);
+    if (stale !== undefined) return stale;
+  }
 
   throw lastError ?? new Error(`getJson: request to ${redactUrl(url)} failed`);
 }
@@ -186,6 +200,8 @@ export async function postJson(url, opts = {}) {
   };
 
   let lastError;
+  // WR-04: stale fallback only for transient terminal failures (see getJson).
+  let transientFailure = false;
 
   for (let attempt = 0; attempt <= BACKOFF_MS.length; attempt++) {
     try {
@@ -207,8 +223,10 @@ export async function postJson(url, opts = {}) {
         throw new RetryableError(`postJson: HTTP ${status} from ${redactUrl(url)}`);
       }
 
-      // Any 4xx (incl. 429/408) or other non-retryable status: do NOT retry.
+      // Any 4xx (incl. 429/408) or other non-retryable status: do NOT retry, and
+      // do NOT serve stale — this is a definitive client-error terminal state.
       lastError = new Error(`postJson: HTTP ${status} from ${redactUrl(url)}`);
+      transientFailure = false;
       break;
     } catch (err) {
       lastError = err;
@@ -217,18 +235,24 @@ export async function postJson(url, opts = {}) {
       const isNetwork = err instanceof TypeError;
       const isRetryable = err instanceof RetryableError || isTimeout || isNetwork;
 
-      if (!isRetryable) break; // non-retryable — stop immediately
+      if (!isRetryable) {
+        transientFailure = false;
+        break; // non-retryable — stop immediately
+      }
 
       if (attempt < BACKOFF_MS.length) {
         await sleep(BACKOFF_MS[attempt]);
         continue;
       }
-      // retries exhausted — fall through to stale/throw below
+      // Retries exhausted on a transient failure — stale fallback is allowed.
+      transientFailure = true;
     }
   }
 
-  const stale = getStale(key);
-  if (stale !== undefined) return stale;
+  if (transientFailure) {
+    const stale = getStale(key);
+    if (stale !== undefined) return stale;
+  }
 
   throw lastError ?? new Error(`postJson: request to ${redactUrl(url)} failed`);
 }
