@@ -100,6 +100,20 @@ export function mapHashnodeNode(node) {
 }
 
 /**
+ * Guard the not-found case (WR-03). When the article does not exist (or GraphQL
+ * returns `data: null` with errors), `post` is null/undefined. Mapping an empty
+ * object via `?? {}` would yield a junk `id: "undefined"` item that passes schema
+ * validation and misrepresents absence as a real, empty article — so we surface a
+ * clear not-found error instead (same convention as SE's requireSeQuestion, CR-01).
+ */
+export function requireHashnodePost(post, id) {
+  if (post == null) {
+    throw new Error(`hashnode: article ${id} not found`);
+  }
+  return post;
+}
+
+/**
  * Map a single `post(id)` node onto { item, comments }. The item reuses
  * mapHashnodeNode but overrides `text` with the full `content.markdown`
  * (the detail body, not the feed brief). Only TOP-LEVEL comments (the first
@@ -224,7 +238,8 @@ server.registerTool(
     const raw = await postJson(HASHNODE, {
       body: { query: POST_QUERY, variables: { id: String(id) } },
     });
-    const { item, comments } = mapHashnodeDetail(raw?.data?.post ?? {});
+    const post = requireHashnodePost(raw?.data?.post, id);
+    const { item, comments } = mapHashnodeDetail(post);
     const env = buildDetailEnvelope({ source: SOURCE, item, comments });
     return toolResult(env);
   },

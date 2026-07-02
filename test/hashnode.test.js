@@ -21,6 +21,7 @@ import { fileURLToPath } from "node:url";
 import {
   mapHashnodeNode,
   mapHashnodeDetail,
+  requireHashnodePost,
   server,
 } from "../servers/hashnode/server.js";
 import {
@@ -120,6 +121,20 @@ test("mapHashnodeDetail comment HTML is stripped through buildDetailEnvelope", (
   const first = env.item.comments[0];
   assert.ok(!/<a /.test(first.text), "anchor tag stripped");
   assert.ok(first.text.includes("the same pattern & it saved us"), "entity decoded");
+});
+
+// --- WR-03: not-found returns a clear error, not a bogus placeholder ------
+
+test("requireHashnodePost throws a clear not-found error when the article is absent (WR-03)", () => {
+  // GraphQL returns data.post === null for a missing id; `?? {}` used to produce
+  // a junk `id: "undefined"` detail item. Now it not-founds cleanly instead.
+  assert.throws(() => requireHashnodePost(null, "abc123"), /article abc123 not found/);
+  assert.throws(() => requireHashnodePost(undefined, "x"), /not found/);
+});
+
+test("requireHashnodePost returns the post unchanged when present (WR-03 happy path)", () => {
+  const p = { id: "real", title: "t" };
+  assert.equal(requireHashnodePost(p, "real"), p);
 });
 
 // --- hashnode_search client-side window filter (D-01) --------------------
