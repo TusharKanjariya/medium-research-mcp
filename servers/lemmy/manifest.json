@@ -1,0 +1,45 @@
+{
+  "manifest_version": "0.3",
+  "name": "medium-research-lemmy",
+  "version": "1.0.0",
+  "description": "Lemmy research with normalized MCP output. Wraps the federated Lemmy 0.19+ API v3 (lemmy_hot, lemmy_search, lemmy_post) against a configured instance (default programming.dev), reading anonymously by default. When LEMMY_* credentials are set, reads carry an Authorization: Bearer <jwt> from the shared auth path (D-06). IMPORTANT: authenticated reads require LEMMY_INSTANCE to be set explicitly (even to the default https://programming.dev) alongside LEMMY_USERNAME/LEMMY_PASSWORD; with username/password set but LEMMY_INSTANCE unset, reads stay anonymous by design (no error). Secrets follow the .mcpb keychain pattern (\"sensitive\": true, injected via ${user_config.*} into mcp_config.env). Actual .mcpb packing is deferred to v2 (PKG-01); this manifest is documentation/scaffold only.",
+  "author": {
+    "name": "Tushar Kanjariya"
+  },
+  "user_config": {
+    "lemmy_instance": {
+      "type": "string",
+      "title": "Lemmy instance URL",
+      "description": "Optional — full HTTPS base URL of the Lemmy instance to read (default https://programming.dev). REQUIRED for authenticated reads: LEMMY_INSTANCE must be set explicitly (even to the default https://programming.dev) alongside LEMMY_USERNAME/LEMMY_PASSWORD, or reads stay anonymous by design (no error).",
+      "sensitive": false,
+      "required": false
+    },
+    "lemmy_username": {
+      "type": "string",
+      "title": "Lemmy username",
+      "description": "Optional — enables authenticated reads. Authenticated reads require LEMMY_INSTANCE to be set explicitly (even to the default https://programming.dev) together with LEMMY_USERNAME/LEMMY_PASSWORD; username/password alone (LEMMY_INSTANCE unset) yields anonymous reads with no error.",
+      "sensitive": false,
+      "required": false
+    },
+    "lemmy_password": {
+      "type": "string",
+      "title": "Lemmy password",
+      "description": "Optional — in-memory only, never logged. Enables authenticated reads. Authenticated reads require LEMMY_INSTANCE to be set explicitly (even to the default https://programming.dev) together with LEMMY_USERNAME/LEMMY_PASSWORD; absent LEMMY_INSTANCE, reads are anonymous by design (no error).",
+      "sensitive": true,
+      "required": false
+    }
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "server.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server.js"],
+      "env": {
+        "LEMMY_INSTANCE": "${user_config.lemmy_instance}",
+        "LEMMY_USERNAME": "${user_config.lemmy_username}",
+        "LEMMY_PASSWORD": "${user_config.lemmy_password}"
+      }
+    }
+  }
+}
