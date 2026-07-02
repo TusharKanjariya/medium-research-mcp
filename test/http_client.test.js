@@ -3,7 +3,7 @@
 // fetch and sleep are injected so no real network and no real waiting occur.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { getJson } from "../shared/http_client.js";
+import { getJson, postJson } from "../shared/http_client.js";
 import { set as cacheSet } from "../shared/cache.js";
 
 // --- helpers -------------------------------------------------------------
@@ -182,4 +182,133 @@ test("a non-JSON body (res.json throws) is a failed attempt — retried, never a
   );
   assert.equal(fetchImpl.calls, 4, "non-JSON body is treated as a retryable failed attempt");
   assert.deepEqual(sleep.waited, [500, 1000, 2000]);
+});
+
+// ========================================================================
+// postJson() — POST + JSON body reusing the SAME cache/retry/stale machinery,
+// with a body-aware cache key so distinct GraphQL queries never collide.
+// ========================================================================
+
+// A fetch stub that ALSO records the (url, init) of every call so we can assert
+// the POST request shape (method/headers/body).
+function capturingStub(queue) {
+  const stub = async (url, init) => {
+    stub.calls++;
+    stub.inits.push(init);
+    stub.urls.push(url);
+    const entry = queue[Math.min(stub.calls - 1, queue.length - 1)];
+    if (typeof entry === "function") return entry();
+    return entry;
+  };
+  stub.calls = 0;
+  stub.inits = [];
+  stub.urls = [];
+  return stub;
+}
+
+// --- caching -------------------------------------------------------------
+test("an in-TTL repeated postJson() with the same body is served from cache — fetch runs once", async () => {
+  const fetchImpl = fetchStub([res(200, { data: { ok: true } })]);
+  const opts = {
+    fetchImpl,
+    sleep: sleepSpy(),
+    body: { query: "{ feed }", variables: { first: 5 } },
+  };
+  const first = await postJson("https://gql.test/graphql", opts);
+  const second = await postJson("https://gql.test/graphql", opts);
+  assert.deepEqual(first, { data: { ok: true } });
+  assert.deepEqual(second, { data: { ok: true } });
+  assert.equal(fetchImpl.calls, 1, "identical body must be cache-served");
+});
+
+test("two postJson() calls to the same URL with DIFFERENT bodies do not collide (both fetch)", async () => {
+  // Distinct payloads => distinct url+sha1(body) keys => two network calls.
+  const fetchImpl = fetchStub([
+    res(200, { data: { which: "A" } }),
+    res(200, { data: { which: "B" } }),
+  ]);
+  const sleep = sleepSpy();
+  const url = "https://gql.test/graphql";
+  const a = await postJson(url, { fetchImpl, sleep, body: { query: "A" } });
+  const b = await postJson(url, { fetchImpl, sleep, body: { query: "B" } });
+  assert.deepEqual(a, { data: { which: "A" } });
+  assert.deepEqual(b, { data: { which: "B" } });
+  assert.equal(fetchImpl.calls, 2, "different bodies must not share a cache key");
+});
+
+// --- POST request shape --------------------------------------------------
+test("postJson() issues a POST with a JSON string body and Content-Type application/json", async () => {
+  const fetchImpl = capturingStub([res(200, { data: {} })]);
+  const body = { query: "{ post(id: 1) }", variables: { id: "1" } };
+  await postJson("https://gql.test/graphql", {
+    fetchImpl,
+    sleep: sleepSpy(),
+    body,
+    cacheKey: "post:shape", // explicit key keeps this test isolated
+  });
+  const init = fetchImpl.inits[0];
+  assert.equal(init.method, "POST");
+  assert.equal(init.headers["Content-Type"], "application/json");
+  assert.equal(typeof init.body, "string", "body is a JSON string");
+  assert.deepEqual(JSON.parse(init.body), body);
+});
+
+test("postJson() merges caller headers alongside the JSON Content-Type", async () => {
+  const fetchImpl = capturingStub([res(200, { data: {} })]);
+  await postJson("https://gql.test/graphql", {
+    fetchImpl,
+    sleep: sleepSpy(),
+    body: { query: "{}" },
+    headers: { Authorization: "Bearer x" },
+    cacheKey: "post:headers",
+  });
+  const init = fetchImpl.inits[0];
+  assert.equal(init.headers["Content-Type"], "application/json");
+  assert.equal(init.headers.Authorization, "Bearer x");
+});
+
+// --- retry / no-4xx-retry parity with getJson ----------------------------
+test("postJson() retries a 500 then resolves on 200 (backoff parity with getJson)", async () => {
+  const fetchImpl = fetchStub([res(500, null), res(200, { data: { ok: true } })]);
+  const sleep = sleepSpy();
+  const out = await postJson("https://gql.test/retry", {
+    fetchImpl,
+    sleep,
+    body: { q: 1 },
+    cacheKey: "post:retry-500",
+  });
+  assert.deepEqual(out, { data: { ok: true } });
+  assert.equal(fetchImpl.calls, 2);
+  assert.deepEqual(sleep.waited, [500]);
+});
+
+test("postJson() does NOT retry a 400 (strict no-4xx-retry parity)", async () => {
+  const fetchImpl = fetchStub([res(400, null)]);
+  const sleep = sleepSpy();
+  await assert.rejects(
+    () =>
+      postJson("https://gql.test/400", {
+        fetchImpl,
+        sleep,
+        body: { q: 1 },
+        cacheKey: "post:400",
+      }),
+    /400/,
+  );
+  assert.equal(fetchImpl.calls, 1);
+  assert.deepEqual(sleep.waited, []);
+});
+
+test("postJson() serves a stale entry on total failure instead of throwing", async () => {
+  cacheSet("post:stale", { data: { cached: "old" } }, -1000); // expired seed
+  const fetchImpl = fetchStub([res(503, null)]); // always fails
+  const sleep = sleepSpy();
+  const out = await postJson("https://gql.test/stale", {
+    fetchImpl,
+    sleep,
+    body: { q: 1 },
+    cacheKey: "post:stale",
+  });
+  assert.deepEqual(out, { data: { cached: "old" } });
+  assert.equal(fetchImpl.calls, 4, "retries attempted before stale fallback");
 });

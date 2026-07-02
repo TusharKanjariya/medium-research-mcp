@@ -17,6 +17,7 @@
 // fetch and sleep are injectable so unit tests drive retry timing without the
 // real network and without real waits.
 
+import { createHash } from "node:crypto";
 import { getFresh, getStale, set } from "./cache.js";
 
 const BACKOFF_MS = [500, 1000, 2000];
@@ -29,11 +30,13 @@ const realSleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 // Marks an error that should trigger a retry (5xx / non-JSON body).
 class RetryableError extends Error {}
 
-async function fetchWithTimeout(fetchImpl, url, headers, timeoutMs) {
+// `init` carries the fetch RequestInit (headers, and for POST also method/body);
+// the abort `signal` is merged in so every verb shares one timeout path.
+async function fetchWithTimeout(fetchImpl, url, init, timeoutMs) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    return await fetchImpl(url, { headers, signal: controller.signal });
+    return await fetchImpl(url, { ...init, signal: controller.signal });
   } finally {
     clearTimeout(timer);
   }
@@ -69,7 +72,12 @@ export async function getJson(url, opts = {}) {
 
   for (let attempt = 0; attempt <= BACKOFF_MS.length; attempt++) {
     try {
-      const response = await fetchWithTimeout(fetchImpl, url, headers, timeoutMs);
+      const response = await fetchWithTimeout(
+        fetchImpl,
+        url,
+        { headers },
+        timeoutMs,
+      );
 
       if (response.ok) {
         let value;
@@ -113,4 +121,100 @@ export async function getJson(url, opts = {}) {
   if (stale !== undefined) return stale;
 
   throw lastError ?? new Error(`getJson: request to ${url} failed`);
+}
+
+/**
+ * POST a JSON body to url and parse the JSON response, with the SAME caching +
+ * resilient retry/stale machinery as getJson() (BACKOFF_MS, RETRYABLE_5XX,
+ * strict no-4xx-retry, stale fallback). The GraphQL sources (Hashnode) route
+ * through here so they never call fetch() directly (CLAUDE.md).
+ *
+ * The cache key folds in the body so two different GraphQL queries to the same
+ * URL do NOT collide: `url + ":" + sha1(JSON.stringify(body))`. The key is a
+ * LOGICAL, non-secret key (these sources are keyless) — never put a secret in it.
+ *
+ * @param {string} url
+ * @param {object} [opts]
+ * @param {any}    [opts.body]              JSON-serializable request body
+ * @param {Record<string,string>} [opts.headers]
+ * @param {number} [opts.ttlMs=900000]      cache TTL (~15 min)
+ * @param {number} [opts.timeoutMs=10000]   per-attempt AbortController timeout
+ * @param {string} [opts.cacheKey]          logical cache key — NEVER a secret;
+ *                                          defaults to url+sha1(body)
+ * @param {Function} [opts.fetchImpl=fetch] injectable fetch (tests)
+ * @param {Function} [opts.sleep]           injectable delay (tests)
+ * @returns {Promise<any>} parsed JSON value (fresh, refreshed, or stale)
+ */
+export async function postJson(url, opts = {}) {
+  const {
+    body,
+    headers = {},
+    ttlMs = DEFAULT_TTL_MS,
+    timeoutMs = DEFAULT_TIMEOUT_MS,
+    cacheKey,
+    fetchImpl = fetch,
+    sleep = realSleep,
+  } = opts;
+
+  const serialized = JSON.stringify(body);
+  // Body-aware default key so distinct payloads to one URL never collide.
+  const key =
+    cacheKey ??
+    `${url}:${createHash("sha1").update(serialized ?? "").digest("hex")}`;
+
+  const fresh = getFresh(key);
+  if (fresh !== undefined) return fresh;
+
+  const init = {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...headers },
+    body: serialized,
+  };
+
+  let lastError;
+
+  for (let attempt = 0; attempt <= BACKOFF_MS.length; attempt++) {
+    try {
+      const response = await fetchWithTimeout(fetchImpl, url, init, timeoutMs);
+
+      if (response.ok) {
+        let value;
+        try {
+          value = await response.json();
+        } catch {
+          throw new RetryableError(`postJson: non-JSON body from ${url}`);
+        }
+        set(key, value, ttlMs);
+        return value;
+      }
+
+      const { status } = response;
+      if (RETRYABLE_5XX.has(status)) {
+        throw new RetryableError(`postJson: HTTP ${status} from ${url}`);
+      }
+
+      // Any 4xx (incl. 429/408) or other non-retryable status: do NOT retry.
+      lastError = new Error(`postJson: HTTP ${status} from ${url}`);
+      break;
+    } catch (err) {
+      lastError = err;
+
+      const isTimeout = err && err.name === "AbortError";
+      const isNetwork = err instanceof TypeError;
+      const isRetryable = err instanceof RetryableError || isTimeout || isNetwork;
+
+      if (!isRetryable) break; // non-retryable — stop immediately
+
+      if (attempt < BACKOFF_MS.length) {
+        await sleep(BACKOFF_MS[attempt]);
+        continue;
+      }
+      // retries exhausted — fall through to stale/throw below
+    }
+  }
+
+  const stale = getStale(key);
+  if (stale !== undefined) return stale;
+
+  throw lastError ?? new Error(`postJson: request to ${url} failed`);
 }
