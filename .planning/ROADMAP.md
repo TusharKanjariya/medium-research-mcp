@@ -100,7 +100,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
 
   1. GitHub server returns trending repos (Search API, stars→`score`) and issues/discussions for pain-point mining (reactions→`score`, comments→`num_comments`), using a PAT when present and running anonymously otherwise.
-  2. Libraries.io server returns rising/most-depended packages and fails with a clear "set LIBRARIES_IO_KEY" error when its required key is missing.
+  2. Libraries.io server returns rising/most-depended packages and fails with a clear "set LIBRARIESIO_KEY" error when its required key is missing.
   3. Product Hunt server returns today/this-week launches by topic and fails with a clear "set X" error when its required token is missing.
   4. All three servers pass the Universal Server Bar, with required-credential error behavior explicitly verified.
 
