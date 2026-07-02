@@ -98,7 +98,7 @@ export function mapDevtoArticle(a) {
  * on the upstream choosing 404 over "200 + empty/odd body". A `200 {}` (or a
  * stale-cache hit of a malformed prior body) would otherwise let mapDevtoArticle
  * dereference an id-less object. An explicit shape check makes the not-found
- * deterministic and consistent with the SE/Hashnode/Lobsters guards.
+ * deterministic and consistent with the SE/Lobsters guards.
  */
 export function requireDevtoArticle(article, id) {
   if (!article || article.id == null) {

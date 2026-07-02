@@ -154,12 +154,13 @@ export async function getJson(url, opts = {}) {
 /**
  * POST a JSON body to url and parse the JSON response, with the SAME caching +
  * resilient retry/stale machinery as getJson() (BACKOFF_MS, RETRYABLE_5XX,
- * strict no-4xx-retry, stale fallback). The GraphQL sources (Hashnode) route
- * through here so they never call fetch() directly (CLAUDE.md).
+ * strict no-4xx-retry, stale fallback). POST-based sources (e.g. GraphQL or
+ * POST-search APIs) route through here so they never call fetch() directly
+ * (CLAUDE.md).
  *
- * The cache key folds in the body so two different GraphQL queries to the same
+ * The cache key folds in the body so two different POST payloads to the same
  * URL do NOT collide: `url + ":" + sha1(JSON.stringify(body))`. The key is a
- * LOGICAL, non-secret key (these sources are keyless) — never put a secret in it.
+ * LOGICAL, non-secret key — never put a secret in it.
  *
  * @param {string} url
  * @param {object} [opts]

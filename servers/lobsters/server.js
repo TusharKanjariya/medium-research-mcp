@@ -68,7 +68,7 @@ export function mapLobstersStory(s) {
  * relies entirely on the upstream choosing 404 over "200 + empty/odd body". A
  * `200 {}` (or a stale-cache hit of a malformed prior body) would otherwise let
  * mapLobstersStory dereference an id-less object. An explicit shape check makes
- * the not-found deterministic and consistent with the SE/Hashnode guards.
+ * the not-found deterministic and consistent with the SE guards.
  */
 export function requireLobstersStory(story, id) {
   if (!story || story.short_id == null) {
