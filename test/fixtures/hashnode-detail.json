@@ -1,0 +1,48 @@
+{
+  "data": {
+    "post": {
+      "id": "665a1f2e9b1c4a0012ab34cd",
+      "title": "Building Resilient HTTP Clients in Node.js",
+      "brief": "A practical walk through retries, backoff, and stale-while-revalidate caching for resilient outbound HTTP in Node services.",
+      "slug": "building-resilient-http-clients-in-nodejs",
+      "url": "https://blog.example.dev/building-resilient-http-clients-in-nodejs",
+      "publishedAt": "2026-06-30T09:14:00.000Z",
+      "reactionCount": 142,
+      "responseCount": 17,
+      "replyCount": 17,
+      "content": {
+        "markdown": "## Why resilience matters\n\nOutbound HTTP is the <b>most</b> failure-prone part of a service. Wrap every call in a shared client that handles retries &amp; backoff.\n\n- Retry only transient failures\n- Never retry 4xx\n- Serve a stale cache entry on total failure",
+        "text": "Why resilience matters Outbound HTTP is the most failure-prone part of a service."
+      },
+      "author": { "name": "Ada Lovelace", "username": "ada" },
+      "tags": [
+        { "name": "Node.js", "slug": "nodejs", "id": "56744723958ef13879b9503f" },
+        { "name": "Backend", "slug": "backend", "id": "56744723958ef13879b95040" }
+      ],
+      "comments": {
+        "edges": [
+          {
+            "node": {
+              "id": "665a20119b1c4a0012ab3500",
+              "content": {
+                "markdown": "Great write-up! We use <a href=\"https://example.dev\">the same pattern</a> &amp; it saved us during an outage.",
+                "text": "Great write-up! We use the same pattern & it saved us during an outage."
+              },
+              "author": { "name": "Linus T", "username": "linus" }
+            }
+          },
+          {
+            "node": {
+              "id": "665a20119b1c4a0012ab3501",
+              "content": {
+                "markdown": "How do you handle Retry-After on 429s?",
+                "text": "How do you handle Retry-After on 429s?"
+              },
+              "author": { "name": null, "username": "curiousdev" }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
