@@ -131,6 +131,27 @@ test("mapPhDetail maps the post onto the item and top-level comments onto commen
   }
 });
 
+// --- WR-01: null-safe edge/node handling (resilience, never hard-error) ---
+
+test("mapPhDetail filters out null/absent comment edges instead of throwing (WR-01)", () => {
+  const withHoles = {
+    ...detailPost,
+    comments: {
+      edges: [
+        null, // a null edge
+        { node: null }, // an edge with a null node
+        detailPost.comments.edges[0], // a real edge
+      ],
+    },
+  };
+  let out;
+  assert.doesNotThrow(() => {
+    out = mapPhDetail(withHoles);
+  }, "a null edge/node must never throw an uncaught TypeError");
+  assert.equal(out.comments.length, 1, "only the one real comment survives");
+  assert.equal(out.comments[0].id, String(detailPost.comments.edges[0].node.id));
+});
+
 test("producthunt_get detail builds a DetailEnvelopeSchema-valid envelope with comments[] populated and stripped", () => {
   const env = buildDetailEnvelope({
     source: "producthunt",

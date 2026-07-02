@@ -96,11 +96,13 @@ export function mapPhPost(node) {
 export function mapPhDetail(post) {
   return {
     item: mapPhPost(post),
-    comments: (post.comments?.edges ?? []).map((e) => ({
-      id: String(e.node.id),
-      author: phAuthor(e.node.user),
-      text: e.node.body ?? null,
-    })),
+    comments: (post.comments?.edges ?? [])
+      .filter((e) => e?.node)
+      .map((e) => ({
+        id: String(e.node.id),
+        author: phAuthor(e.node.user),
+        text: e.node.body ?? null,
+      })),
   };
 }
 
@@ -200,7 +202,7 @@ server.registerTool(
     const env = buildListEnvelope({
       source: SOURCE,
       query: topic ?? null,
-      results: edges.map((e) => mapPhPost(e.node)),
+      results: edges.filter((e) => e?.node).map((e) => mapPhPost(e.node)),
     });
     return toolResult(env);
   },
