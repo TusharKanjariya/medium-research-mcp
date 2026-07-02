@@ -1,0 +1,36 @@
+{
+  "items": [
+    {
+      "tags": [
+        "visual-studio-code",
+        "artificial-intelligence",
+        "model-context-protocol",
+        "claude-code"
+      ],
+      "owner": {
+        "account_id": 8223760,
+        "reputation": 571,
+        "user_id": 6186647,
+        "user_type": "registered",
+        "accept_rate": 73,
+        "profile_image": "https://www.gravatar.com/avatar/927413a8abdc75da7e6cdbd2f21c0429?s=256&d=identicon&r=PG&f=y&so-version=2",
+        "display_name": "Milad",
+        "link": "https://stackoverflow.com/users/6186647/milad"
+      },
+      "is_answered": false,
+      "view_count": 25,
+      "answer_count": 1,
+      "score": 1,
+      "last_activity_date": 1782969190,
+      "creation_date": 1782968572,
+      "question_id": 79972441,
+      "content_license": "CC BY-SA 4.0",
+      "link": "https://stackoverflow.com/questions/79972441/i-encountered-something-odd-with-the-claude-code-extension-for-vs-code-do-you-k",
+      "title": "I encountered something odd with the Claude Code extension for VS Code. Do you know how tool calling works in Claude Code for VS Code?",
+      "body": "<p><a href=\"https://i.sstatic.net/9QzsERtK.png\" rel=\"nofollow noreferrer\"><img src=\"https://i.sstatic.net/9QzsERtK.png\" alt=\"enter image description here\" /></a>\nIt's a screenshot of Claude Code for VS Code. It seems to be attempting to invoke a tool named &quot;Grag.&quot; The call failed. After that, it started using the &quot;Grep&quot; tool. I searched for it, but I couldn't find any tool or MCP server with that name. Do you have any idea what it is?</p>\n"
+    }
+  ],
+  "has_more": false,
+  "quota_max": 300,
+  "quota_remaining": 296
+}

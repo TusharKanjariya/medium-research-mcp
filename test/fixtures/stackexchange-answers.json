@@ -1,0 +1,27 @@
+{
+  "items": [
+    {
+      "owner": {
+        "account_id": 8223760,
+        "reputation": 571,
+        "user_id": 6186647,
+        "user_type": "registered",
+        "accept_rate": 73,
+        "profile_image": "https://www.gravatar.com/avatar/927413a8abdc75da7e6cdbd2f21c0429?s=256&d=identicon&r=PG&f=y&so-version=2",
+        "display_name": "Milad",
+        "link": "https://stackoverflow.com/users/6186647/milad"
+      },
+      "is_accepted": false,
+      "score": 0,
+      "last_activity_date": 1782969190,
+      "creation_date": 1782969190,
+      "answer_id": 79972445,
+      "question_id": 79972441,
+      "content_license": "CC BY-SA 4.0",
+      "body": "<p>After claude code finished the job I asked it: &quot;By the way what is Grag you tried to invoke?&quot;<br />\nShe answered:<br />\n<em>That was a typo on my part — I meant to call <code>Grep</code> but fat-fingered it as <code>Grag</code>. It errored immediately (&quot;No such tool available&quot;), so I just called <code>Grep</code> correctly on the next attempt. Not an actual tool, just a slip.</em></p>\n<p>It can be a new attack surface, relying on LLMs typos!</p>\n"
+    }
+  ],
+  "has_more": false,
+  "quota_max": 300,
+  "quota_remaining": 296
+}
