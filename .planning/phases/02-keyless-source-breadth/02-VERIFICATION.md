@@ -1,10 +1,11 @@
 ---
 phase: 02-keyless-source-breadth
 verified: 2026-07-02T00:00:00Z
-status: human_needed
+status: passed
 score: 4/4 must-haves verified
 behavior_unverified: 0
-overrides_applied: 0
+overrides_applied: 1
+override_note: "2026-07-02 orchestrator override (user-directed): phase marked passed with the single OPTIONAL human item (live Lemmy authenticated read) DEFERRED. The account created for the check (programming.dev) is stuck on admin 'Registration approval pending' — an external gate with an indeterminate wait, outside project control. The Lemmy auth path is proven offline (unit-tested login POST shape + Bearer-when-token/empty-when-null wiring) and the live 401 confirms the request reaches a real login endpoint and is handled cleanly. Re-run /gsd-verify-work 2 once an approved instance account exists to tick the live confirmation."
 re_verification:
   previous_status: human_needed
   previous_score: 4/5
@@ -23,7 +24,7 @@ human_verification:
 
 **Phase Goal:** Fan out across the keyless (and optional-auth) sources, proving that adding a source is a mechanical copy of the Phase 1 pattern and that the contract holds across very different payloads.
 **Verified:** 2026-07-02
-**Status:** human_needed
+**Status:** passed (orchestrator override — optional live Lemmy check deferred; blocked by external registration-approval gate, auth proven offline)
 **Re-verification:** Yes — after SRC-04 (Hashnode) scope removal
 
 ## Scope Change
