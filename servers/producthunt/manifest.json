@@ -1,0 +1,29 @@
+{
+  "manifest_version": "0.3",
+  "name": "medium-research-producthunt",
+  "version": "1.0.0",
+  "description": "Product Hunt research with normalized MCP output. Wraps the Product Hunt API v2 GraphQL endpoint (producthunt_launches, producthunt_get) — today's / this-week's launches ranked by votes (votes->score, comments->num_comments), optionally scoped to a topic slug. REQUIRES a PRODUCTHUNT_TOKEN (developer token, read-only): without it the tool call fails loudly with a clear 'set PRODUCTHUNT_TOKEN' error (never an unauthenticated call). The token is injected via the sensitive, required user_config field below (stored in the OS keychain, masked on input, never written to disk in plaintext) and rides only in the Authorization header, never in the URL, cache key, or error text. Personal/non-commercial use (Product Hunt API is non-commercial by default). Actual .mcpb packing is deferred to v2 (PKG-01); this manifest is documentation/scaffold only.",
+  "author": {
+    "name": "Tushar Kanjariya"
+  },
+  "user_config": {
+    "producthunt_token": {
+      "type": "string",
+      "title": "Product Hunt developer token",
+      "description": "Required — Product Hunt needs a bearer token for every request; the server fails with a clear 'set PRODUCTHUNT_TOKEN' error without it. Create an API application and generate a developer token at https://www.producthunt.com/v2/oauth/applications.",
+      "sensitive": true,
+      "required": true
+    }
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "server.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server.js"],
+      "env": {
+        "PRODUCTHUNT_TOKEN": "${user_config.producthunt_token}"
+      }
+    }
+  }
+}

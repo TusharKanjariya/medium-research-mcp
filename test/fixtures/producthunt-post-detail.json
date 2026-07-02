@@ -1,0 +1,38 @@
+{
+  "data": {
+    "post": {
+      "id": "123456",
+      "name": "SuperTool",
+      "tagline": "The fastest way to ship blog research",
+      "votesCount": 842,
+      "commentsCount": 57,
+      "url": "https://www.producthunt.com/posts/supertool",
+      "website": "https://supertool.example.com",
+      "createdAt": "2026-07-02T07:00:00Z",
+      "topics": {
+        "edges": [
+          { "node": { "slug": "developer-tools" } }
+        ]
+      },
+      "user": { "name": "Ada Hunter", "username": "ada" },
+      "comments": {
+        "edges": [
+          {
+            "node": {
+              "id": "c1",
+              "body": "Congrats on the <i>launch</i>!",
+              "user": { "name": "Beth", "username": "beth" }
+            }
+          },
+          {
+            "node": {
+              "id": "c2",
+              "body": "How does it compare to X?",
+              "user": { "name": null, "username": "carl" }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

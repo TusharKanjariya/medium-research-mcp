@@ -1,0 +1,41 @@
+{
+  "data": {
+    "posts": {
+      "edges": [
+        {
+          "node": {
+            "id": "123456",
+            "name": "SuperTool",
+            "tagline": "The <b>fastest</b> way to ship blog research",
+            "votesCount": 842,
+            "commentsCount": 57,
+            "url": "https://www.producthunt.com/posts/supertool",
+            "website": "https://supertool.example.com",
+            "createdAt": "2026-07-02T07:00:00Z",
+            "topics": {
+              "edges": [
+                { "node": { "slug": "developer-tools" } },
+                { "node": { "slug": "productivity" } }
+              ]
+            },
+            "user": { "name": "Ada Hunter", "username": "ada" }
+          }
+        },
+        {
+          "node": {
+            "id": "123457",
+            "name": "MinimalApp",
+            "tagline": "Less is more",
+            "votesCount": 310,
+            "commentsCount": 12,
+            "url": "https://www.producthunt.com/posts/minimalapp",
+            "website": "https://minimalapp.example.com",
+            "createdAt": "2026-07-02T06:30:00Z",
+            "topics": { "edges": [] },
+            "user": { "name": null, "username": "maker2" }
+          }
+        }
+      ]
+    }
+  }
+}
