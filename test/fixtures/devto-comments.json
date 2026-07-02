@@ -1,0 +1,104 @@
+[
+  {
+    "type_of": "comment",
+    "id_code": "3abed",
+    "created_at": "2026-06-30T19:21:33Z",
+    "body_html": "<p>you made a valid point about AI, Paige. Someone mention to me about Openrouter and Opencode as an AI framework. I am curious about your thought on the AI frameworks.</p>\n\n",
+    "user": {
+      "name": "Benjamin Nguyen",
+      "username": "benjamin_nguyen_8ca6ff360",
+      "twitter_username": null,
+      "github_username": "ben854719",
+      "user_id": 1727340,
+      "website_url": "https://ben854719.github.io/",
+      "profile_image": "https://media2.dev.to/dynamic/image/width=640,height=640,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Fuser%2Fprofile_image%2F1727340%2F6c28d323-0ae7-4f07-ac91-6320fcdc3da1.jpg",
+      "profile_image_90": "https://media2.dev.to/dynamic/image/width=90,height=90,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Fuser%2Fprofile_image%2F1727340%2F6c28d323-0ae7-4f07-ac91-6320fcdc3da1.jpg"
+    },
+    "children": []
+  },
+  {
+    "type_of": "comment",
+    "id_code": "3abhf",
+    "created_at": "2026-06-30T21:05:41Z",
+    "body_html": "<p>Quick question on the browser angle. When you say Gemma 4 runs entirely in the browser through Transformers.js and WebGPU, which sizes actually hold up there in practice? I can picture the 2B feeling smooth on a laptop, but I'm trying to work out where the ceiling is before a phone or a modest GPU starts to struggle. The no API keys to leak in a public repo point is a real one, that alone sells the local path for a lot of weekend builds.</p>\n\n",
+    "user": {
+      "name": "Nazar Boyko",
+      "username": "nazar_boyko",
+      "twitter_username": null,
+      "github_username": "nazboyko",
+      "user_id": 1875383,
+      "website_url": "http://nazarboyko.com/",
+      "profile_image": "https://media2.dev.to/dynamic/image/width=640,height=640,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Fuser%2Fprofile_image%2F1875383%2Fbaa58f3a-24b4-4cd1-bea6-034acfb76210.jpg",
+      "profile_image_90": "https://media2.dev.to/dynamic/image/width=90,height=90,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Fuser%2Fprofile_image%2F1875383%2Fbaa58f3a-24b4-4cd1-bea6-034acfb76210.jpg"
+    },
+    "children": []
+  },
+  {
+    "type_of": "comment",
+    "id_code": "3abja",
+    "created_at": "2026-06-30T21:21:43Z",
+    "body_html": "<p>The license and the run-anywhere story get the headlines, but imo the quietest production win here is that open weights let you pin the target. W/ a closed API the model can shift under you on a silent version bump, and the eval suite you wrote last month no longer means what you think it does. Freeze the weights and your regression tests stay valid, behavior's reproducible, and \"did this change break anything\" becomes an answerable q instead of a vibe.</p>\n\n<p>That's what actually decides \"production-ready\" for me, more than the benchmark numbers. \"Good enough\" isn't a property of the model, it's a property of your task, and you only find that out by running your own eval against it. Open + Apache-2.0 is what finally lets you build that eval against a target that won't move under you. Cost and ownership are nice, but reproducibility is the thing that lets you actually sleep w/ it in prod.</p>\n\n",
+    "user": {
+      "name": "Vinicius Pereira",
+      "username": "vinimabreu",
+      "twitter_username": null,
+      "github_username": "vinimabreu",
+      "user_id": 4010065,
+      "website_url": "https://github.com/vinimabreu",
+      "profile_image": "https://media2.dev.to/dynamic/image/width=640,height=640,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Fuser%2Fprofile_image%2F4010065%2Fd51bbccb-85bd-431c-8ae0-02f0ccfc120c.jpg",
+      "profile_image_90": "https://media2.dev.to/dynamic/image/width=90,height=90,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Fuser%2Fprofile_image%2F4010065%2Fd51bbccb-85bd-431c-8ae0-02f0ccfc120c.jpg"
+    },
+    "children": []
+  },
+  {
+    "type_of": "comment",
+    "id_code": "3ac2d",
+    "created_at": "2026-07-01T06:55:53Z",
+    "body_html": "<p>I like that the article separates \"open\" from \"low performance.\" That perception is changing quickly. For many production use cases, the conversation is no longer just about having the most powerful model—it's about choosing the right balance of latency, privacy, cost, and deployment flexibility. Local and open models give teams another viable architecture instead of forcing everything through hosted APIs.</p>\n\n",
+    "user": {
+      "name": "Prabhanshu Pandey",
+      "username": "prabhanshu_pandey_21e9290",
+      "twitter_username": null,
+      "github_username": null,
+      "user_id": 3992442,
+      "website_url": "https://www.botintelli.com/",
+      "profile_image": "https://media2.dev.to/dynamic/image/width=640,height=640,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Fuser%2Fprofile_image%2F3992442%2F8607a358-57ca-4b3f-8aba-80dbdc8e125f.jpeg",
+      "profile_image_90": "https://media2.dev.to/dynamic/image/width=90,height=90,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Fuser%2Fprofile_image%2F3992442%2F8607a358-57ca-4b3f-8aba-80dbdc8e125f.jpeg"
+    },
+    "children": []
+  },
+  {
+    "type_of": "comment",
+    "id_code": "3acbj",
+    "created_at": "2026-07-01T11:09:45Z",
+    "body_html": "<p>the local+open shift is real. but most local deployments still have cloud tendrils for fine-tuning or telemetry. running the model locally is the easy part - keeping the whole data supply chain local is where it gets hard.</p>\n\n",
+    "user": {
+      "name": "Mykola Kondratiuk",
+      "username": "itskondrat",
+      "twitter_username": "ItsKondrat",
+      "github_username": "nkondratyk93",
+      "user_id": 3753205,
+      "website_url": "https://www.linkedin.com/in/nikolay-kondratyk",
+      "profile_image": "https://media2.dev.to/dynamic/image/width=640,height=640,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Fuser%2Fprofile_image%2F3753205%2Fa206f74a-98be-4c2b-abbd-f06ec964327b.jpg",
+      "profile_image_90": "https://media2.dev.to/dynamic/image/width=90,height=90,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Fuser%2Fprofile_image%2F3753205%2Fa206f74a-98be-4c2b-abbd-f06ec964327b.jpg"
+    },
+    "children": []
+  },
+  {
+    "type_of": "comment",
+    "id_code": "3adjo",
+    "created_at": "2026-07-02T04:07:10Z",
+    "body_html": "<p>Local and open AI changes the operating model, not just the hosting bill. Teams still need evals, update discipline, and clear boundaries for what can run locally versus what needs managed reliability.</p>\n\n",
+    "user": {
+      "name": "Alex Shev",
+      "username": "alexshev",
+      "twitter_username": "AlexshevPm",
+      "github_username": null,
+      "user_id": 3812101,
+      "website_url": "https://terminalskills.io",
+      "profile_image": "https://media2.dev.to/dynamic/image/width=640,height=640,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Fuser%2Fprofile_image%2F3812101%2Fa5dfb3f9-d006-41a1-a868-995b7f219269.png",
+      "profile_image_90": "https://media2.dev.to/dynamic/image/width=90,height=90,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Fuser%2Fprofile_image%2F3812101%2Fa5dfb3f9-d006-41a1-a868-995b7f219269.png"
+    },
+    "children": []
+  }
+]
