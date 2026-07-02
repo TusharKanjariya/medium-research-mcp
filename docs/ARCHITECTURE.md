@@ -72,7 +72,7 @@ Every item:
 ```jsonc
 {
   "id": "40123",
-  "type": "story",             // story | ask | show | job | question | article | repo | comment | post
+  "type": "story",             // story | ask | show | job | question | article | repo | comment | post | issue | package | launch
   "title": "…",
   "author": "…",
   "score": 342,                // NORMALIZED engagement (see §5)

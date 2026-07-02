@@ -19,6 +19,12 @@
 import { z } from "zod";
 
 // Contract item type enum (ARCHITECTURE §4).
+//
+// APPEND-ONLY: itemShape.type = z.enum(TYPE) and toolResult() validates every
+// structuredContent return against it, so removing/reordering a value would
+// break existing servers' output validation. New source types are added at the
+// END. Phase 3 appended issue (GitHub issues), package (Libraries.io) and launch
+// (Product Hunt) — the original nine stay put as the leading prefix.
 export const TYPE = [
   "story",
   "ask",
@@ -29,6 +35,9 @@ export const TYPE = [
   "comment",
   "post",
   "job",
+  "issue", // GitHub issues (Phase 3, SRC-06)
+  "package", // Libraries.io packages (Phase 3, SRC-07)
+  "launch", // Product Hunt launches (Phase 3, SRC-08)
 ];
 
 // --- item ----------------------------------------------------------------
