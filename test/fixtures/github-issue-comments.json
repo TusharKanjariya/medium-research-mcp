@@ -1,0 +1,12 @@
+[
+  {
+    "id": 9001,
+    "user": { "login": "maintainer" },
+    "body": "Can you share the <code>CI</code> logs?"
+  },
+  {
+    "id": 9002,
+    "user": { "login": "dev1" },
+    "body": "Attached &amp; linked."
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "id": 111,
+  "number": 42,
+  "title": "Flaky tests on CI",
+  "user": { "login": "dev1" },
+  "html_url": "https://github.com/octocat/awesome-lib/issues/42",
+  "body": "The suite <em>randomly</em> fails on <b>macOS</b>.",
+  "comments": 2,
+  "created_at": "2026-06-20T12:00:00Z",
+  "labels": [{ "name": "bug" }],
+  "reactions": { "total_count": 15 }
+}
