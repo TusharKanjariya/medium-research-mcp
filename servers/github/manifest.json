@@ -1,0 +1,29 @@
+{
+  "manifest_version": "0.3",
+  "name": "medium-research-github",
+  "version": "1.0.0",
+  "description": "GitHub research with normalized MCP output. Wraps the GitHub REST API (gh_trending_repos, gh_search_issues, gh_get_item) — trending repositories via the Search API (stars->score) and open issues for pain-point mining (reaction total->score, comments->num_comments). Runs fully anonymously; an optional GITHUB_TOKEN (PAT) raises rate limits (30 req/min search, 5000/hr core vs 10/60 anonymous) and is injected via the sensitive user_config field below (stored in the OS keychain, masked on input, never written to disk in plaintext). Actual .mcpb packing is deferred to v2 (PKG-01); this manifest is documentation/scaffold only.",
+  "author": {
+    "name": "Tushar Kanjariya"
+  },
+  "user_config": {
+    "github_token": {
+      "type": "string",
+      "title": "GitHub personal access token",
+      "description": "Optional — a fine-grained or classic PAT with public read scope raises GitHub API rate limits. The server runs anonymously without it. Create one at https://github.com/settings/tokens.",
+      "sensitive": true,
+      "required": false
+    }
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "server.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server.js"],
+      "env": {
+        "GITHUB_TOKEN": "${user_config.github_token}"
+      }
+    }
+  }
+}
