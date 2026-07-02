@@ -93,6 +93,21 @@ export function mapDevtoArticle(a) {
 }
 
 /**
+ * Guard the not-found case (WR-05, same class as CR-01). Dev.to returns HTTP 404
+ * for a missing id today, so getJson throws before mapping — but that safety relies
+ * on the upstream choosing 404 over "200 + empty/odd body". A `200 {}` (or a
+ * stale-cache hit of a malformed prior body) would otherwise let mapDevtoArticle
+ * dereference an id-less object. An explicit shape check makes the not-found
+ * deterministic and consistent with the SE/Hashnode/Lobsters guards.
+ */
+export function requireDevtoArticle(article, id) {
+  if (!article || article.id == null) {
+    throw new Error(`devto: article ${id} not found`);
+  }
+  return article;
+}
+
+/**
  * Map a single /articles/{id} article plus its /comments?a_id= tree onto
  * { item, comments }. The item reuses mapDevtoArticle but overrides `text` with
  * the full `body_markdown` (the detail body, not the list description). Only
@@ -228,10 +243,11 @@ server.registerTool(
     outputSchema: detailEnvelopeShape,
   },
   async ({ id }) => {
-    const article = await getJson(
+    const raw = await getJson(
       `${DEVTO}/articles/${encodeURIComponent(id)}`,
       { headers: FOREM_HEADERS },
     );
+    const article = requireDevtoArticle(raw, id);
     const comments = await getJson(
       `${DEVTO}/comments?a_id=${encodeURIComponent(id)}`,
       { headers: FOREM_HEADERS },

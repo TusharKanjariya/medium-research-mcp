@@ -18,6 +18,7 @@ import { fileURLToPath } from "node:url";
 import {
   mapLobstersStory,
   mapLobstersDetail,
+  requireLobstersStory,
   server,
 } from "../servers/lobsters/server.js";
 import {
@@ -122,6 +123,20 @@ test("mapLobstersDetail comments are HTML-stripped through buildDetailEnvelope",
   const c = env.item.comments[0];
   assert.ok(!/<a /.test(c.text), "anchor tag stripped");
   assert.ok(c.text.includes("Aw & man"), "entities decoded, tags removed");
+});
+
+// --- WR-05: not-found guard (defensive, same class as CR-01) -------------
+
+test("requireLobstersStory throws a clear not-found error for a missing/empty body (WR-05)", () => {
+  assert.throws(() => requireLobstersStory(null, "abc"), /story abc not found/);
+  assert.throws(() => requireLobstersStory(undefined, "x"), /not found/);
+  // a 200 {} with no short_id must not be mapped as a real story
+  assert.throws(() => requireLobstersStory({}, "y"), /not found/);
+});
+
+test("requireLobstersStory returns the story unchanged when present (WR-05 happy path)", () => {
+  const s = { short_id: "s1", title: "t" };
+  assert.equal(requireLobstersStory(s, "s1"), s);
 });
 
 // --- lobsters_search client-side window filter (D-01) --------------------

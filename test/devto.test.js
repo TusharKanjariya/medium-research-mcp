@@ -21,6 +21,7 @@ import { fileURLToPath } from "node:url";
 import {
   mapDevtoArticle,
   mapDevtoDetail,
+  requireDevtoArticle,
   server,
 } from "../servers/devto/server.js";
 import {
@@ -131,6 +132,20 @@ test("mapDevtoDetail comment body_html is HTML-stripped through buildDetailEnvel
   const c = env.item.comments[0];
   assert.ok(!/<a /.test(c.text), "anchor tag stripped");
   assert.ok(c.text.includes("Nice & clear write-up"), "entities decoded, tags removed");
+});
+
+// --- WR-05: not-found guard (defensive, same class as CR-01) -------------
+
+test("requireDevtoArticle throws a clear not-found error for a missing/empty body (WR-05)", () => {
+  assert.throws(() => requireDevtoArticle(null, "123"), /article 123 not found/);
+  assert.throws(() => requireDevtoArticle(undefined, "x"), /not found/);
+  // a 200 {} with no id must not be mapped as a real article
+  assert.throws(() => requireDevtoArticle({}, "y"), /not found/);
+});
+
+test("requireDevtoArticle returns the article unchanged when present (WR-05 happy path)", () => {
+  const a = { id: 9, title: "t" };
+  assert.equal(requireDevtoArticle(a, "9"), a);
 });
 
 // --- devto_search client-side window filter (D-01) -----------------------

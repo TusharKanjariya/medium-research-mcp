@@ -63,6 +63,21 @@ export function mapLobstersStory(s) {
 }
 
 /**
+ * Guard the not-found case (WR-05, same class as CR-01). Today lobste.rs returns
+ * HTTP 404 for a missing id, so getJson throws before mapping — but that safety
+ * relies entirely on the upstream choosing 404 over "200 + empty/odd body". A
+ * `200 {}` (or a stale-cache hit of a malformed prior body) would otherwise let
+ * mapLobstersStory dereference an id-less object. An explicit shape check makes
+ * the not-found deterministic and consistent with the SE/Hashnode guards.
+ */
+export function requireLobstersStory(story, id) {
+  if (!story || story.short_id == null) {
+    throw new Error(`lobsters: story ${id} not found`);
+  }
+  return story;
+}
+
+/**
  * Map one raw Lobsters story detail (/s/{short_id}.json) onto { item, comments }.
  * The detail object carries the story fields at the top level plus a flat
  * `comments` array; each comment is flattened to the contract's {id, author,
@@ -149,9 +164,10 @@ server.registerTool(
     outputSchema: detailEnvelopeShape,
   },
   async ({ id }) => {
-    const story = await getJson(
+    const raw = await getJson(
       `${LOBSTERS}/s/${encodeURIComponent(id)}.json`,
     );
+    const story = requireLobstersStory(raw, id);
     const { item, comments } = mapLobstersDetail(story);
     const env = buildDetailEnvelope({ source: SOURCE, item, comments });
     return toolResult(env);
