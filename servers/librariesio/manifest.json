@@ -1,0 +1,29 @@
+{
+  "manifest_version": "0.3",
+  "name": "medium-research-librariesio",
+  "version": "1.0.0",
+  "description": "Libraries.io research with normalized MCP output. Wraps the Libraries.io API (librariesio_search, librariesio_get) — most-depended (or sort-overridden) packages across a package ecosystem (dependents_count->score; num_comments n/a). REQUIRES a LIBRARIESIO_KEY: without it the tool call fails loudly with a clear 'set LIBRARIESIO_KEY' error (never an unauthenticated call). The key is injected via the sensitive, required user_config field below (stored in the OS keychain, masked on input, never written to disk in plaintext) and rides only in the request query string, never in the cache key or error text. Actual .mcpb packing is deferred to v2 (PKG-01); this manifest is documentation/scaffold only.",
+  "author": {
+    "name": "Tushar Kanjariya"
+  },
+  "user_config": {
+    "librariesio_key": {
+      "type": "string",
+      "title": "Libraries.io API key",
+      "description": "Required — Libraries.io needs an API key for every request; the server fails with a clear 'set LIBRARIESIO_KEY' error without it. Get a free key from your account page at https://libraries.io/account.",
+      "sensitive": true,
+      "required": true
+    }
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "server.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server.js"],
+      "env": {
+        "LIBRARIESIO_KEY": "${user_config.librariesio_key}"
+      }
+    }
+  }
+}

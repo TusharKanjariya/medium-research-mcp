@@ -1,0 +1,14 @@
+{
+  "name": "express",
+  "platform": "NPM",
+  "rank": 27,
+  "dependents_count": 54321,
+  "dependent_repos_count": 4444444,
+  "stars": 64000,
+  "latest_release_published_at": "2024-03-25T20:00:00.000Z",
+  "package_manager_url": "https://www.npmjs.com/package/express",
+  "repository_url": "https://github.com/expressjs/express",
+  "homepage": "https://expressjs.com/",
+  "keywords": ["express", "framework", "web", "http", "rest"],
+  "description": "Fast, unopinionated, minimalist web framework for <b>Node.js</b>."
+}

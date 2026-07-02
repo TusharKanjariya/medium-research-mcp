@@ -1,0 +1,30 @@
+[
+  {
+    "name": "react",
+    "platform": "NPM",
+    "rank": 28,
+    "dependents_count": 123456,
+    "dependent_repos_count": 9876543,
+    "stars": 220000,
+    "latest_release_published_at": "2024-04-25T18:32:11.000Z",
+    "package_manager_url": "https://www.npmjs.com/package/react",
+    "repository_url": "https://github.com/facebook/react",
+    "homepage": "https://react.dev",
+    "keywords": ["react", "ui", "frontend"],
+    "description": "React is a JavaScript library for building user interfaces."
+  },
+  {
+    "name": "lodash",
+    "platform": "NPM",
+    "rank": 26,
+    "dependents_count": 98765,
+    "dependent_repos_count": 5555555,
+    "stars": 59000,
+    "latest_release_published_at": "2021-02-20T15:42:16.891Z",
+    "package_manager_url": "https://www.npmjs.com/package/lodash",
+    "repository_url": "https://github.com/lodash/lodash",
+    "homepage": "https://lodash.com/",
+    "keywords": [],
+    "description": "Lodash modular utilities."
+  }
+]
