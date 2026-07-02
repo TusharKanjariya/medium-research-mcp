@@ -24,7 +24,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Source Servers
 
-- [ ] **SRC-01**: Stack Exchange server (`so_hot_questions`, `so_search`, `so_get_question`) generalized to the network via a `site` param; optional `STACKEXCHANGE_KEY`
+- [x] **SRC-01**: Stack Exchange server (`so_hot_questions`, `so_search`, `so_get_question`) generalized to the network via a `site` param; optional `STACKEXCHANGE_KEY`
 - [ ] **SRC-02**: Lobsters server (`lobsters_hottest`, `lobsters_tag`, `lobsters_get`), no auth
 - [ ] **SRC-03**: Lemmy server (`lemmy_hot`, `lemmy_search`, `lemmy_post`); auto-auth when `LEMMY_*` present — exercises the username/password path
 - [ ] **SRC-04**: Hashnode server (trending by tag, search, article) via public GraphQL, no auth
@@ -85,7 +85,7 @@ Which phases cover which requirements. Finalized during roadmap creation.
 | CRED-02 | Phase 1 | Complete |
 | CRED-03 | Phase 1 | Complete |
 | CRED-04 | Phase 1 | Complete |
-| SRC-01 | Phase 2 | Pending |
+| SRC-01 | Phase 2 | Complete |
 | SRC-02 | Phase 2 | Pending |
 | SRC-03 | Phase 2 | Pending |
 | SRC-04 | Phase 2 | Pending |

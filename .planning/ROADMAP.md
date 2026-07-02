@@ -82,12 +82,12 @@ Plans:
   4. Hashnode tools return trending-by-tag, search, and article results via the public GraphQL API with reactions mapped to `score` and responses to `num_comments`.
   5. All five servers pass the Universal Server Bar.
 
-**Plans**: 3 plans
+**Plans**: 1/3 plans executed
 
 Plans:
 **Wave 1** *(all three plans are independent — disjoint files — and run in parallel)*
 
-- [ ] 02-01-PLAN.md — Stack Exchange server (network-wide via `site` D-03, optional `STACKEXCHANGE_KEY` D-04, `filter=withbody`) [SRC-01] (wave 1)
+- [x] 02-01-PLAN.md — Stack Exchange server (network-wide via `site` D-03, optional `STACKEXCHANGE_KEY` D-04, `filter=withbody`) [SRC-01] (wave 1)
 - [ ] 02-02-PLAN.md — `lemmyInstance()` helper + Lobsters + Lemmy servers (Lemmy exercises the auth path D-06) [SRC-02, SRC-03] (wave 1)
 - [ ] 02-03-PLAN.md — `postJson()` shared POST path + Hashnode (GraphQL) + Dev.to (Forem REST) servers [SRC-04, SRC-05] (wave 1)
 
@@ -155,6 +155,6 @@ Phase 1 and may run in parallel; Phase 4 depends on both).
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Credential Infrastructure | 3/3 | Complete    | 2026-07-01 |
-| 2. Keyless Source Breadth | 0/3 | Planned | - |
+| 2. Keyless Source Breadth | 1/3 | In Progress|  |
 | 3. Keyed Ecosystem & Launch Sources | 0/2 | Not started | - |
 | 4. RSS Multiplier & Output Proof | 0/3 | Not started | - |
