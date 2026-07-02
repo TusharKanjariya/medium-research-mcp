@@ -71,8 +71,8 @@ export function mapLibProject(p) {
     score: p.dependents_count ?? null, // §5 dependents (D-04)
     num_comments: null, // n/a for packages
     created_utc: p.latest_release_published_at ?? null, // already ISO-8601
-    url: p.package_manager_url ?? p.repository_url ?? p.homepage ?? null,
-    permalink: p.package_manager_url ?? null, // canonical registry page
+    url: p.package_manager_url || p.repository_url || p.homepage || null,
+    permalink: p.package_manager_url || null, // canonical registry page
     tags: p.keywords ?? [],
     text: p.description ?? null,
   };

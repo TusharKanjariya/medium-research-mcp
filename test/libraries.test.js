@@ -81,6 +81,14 @@ test("mapLibProject url prefers package_manager_url, then repository_url, then h
   assert.equal(mapLibProject(repoOnly).url, searchItem.homepage);
 });
 
+test("mapLibProject falls back past a blank-string package_manager_url (WR-02)", () => {
+  // Registry APIs can emit "" (not just undefined); || must coalesce it away.
+  const blankRegistry = { ...searchItem, package_manager_url: "" };
+  const m = mapLibProject(blankRegistry);
+  assert.equal(m.url, searchItem.repository_url, "blank registry url falls back to repository_url");
+  assert.equal(m.permalink, null, "blank registry url yields a null permalink, not an empty citation URL");
+});
+
 test("mapLibProject preserves a legitimate 0 dependents_count as score 0 (not null)", () => {
   const m = mapLibProject({ ...searchItem, dependents_count: 0 });
   assert.equal(m.score, 0);

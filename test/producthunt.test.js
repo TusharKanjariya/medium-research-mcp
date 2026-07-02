@@ -79,6 +79,11 @@ test("mapPhPost author falls back to username when the display name is null", ()
   assert.equal(mapPhPost(bareNode).author, bareNode.user.username);
 });
 
+test("mapPhPost coalesces a blank-string website to null, not an empty url (WR-02)", () => {
+  const m = mapPhPost({ ...firstNode, website: "" });
+  assert.equal(m.url, null, "blank website yields null, not an empty citation URL");
+});
+
 test("mapPhPost preserves a legitimate 0 votesCount/commentsCount (not null)", () => {
   const m = mapPhPost({ ...firstNode, votesCount: 0, commentsCount: 0 });
   assert.equal(m.score, 0);

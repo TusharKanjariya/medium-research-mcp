@@ -79,7 +79,7 @@ export function mapPhPost(node) {
     score: node.votesCount ?? null, // §5 votes (D-05)
     num_comments: node.commentsCount ?? null, // §5 comments (D-07)
     created_utc: node.createdAt ?? null, // already ISO-8601
-    url: node.website ?? null, // external product link
+    url: node.website || null, // external product link (blank -> null)
     permalink: node.url ?? null, // Product Hunt post page
     tags: (node.topics?.edges ?? [])
       .map((e) => e?.node?.slug)
