@@ -575,14 +575,21 @@ test("lib_search surfaces 'set LIBRARIESIO_KEY' when the key is unset", () => {
 ## Open Questions
 
 1. **Does `reactions.total_count` appear in the `/search/issues` list payload for the
-   pinned API version?** (D-09 load-bearing.)
+   pinned API version?** (D-09 load-bearing.) — **RESOLVED WITH CONTINGENCY (carried
+   into 03-01 Task 2).**
    - What we know: reactions are GA; docs list `reactions` as a search sort and
      document the `reactions` object on issues.
    - What's unclear: whether it's inlined in the **search** list item vs only on the
      per-issue endpoint, for a given `X-GitHub-Api-Version`.
-   - Recommendation: one live smoke call during Plan/Execute; if absent in search,
-     fall back to `sort=reactions` ordering + a per-item reactions read only for the
-     detail tool (keep list `score` from `reactions` if present, else document null).
+   - Resolution: 03-01 Task 2 now carries BOTH branches. Primary path = read
+     `reactions.total_count` from the search LIST item (no per-issue second fetch). The
+     documented fallback is now an explicit in-plan action + gating live-smoke check:
+     if the smoke shows `reactions` absent from the search item, keep `sort=reactions`
+     ordering and populate list `score` where present else leave `score: null`
+     (contract-legal), sourcing issue reaction totals from the detail tool
+     (`gh_get_item`) — with NO per-issue N+1 fetch added to the list path either way.
+     The offline fixture test asserts both branches (`mapGhIssue` is null-safe when the
+     `reactions` object is absent). No longer a planning risk.
 
 2. **Libraries.io "most-depended" without a keyword.**
    - What we know: `/api/search?sort=dependents_count&platforms=npm` is the supported
