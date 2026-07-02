@@ -14,6 +14,7 @@ import {
   userAgent,
   redditCreds,
   lemmyCreds,
+  lemmyInstance,
 } from "../shared/credentials.js";
 
 // Every ENV_VAR credentials.js knows about — cleared before each case so a stray
@@ -173,6 +174,19 @@ test("lemmyCreds returns an object when instance + username + password are prese
       });
     },
   );
+});
+
+// --- lemmyInstance defaults to programming.dev, honors LEMMY_INSTANCE (D-05) --
+test("lemmyInstance returns https://programming.dev when LEMMY_INSTANCE is unset (default)", () => {
+  withEnv({}, () => {
+    assert.equal(lemmyInstance(), "https://programming.dev");
+  });
+});
+
+test("lemmyInstance returns the configured value when LEMMY_INSTANCE is set", () => {
+  withEnv({ LEMMY_INSTANCE: "https://lemmy.ml" }, () => {
+    assert.equal(lemmyInstance(), "https://lemmy.ml");
+  });
 });
 
 // --- userAgent has a non-blank default (Reddit requires a real UA) ------------

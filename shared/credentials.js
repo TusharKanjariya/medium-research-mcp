@@ -80,6 +80,21 @@ export const userAgent = () =>
   "medium-research-mcp/1.0 (+https://github.com/TusharRedlioDesigns/medium-research-mcp)";
 
 /**
+ * OPTIONAL Lemmy instance base URL for anonymous reads (D-05). Returns the
+ * operator-set LEMMY_INSTANCE or defaults to https://programming.dev (chosen for
+ * dev-topic relevance). The value is the FULL base URL incl. the https:// scheme and
+ * no trailing slash, so callers interpolate `${lemmyInstance()}/api/v3/...` exactly as
+ * auth.js does (see shared/auth.js lemmyJwt, which builds `${c.instance}/api/v3/...`).
+ *
+ * Security: LEMMY_INSTANCE is operator-set env (read only via get()), NOT a per-call
+ * tool parameter — untrusted tool input can never select the outbound host (SSRF
+ * mitigation, T-02-02-SSRF). Must be a trusted full HTTPS URL.
+ * @returns {string} the Lemmy instance base URL incl. scheme
+ */
+export const lemmyInstance = () =>
+  get("lemmyInstance") || "https://programming.dev";
+
+/**
  * OPTIONAL Reddit OAuth2 password-grant credentials (D-04). Returns an object ONLY when
  * all four of client_id, client_secret, username, and password are present; otherwise
  * returns undefined so Reddit degrades to keyless www.reddit.com/.json reads (D-03).
