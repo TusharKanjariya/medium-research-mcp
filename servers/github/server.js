@@ -156,6 +156,22 @@ export function requireGhResource(resource, kind, ref) {
   return resource;
 }
 
+/**
+ * Uphold the list tool's "Pull requests are excluded" invariant on the DETAIL
+ * path (WR-03, Pitfall 5). GitHub's issues endpoint also resolves pull-request
+ * numbers, returning a node carrying a `pull_request` key. mapGhIssue would
+ * unconditionally stamp `type: "issue"`, so a PR number would yield a contract
+ * item mislabeled as an issue (wrong type; num_comments excludes review
+ * comments). Surface a clear not-an-issue error instead — mirrors the list
+ * tool's mapGhIssues PR-skip rather than returning a mislabeled item.
+ */
+export function requireGhIssueNotPr(issue, ref) {
+  if (issue?.pull_request) {
+    throw new Error(`github: ${ref} is a pull request, not an issue`);
+  }
+  return issue;
+}
+
 // Compose GitHub Search qualifiers INTO the q string (Pitfall 6): language:,
 // label:, repo:, is:issue, is:open and the pushed:>cutoff recency window are all q
 // qualifiers — only sort/order/per_page are real query params. The whole q is
@@ -294,6 +310,10 @@ server.registerTool(
       const base = `${GH}/repos/${encOwner}/${encRepo}/issues/${encNum}`;
       const issue = await getJson(base, { headers: ghHeaders() });
       requireGhResource(issue, "issue", `${owner}/${repo}#${number}`);
+      // Uphold the list tool's PR-exclusion on the detail path too (WR-03): the
+      // issues endpoint resolves PR numbers, so reject a PR rather than return
+      // a node mislabeled type:"issue".
+      requireGhIssueNotPr(issue, `${owner}/${repo}#${number}`);
       const rawComments = await getJson(`${base}/comments`, {
         headers: ghHeaders(),
       });

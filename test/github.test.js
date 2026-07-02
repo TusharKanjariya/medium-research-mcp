@@ -26,6 +26,7 @@ import {
   mapGhIssues,
   mapGhIssueDetail,
   requireGhResource,
+  requireGhIssueNotPr,
   server,
 } from "../servers/github/server.js";
 import {
@@ -214,6 +215,23 @@ test("requireGhResource throws a clear not-found error for an absent resource", 
 test("requireGhResource returns the resource unchanged when present (happy path)", () => {
   const r = { id: 1 };
   assert.equal(requireGhResource(r, "repo", "a/b"), r);
+});
+
+// --- WR-03: gh_get_item detail path rejects a PR number ------------------
+
+test("requireGhIssueNotPr rejects a node carrying a pull_request key (WR-03)", () => {
+  // GitHub's issues endpoint resolves PR numbers too; the list tool excludes
+  // PRs (Pitfall 5) and the detail path must uphold the same invariant.
+  assert.throws(
+    () => requireGhIssueNotPr(prItem, "octocat/awesome-lib#43"),
+    /octocat\/awesome-lib#43 is a pull request, not an issue/,
+  );
+});
+
+test("requireGhIssueNotPr returns a genuine issue unchanged (happy path)", () => {
+  assert.equal(requireGhIssueNotPr(issueWithReactions, "a/b#42"), issueWithReactions);
+  // an issue detail node with no pull_request key passes through
+  assert.equal(requireGhIssueNotPr(issueDetail, "a/b#42"), issueDetail);
 });
 
 // --- registration smoke (FOUND-05) --------------------------------------
