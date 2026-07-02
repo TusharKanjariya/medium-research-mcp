@@ -6,7 +6,7 @@
 
 A suite of small, single-purpose **MCP servers** (Node) that each wrap one
 developer-community source's public API — Hacker News, Stack Exchange, Lobsters,
-Lemmy, Hashnode, Dev.to, GitHub, Libraries.io, Product Hunt, and a generic
+Lemmy, Dev.to, GitHub, Libraries.io, Product Hunt, and a generic
 RSS/Atom fetcher — plus a separate Python YouTube→blog wrapper. Every server
 emits the **same normalized JSON shape** so the `medium-blog-pro` skill can pull
 blog-topic research from many sources in one pass with zero per-source logic.

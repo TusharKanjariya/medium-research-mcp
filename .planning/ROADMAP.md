@@ -38,7 +38,7 @@ in addition to the phase's own success criteria:
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Foundation & Credential Infrastructure** - Shared cache/HTTP layer, the output contract, the HN reference server, and env-only credential + token-auth infrastructure (completed 2026-07-01)
-- [x] **Phase 2: Keyless Source Breadth** - Stack Exchange, Lobsters, Lemmy, Hashnode, and Dev.to servers, proving the copy-a-folder pattern at breadth (completed 2026-07-02)
+- [x] **Phase 2: Keyless Source Breadth** - Stack Exchange, Lobsters, Lemmy, and Dev.to servers, proving the copy-a-folder pattern at breadth (completed 2026-07-02; Hashnode dropped — upstream retired free GraphQL API)
 - [ ] **Phase 3: Keyed Ecosystem & Launch Sources** - GitHub, Libraries.io, and Product Hunt servers, exercising optional-PAT and required-credential paths
 - [ ] **Phase 4: RSS Multiplier & Output Proof** - Generic RSS/Atom fetcher (incl. subreddit `.rss`), a real 5+-source uniform run, and the Python YouTube→blog wrapper
 
@@ -73,14 +73,15 @@ Plans:
 
 **Goal**: Fan out across the keyless (and optional-auth) sources, proving that adding a source is a mechanical copy of the Phase 1 pattern and that the contract holds across very different payloads.
 **Depends on**: Phase 1
-**Requirements**: SRC-01, SRC-02, SRC-03, SRC-04, SRC-05
+**Requirements**: SRC-01, SRC-02, SRC-03, SRC-05 (SRC-04 Hashnode **dropped** 2026-07-02 — upstream retired free GraphQL API)
 **Success Criteria** (what must be TRUE):
 
   1. Stack Exchange tools (`so_hot_questions`, `so_search`, `so_get_question`) work across the network via a `site` param and use `STACKEXCHANGE_KEY` when present, keyless otherwise.
   2. Lobsters (`lobsters_hottest`, `lobsters_tag`, `lobsters_get`) and Dev.to servers return contract-shaped results with no auth.
   3. Lemmy tools (`lemmy_hot`, `lemmy_search`, `lemmy_post`) work on public reads and auto-authenticate when `LEMMY_*` is set, exercising the `auth.js` username/password path end-to-end.
-  4. Hashnode tools return trending-by-tag, search, and article results via the public GraphQL API with reactions mapped to `score` and responses to `num_comments`.
-  5. All five servers pass the Universal Server Bar.
+  4. All four servers pass the Universal Server Bar.
+
+  _(Original criterion 4 — Hashnode public GraphQL — dropped: Hashnode retired free/keyless GraphQL access, Pro plan required as of 2026-05-13, which conflicts with the project's keyless/non-commercial constraint.)_
 
 **Plans**: 3/3 plans complete
 
@@ -89,7 +90,7 @@ Plans:
 
 - [x] 02-01-PLAN.md — Stack Exchange server (network-wide via `site` D-03, optional `STACKEXCHANGE_KEY` D-04, `filter=withbody`) [SRC-01] (wave 1)
 - [x] 02-02-PLAN.md — `lemmyInstance()` helper + Lobsters + Lemmy servers (Lemmy exercises the auth path D-06) [SRC-02, SRC-03] (wave 1)
-- [x] 02-03-PLAN.md — `postJson()` shared POST path + Hashnode (GraphQL) + Dev.to (Forem REST) servers [SRC-04, SRC-05] (wave 1)
+- [x] 02-03-PLAN.md — `postJson()` shared POST path + Dev.to (Forem REST) server [SRC-05] (wave 1) — _Hashnode (GraphQL) built then dropped 2026-07-02 (upstream paywalled); `postJson()` retained as generic shared infra_
 
 ### Phase 3: Keyed Ecosystem & Launch Sources
 

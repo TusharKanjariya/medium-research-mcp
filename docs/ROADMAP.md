@@ -35,7 +35,6 @@ every server: tools register; helpers unit-tested; output matches the contract
   `lemmy_search`, `lemmy_post(id)`. End-to-end test of the username/password path.
 
 ## Phase 4 — Competitive scoping
-- **Hashnode** (no auth, GraphQL): trending by tag, search, article.
 - **Dev.to** (no auth): trending by tag, search (client-side filter), article.
 
 ## Phase 5 — Ecosystem / pain-point signal

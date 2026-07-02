@@ -6,7 +6,7 @@ Full detail lives in `docs/PRD.md` and `docs/ARCHITECTURE.md`.
 ## What this is
 
 A suite of MCP servers that pull blog-topic research from multiple developer
-sources (Hacker News, Stack Exchange, Lobsters, Lemmy, Hashnode, Dev.to, GitHub,
+sources (Hacker News, Stack Exchange, Lobsters, Lemmy, Dev.to, GitHub,
 Libraries.io, Product Hunt, RSS, …). Each server wraps one source's public API
 and is called from Claude Desktop. The output feeds a separate skill,
 `medium-blog-pro`, so **uniform output across sources is the whole point**.

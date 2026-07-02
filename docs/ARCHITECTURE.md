@@ -99,7 +99,6 @@ and cite across sources with no per-source code.
 | Stack Exchange (all sites) | votes | answers | Stack Exchange API (`site=`) | optional key |
 | Lobsters | upvotes | comments | `*.json` page endpoints | none |
 | Lemmy | score | comments | `/api/v3` REST | optional (login) |
-| Hashnode | reactions | responses | public GraphQL | none |
 | Dev.to | reactions | comments | dev.to API | none |
 | GitHub repos | stars | (n/a) | GitHub Search API | optional PAT |
 | GitHub issues/discussions | reactions | comments | GitHub API | optional PAT |

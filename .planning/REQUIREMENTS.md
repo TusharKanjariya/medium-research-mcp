@@ -27,7 +27,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **SRC-01**: Stack Exchange server (`so_hot_questions`, `so_search`, `so_get_question`) generalized to the network via a `site` param; optional `STACKEXCHANGE_KEY`
 - [x] **SRC-02**: Lobsters server (`lobsters_hottest`, `lobsters_tag`, `lobsters_get`), no auth
 - [x] **SRC-03**: Lemmy server (`lemmy_hot`, `lemmy_search`, `lemmy_post`); auto-auth when `LEMMY_*` present — exercises the username/password path
-- [x] **SRC-04**: Hashnode server (trending by tag, search, article) via public GraphQL, no auth
+- [~] **SRC-04**: ~~Hashnode server (trending by tag, search, article) via public GraphQL, no auth~~ — **DROPPED 2026-07-02**: Hashnode retired free/keyless GraphQL access (Pro plan required for all queries as of 2026-05-13), which breaks the public-keyless premise and conflicts with the project's keyless/non-commercial constraint. Server was built + offline-tested, then removed.
 - [x] **SRC-05**: Dev.to server (trending by tag, search, article), no auth
 - [ ] **SRC-06**: GitHub server — trending repos (Search API) + issues/discussions pain-point mining; optional PAT
 - [ ] **SRC-07**: Libraries.io server (rising/most-depended packages); required key
@@ -88,7 +88,7 @@ Which phases cover which requirements. Finalized during roadmap creation.
 | SRC-01 | Phase 2 | Complete |
 | SRC-02 | Phase 2 | Complete |
 | SRC-03 | Phase 2 | Complete |
-| SRC-04 | Phase 2 | Complete |
+| SRC-04 | Phase 2 | Dropped (upstream paywalled 2026-05-13) |
 | SRC-05 | Phase 2 | Complete |
 | SRC-06 | Phase 3 | Pending |
 | SRC-07 | Phase 3 | Pending |

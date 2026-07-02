@@ -74,7 +74,7 @@ sources in one pass instead of manual searching.
 
 Built: **Hacker News**. Planned, roughly in priority order: **Stack Exchange
 network** (Stack Overflow + Server Fault, Super User, DBA, Security, …),
-**Lobsters**, **Lemmy** (Reddit replacement), **Hashnode**, **Dev.to**,
+**Lobsters**, **Lemmy** (Reddit replacement), **Dev.to**,
 **GitHub** (trending repos + issues/discussions), **Libraries.io**,
 **Product Hunt**, a **generic RSS/Atom fetcher** (unlocks many newsletters/blogs
 at once), and the **YouTube→blog** wrapper. See ROADMAP.md for sequencing and

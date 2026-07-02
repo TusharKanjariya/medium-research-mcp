@@ -72,7 +72,7 @@ Recent decisions affecting current work:
 - [Phase ?]: SE text mapped from body_markdown ?? body: built-in withbody filter returns HTML body not body_markdown (A1 corrected); stripHtml cleans downstream
 - [Phase 02 P02]: Lemmy authenticated reads require LEMMY_INSTANCE set explicitly (even to the default programming.dev) alongside LEMMY_USERNAME/LEMMY_PASSWORD — lemmyCreds() needs all three; username/password alone degrade to anonymous with no error. Documented in manifest + tool descriptions and asserted by tests.
 - [Phase 02 P02]: Lobsters author = plain-string submitter_user (Pitfall 6); Lemmy permalink = post.ap_id (federation URL); Lemmy posts have no tags (tags: []).
-- [Phase ?]: [Phase 02 P03]: Hashnode public GraphQL endpoint is gql.hashnode.com/public (root now serves a Vercel app); live origin was down (522) so fixtures built from cited schema, flagged for one live-call A2 verification.
+- [Phase ?]: [Phase 02 P03]: Hashnode public GraphQL endpoint is gql.hashnode.com/public (root now serves a Vercel app); live origin was down (522) so fixtures built from cited schema, flagged for one live-call A2 verification. — SUPERSEDED 2026-07-02: SRC-04 (Hashnode) dropped and server removed; upstream retired free/keyless GraphQL access (Pro plan required as of 2026-05-13).
 - [Phase ?]: [Phase 02 P03]: postJson() cache key = url+sha1(body) via node:crypto so distinct GraphQL queries to one URL never collide; key stays a non-secret logical key.
 - [Phase ?]: [Phase 02 P03]: Dev.to tag_list is array on list, comma-string on detail; toTags() normalizes both so contract tags:string[] always holds.
 
