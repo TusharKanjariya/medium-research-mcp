@@ -1,0 +1,476 @@
+[
+  {
+    "short_id": "thkwcf",
+    "created_at": "2026-07-01T09:55:34.000-05:00",
+    "title": "US Supreme Court just blew up EU-US Data Transfers",
+    "url": "https://noyb.eu/en/us-supreme-court-just-blew-eu-us-data-transfers",
+    "score": 100,
+    "flags": 2,
+    "comment_count": 1,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "kngl",
+    "user_is_author": false,
+    "tags": [
+      "law"
+    ],
+    "short_id_url": "https://lobste.rs/s/thkwcf",
+    "comments_url": "https://lobste.rs/s/thkwcf/us_supreme_court_just_blew_up_eu_us_data"
+  },
+  {
+    "short_id": "rfkmw3",
+    "created_at": "2026-06-30T19:17:06.000-05:00",
+    "title": "What happened to the fight for the internet?",
+    "url": "https://dustycloud.org/blog/what-happened-to-the-fight-for-the-internet/",
+    "score": 140,
+    "flags": 0,
+    "comment_count": 82,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "dustyweb",
+    "user_is_author": true,
+    "tags": [
+      "privacy"
+    ],
+    "short_id_url": "https://lobste.rs/s/rfkmw3",
+    "comments_url": "https://lobste.rs/s/rfkmw3/what_happened_fight_for_internet"
+  },
+  {
+    "short_id": "khdiby",
+    "created_at": "2026-07-01T20:11:56.000-05:00",
+    "title": "Artificial adventures",
+    "url": "https://www.scattered-thoughts.net/writing/artificial-adventures/",
+    "score": 11,
+    "flags": 0,
+    "comment_count": 3,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "jamii",
+    "user_is_author": true,
+    "tags": [
+      "vibecoding"
+    ],
+    "short_id_url": "https://lobste.rs/s/khdiby",
+    "comments_url": "https://lobste.rs/s/khdiby/artificial_adventures"
+  },
+  {
+    "short_id": "iloa3u",
+    "created_at": "2026-07-01T11:04:07.000-05:00",
+    "title": "Pidgin 3.0 Alpha 2 (2.96.0) has been released",
+    "url": "https://discourse.imfreedom.org/t/pidgin-3-0-alpha-2-2-96-0-has-been-released/398",
+    "score": 22,
+    "flags": 0,
+    "comment_count": 9,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "grim",
+    "user_is_author": true,
+    "tags": [
+      "release"
+    ],
+    "short_id_url": "https://lobste.rs/s/iloa3u",
+    "comments_url": "https://lobste.rs/s/iloa3u/pidgin_3_0_alpha_2_2_96_0_has_been_released"
+  },
+  {
+    "short_id": "qwk5vn",
+    "created_at": "2026-07-01T05:32:50.000-05:00",
+    "title": "Building a passive Ethernet tap",
+    "url": "https://blog.lvmbdv.dev/posts/building-a-passive-ethernet-tap/",
+    "score": 29,
+    "flags": 1,
+    "comment_count": 19,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "lvmbdv",
+    "user_is_author": true,
+    "tags": [
+      "hardware",
+      "networking",
+      "security"
+    ],
+    "short_id_url": "https://lobste.rs/s/qwk5vn",
+    "comments_url": "https://lobste.rs/s/qwk5vn/building_passive_ethernet_tap"
+  },
+  {
+    "short_id": "jcdcit",
+    "created_at": "2026-07-01T08:38:39.000-05:00",
+    "title": "Announcing Box3D",
+    "url": "https://box2d.org/posts/2026/06/announcing-box3d/",
+    "score": 67,
+    "flags": 0,
+    "comment_count": 2,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "yokljo",
+    "user_is_author": false,
+    "tags": [
+      "c",
+      "math",
+      "vibecoding"
+    ],
+    "short_id_url": "https://lobste.rs/s/jcdcit",
+    "comments_url": "https://lobste.rs/s/jcdcit/announcing_box3d"
+  },
+  {
+    "short_id": "ujlr19",
+    "created_at": "2026-07-01T01:54:13.000-05:00",
+    "title": "Uruky - The Paid European Search Engine",
+    "url": "https://robheghan.prose.sh/26_06_30_uruky",
+    "score": 35,
+    "flags": 1,
+    "comment_count": 11,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "robinheghan",
+    "user_is_author": true,
+    "tags": [
+      "web"
+    ],
+    "short_id_url": "https://lobste.rs/s/ujlr19",
+    "comments_url": "https://lobste.rs/s/ujlr19/uruky_paid_european_search_engine"
+  },
+  {
+    "short_id": "4liqdw",
+    "created_at": "2026-07-01T06:29:46.000-05:00",
+    "title": "All Package Management Functionality Moved from Compiler to Build System",
+    "url": "https://ziglang.org/devlog/2026/?2026-06-30#2026-06-30",
+    "score": 55,
+    "flags": 0,
+    "comment_count": 1,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "FedericoSchonborn",
+    "user_is_author": false,
+    "tags": [
+      "zig"
+    ],
+    "short_id_url": "https://lobste.rs/s/4liqdw",
+    "comments_url": "https://lobste.rs/s/4liqdw/all_package_management_functionality"
+  },
+  {
+    "short_id": "ivfo77",
+    "created_at": "2026-07-01T03:01:30.000-05:00",
+    "title": "Who's hiring? Q3 2026",
+    "url": "",
+    "score": 40,
+    "flags": 0,
+    "comment_count": 14,
+    "description": "<p>Please, use the template:</p>\n<pre lang=\"**Company:**\"><code>\r\n**Company website:** WWW\r\n\r\n**Position(s):** ABC\r\n\r\n**Location:** XXX (include whether REMOTE worldwide/US/EU/etc. or ONSITE)\r\n\r\n**Description:** XYZ\r\n\r\n**Tech stack:** ABC\r\n\r\n**Compensation:** XXX (salary, equity, vacation, major benefits)\r\n\r\n**Contacts:** WWW\r\n</code></pre>\n",
+    "description_plain": "Please, use the template:\r\n\r\n```**Company:** XYZ\r\n\r\n**Company website:** WWW\r\n\r\n**Position(s):** ABC\r\n\r\n**Location:** XXX (include whether REMOTE worldwide/US/EU/etc. or ONSITE)\r\n\r\n**Description:** XYZ\r\n\r\n**Tech stack:** ABC\r\n\r\n**Compensation:** XXX (salary, equity, vacation, major benefits)\r\n\r\n**Contacts:** WWW\r\n```",
+    "submitter_user": "makishimu",
+    "user_is_author": true,
+    "tags": [
+      "job"
+    ],
+    "short_id_url": "https://lobste.rs/s/ivfo77",
+    "comments_url": "https://lobste.rs/s/ivfo77/who_s_hiring_q3_2026"
+  },
+  {
+    "short_id": "96kp1m",
+    "created_at": "2026-06-30T17:16:39.000-05:00",
+    "title": "jj jj jj jj jj",
+    "url": "https://caiustheory.com/jj-jj-jj-jj-jj/",
+    "score": 63,
+    "flags": 1,
+    "comment_count": 26,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "caius",
+    "user_is_author": true,
+    "tags": [
+      "vcs"
+    ],
+    "short_id_url": "https://lobste.rs/s/96kp1m",
+    "comments_url": "https://lobste.rs/s/96kp1m/jj_jj_jj_jj_jj"
+  },
+  {
+    "short_id": "knec7o",
+    "created_at": "2026-07-01T05:59:34.000-05:00",
+    "title": "Changes to Godot Engine Contribution Policies",
+    "url": "https://godotengine.org/article/contribution-policy-2026/",
+    "score": 37,
+    "flags": 1,
+    "comment_count": 4,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "hoistbypetard",
+    "user_is_author": false,
+    "tags": [
+      "practices",
+      "vibecoding"
+    ],
+    "short_id_url": "https://lobste.rs/s/knec7o",
+    "comments_url": "https://lobste.rs/s/knec7o/changes_godot_engine_contribution"
+  },
+  {
+    "short_id": "dvhioc",
+    "created_at": "2026-07-01T09:00:35.000-05:00",
+    "title": "Progress Report: Linux 7.1 - Asahi Linux",
+    "url": "https://asahilinux.org/2026/06/progress-report-7-1/",
+    "score": 33,
+    "flags": 0,
+    "comment_count": 0,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "thisalex",
+    "user_is_author": false,
+    "tags": [
+      "linux"
+    ],
+    "short_id_url": "https://lobste.rs/s/dvhioc",
+    "comments_url": "https://lobste.rs/s/dvhioc/progress_report_linux_7_1_asahi_linux"
+  },
+  {
+    "short_id": "q8vdre",
+    "created_at": "2026-07-01T23:23:14.000-05:00",
+    "title": "The Physics of Memory (aka can Javascript ECS?)",
+    "url": "https://www.dmurph.com/posts/2026/06/ecs_vs_oop_benchmark/ecs_vs_oop_benchmark.html",
+    "score": 3,
+    "flags": 0,
+    "comment_count": 0,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "dmurph",
+    "user_is_author": true,
+    "tags": [
+      "compsci",
+      "games",
+      "javascript",
+      "show",
+      "wasm",
+      "web"
+    ],
+    "short_id_url": "https://lobste.rs/s/q8vdre",
+    "comments_url": "https://lobste.rs/s/q8vdre/physics_memory_aka_can_javascript_ecs"
+  },
+  {
+    "short_id": "pth2bm",
+    "created_at": "2026-07-01T06:58:15.000-05:00",
+    "title": "The Internet I Grew Up With Doesn’t Exist Anymore",
+    "url": "https://cleberg.net/blog/internet.html",
+    "score": 30,
+    "flags": 0,
+    "comment_count": 4,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "gerikson",
+    "user_is_author": false,
+    "tags": [
+      "historical",
+      "web"
+    ],
+    "short_id_url": "https://lobste.rs/s/pth2bm",
+    "comments_url": "https://lobste.rs/s/pth2bm/internet_i_grew_up_with_doesn_t_exist"
+  },
+  {
+    "short_id": "w01x4p",
+    "created_at": "2026-07-01T05:22:06.000-05:00",
+    "title": "Which GitHub features are needed in a code forge before you can migrate?",
+    "url": "",
+    "score": 20,
+    "flags": 4,
+    "comment_count": 52,
+    "description": "<p>Which GitHub features would you consider a blocker for migrating to a different code forge, and in what order do you prioritize them?</p>\n<p><strong>Context:</strong></p>\n<p>I am heads down building a code forge (<a href=\"https://juju.bi\" rel=\"ugc\">https://juju.bi</a>) based on three ideas:</p>\n<ul>\n<li>Code collaboration part should work offline</li>\n<li>Should be compatible with GitHub API (like how some services are considered S3 compatible)</li>\n<li>Support <code>change-id</code> based features (ex: Jujutsu's evolog)</li>\n</ul>\n<p>I shipped a super-early version that I am currently dogfooding. <a href=\"https://juju.bi/changelog/2026-07-01-alpha-release\" rel=\"ugc\">https://juju.bi/changelog/2026-07-01-alpha-release</a></p>\n<p>I am currently focused on improving the experience for small teams working on private repos. I would like to polish the overall product before thinking about public repos. (A lot of great forges exist for public repos right now).</p>\n",
+    "description_plain": "Which GitHub features would you consider a blocker for migrating to a different code forge, and in what order do you prioritize them?\r\n\r\n**Context:**\r\n\r\nI am heads down building a code forge (https://juju.bi) based on three ideas:\r\n\r\n* Code collaboration part should work offline\r\n* Should be compatible with GitHub API (like how some services are considered S3 compatible)\r\n* Support `change-id` based features (ex: Jujutsu's evolog)\r\n\r\nI shipped a super-early version that I am currently dogfooding. https://juju.bi/changelog/2026-07-01-alpha-release\r\n\r\nI am currently focused on improving the experience for small teams working on private repos. I would like to polish the overall product before thinking about public repos. (A lot of great forges exist for public repos right now).",
+    "submitter_user": "pksunkara",
+    "user_is_author": true,
+    "tags": [
+      "ask",
+      "vcs"
+    ],
+    "short_id_url": "https://lobste.rs/s/w01x4p",
+    "comments_url": "https://lobste.rs/s/w01x4p/which_github_features_are_needed_code"
+  },
+  {
+    "short_id": "mml3sh",
+    "created_at": "2026-07-01T21:29:04.000-05:00",
+    "title": "Creating a development sandbox with crosvm",
+    "url": "https://www.erat.org/crosvm.html",
+    "score": 3,
+    "flags": 0,
+    "comment_count": 0,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "derat",
+    "user_is_author": true,
+    "tags": [
+      "practices",
+      "security",
+      "virtualization"
+    ],
+    "short_id_url": "https://lobste.rs/s/mml3sh",
+    "comments_url": "https://lobste.rs/s/mml3sh/creating_development_sandbox_with"
+  },
+  {
+    "short_id": "0kc445",
+    "created_at": "2026-07-01T19:36:55.000-05:00",
+    "title": "Unprivileged root via an out-of-bounds write in the FUSE readdir cache (CVE-2026-31694)",
+    "url": "https://cyberstan.co.uk/fuse-readdir-oob/",
+    "score": 6,
+    "flags": 0,
+    "comment_count": 1,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "fro",
+    "user_is_author": false,
+    "tags": [
+      "linux",
+      "security"
+    ],
+    "short_id_url": "https://lobste.rs/s/0kc445",
+    "comments_url": "https://lobste.rs/s/0kc445/unprivileged_root_via_out_bounds_write"
+  },
+  {
+    "short_id": "paoclp",
+    "created_at": "2026-07-01T10:16:54.000-05:00",
+    "title": "GraalVM Hello World Program Down To \"Just\" 6.5MB",
+    "url": "https://www.phoronix.com/news/GraalVM-Community-25.1.3",
+    "score": 8,
+    "flags": 0,
+    "comment_count": 7,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "alemi",
+    "user_is_author": false,
+    "tags": [
+      "java"
+    ],
+    "short_id_url": "https://lobste.rs/s/paoclp",
+    "comments_url": "https://lobste.rs/s/paoclp/graalvm_hello_world_program_down_just_6"
+  },
+  {
+    "short_id": "bsojea",
+    "created_at": "2026-07-01T09:19:33.000-05:00",
+    "title": "GameBoy Emulator on ESP32 + Eink",
+    "url": "https://www.youtube.com/watch?v=oPbOK90aJEo",
+    "score": 16,
+    "flags": 0,
+    "comment_count": 1,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "Yogthos",
+    "user_is_author": false,
+    "tags": [
+      "hardware",
+      "programming",
+      "video"
+    ],
+    "short_id_url": "https://lobste.rs/s/bsojea",
+    "comments_url": "https://lobste.rs/s/bsojea/gameboy_emulator_on_esp32_eink"
+  },
+  {
+    "short_id": "gwxqmh",
+    "created_at": "2026-07-02T00:19:10.000-05:00",
+    "title": "The Control Plane Was the Point: Revisiting autofz in the LLM Era",
+    "url": "https://yfu.tw/blog/en/autofz-revisited/",
+    "score": 1,
+    "flags": 0,
+    "comment_count": 0,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "yufu",
+    "user_is_author": true,
+    "tags": [
+      "ai",
+      "programming",
+      "security"
+    ],
+    "short_id_url": "https://lobste.rs/s/gwxqmh",
+    "comments_url": "https://lobste.rs/s/gwxqmh/control_plane_was_point_revisiting"
+  },
+  {
+    "short_id": "qs2sxd",
+    "created_at": "2026-06-30T14:04:44.000-05:00",
+    "title": "Claude Code Is Steganographically Marking Requests",
+    "url": "https://thereallo.dev/blog/claude-code-prompt-steganography",
+    "score": 85,
+    "flags": 1,
+    "comment_count": 8,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "alexjs",
+    "user_is_author": false,
+    "tags": [
+      "privacy",
+      "vibecoding"
+    ],
+    "short_id_url": "https://lobste.rs/s/qs2sxd",
+    "comments_url": "https://lobste.rs/s/qs2sxd/claude_code_is_steganographically"
+  },
+  {
+    "short_id": "z2wzap",
+    "created_at": "2026-07-01T12:29:00.000-05:00",
+    "title": "Open Source as Infrastructure: Taking Roads and Bridges literally",
+    "url": "https://nesbitt.io/2026/06/30/taking-roads-and-bridges-literally.html",
+    "score": 8,
+    "flags": 0,
+    "comment_count": 1,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "robey",
+    "user_is_author": false,
+    "tags": [
+      "security",
+      "testing"
+    ],
+    "short_id_url": "https://lobste.rs/s/z2wzap",
+    "comments_url": "https://lobste.rs/s/z2wzap/open_source_as_infrastructure_taking"
+  },
+  {
+    "short_id": "v7ghbn",
+    "created_at": "2026-06-30T20:38:44.000-05:00",
+    "title": "It's not me, it's the compiler",
+    "url": "https://parsa.wtf/cast/",
+    "score": 55,
+    "flags": 0,
+    "comment_count": 1,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "robinhundt",
+    "user_is_author": false,
+    "tags": [
+      "rust"
+    ],
+    "short_id_url": "https://lobste.rs/s/v7ghbn",
+    "comments_url": "https://lobste.rs/s/v7ghbn/it_s_not_me_it_s_compiler"
+  },
+  {
+    "short_id": "vuqsur",
+    "created_at": "2026-07-02T00:21:42.000-05:00",
+    "title": "On Ditching Vagrant",
+    "url": "https://benjamintoll.com/2026/06/29/on-ditching-vagrant/",
+    "score": 2,
+    "flags": 0,
+    "comment_count": 0,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "raymii",
+    "user_is_author": false,
+    "tags": [
+      "linux",
+      "virtualization"
+    ],
+    "short_id_url": "https://lobste.rs/s/vuqsur",
+    "comments_url": "https://lobste.rs/s/vuqsur/on_ditching_vagrant"
+  },
+  {
+    "short_id": "tgjz7s",
+    "created_at": "2026-07-01T21:32:44.000-05:00",
+    "title": "Improving token efficiency for GitHub Copilot in VS Code",
+    "url": "https://code.visualstudio.com/blogs/2026/06/17/improving-token-efficiency-in-github-copilot",
+    "score": 3,
+    "flags": 0,
+    "comment_count": 0,
+    "description": "",
+    "description_plain": "",
+    "submitter_user": "expurple",
+    "user_is_author": false,
+    "tags": [
+      "performance",
+      "vibecoding",
+      "vscode"
+    ],
+    "short_id_url": "https://lobste.rs/s/tgjz7s",
+    "comments_url": "https://lobste.rs/s/tgjz7s/improving_token_efficiency_for_github"
+  }
+]

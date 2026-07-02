@@ -1,0 +1,36 @@
+{
+  "short_id": "thkwcf",
+  "created_at": "2026-07-01T09:55:34.000-05:00",
+  "title": "US Supreme Court just blew up EU-US Data Transfers",
+  "url": "https://noyb.eu/en/us-supreme-court-just-blew-eu-us-data-transfers",
+  "score": 100,
+  "flags": 2,
+  "comment_count": 1,
+  "description": "",
+  "description_plain": "",
+  "submitter_user": "kngl",
+  "user_is_author": false,
+  "tags": [
+    "law"
+  ],
+  "comments": [
+    {
+      "short_id": "5cflvm",
+      "created_at": "2026-07-01T21:25:38.000-05:00",
+      "last_edited_at": "2026-07-01T21:25:38.386-05:00",
+      "is_deleted": false,
+      "is_moderated": false,
+      "score": 16,
+      "flags": 0,
+      "parent_comment": null,
+      "comment": "<p>This is a good thing. The EU, and by extension and example the rest of the world, should not be so dependent on a rogue state that insists its authority is supreme, that no longer treats any other country or government as an equal.</p>\n",
+      "comment_plain": "This is a good thing. The EU, and by extension and example the rest of the world, should not be so dependent on a rogue state that insists its authority is supreme, that no longer treats any other country or government as an equal.",
+      "depth": 0,
+      "commenting_user": "johnklos",
+      "short_id_url": "https://lobste.rs/c/5cflvm",
+      "url": "https://lobste.rs/s/thkwcf/us_supreme_court_just_blew_up_eu_us_data#c_5cflvm"
+    }
+  ],
+  "short_id_url": "https://lobste.rs/s/thkwcf",
+  "comments_url": "https://lobste.rs/s/thkwcf/us_supreme_court_just_blew_up_eu_us_data"
+}

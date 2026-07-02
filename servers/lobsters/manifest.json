@@ -1,0 +1,18 @@
+{
+  "manifest_version": "0.3",
+  "name": "medium-research-lobsters",
+  "version": "1.0.0",
+  "description": "Lobsters research with normalized MCP output. Wraps the public lobste.rs .json endpoints (lobsters_hottest, lobsters_tag, lobsters_get, plus a client-side lobsters_search over the hottest window). Runs fully keyless — Lobsters needs no credentials, so there is no user_config. Actual .mcpb packing is deferred to v2 (PKG-01); this manifest is documentation/scaffold only.",
+  "author": {
+    "name": "Tushar Kanjariya"
+  },
+  "user_config": {},
+  "server": {
+    "type": "node",
+    "entry_point": "server.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server.js"]
+    }
+  }
+}
