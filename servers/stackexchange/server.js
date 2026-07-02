@@ -90,15 +90,24 @@ export function mapSeDetail(question, answers = []) {
   return { item, comments };
 }
 
-// Build a SE query string: always includes filter=withbody and spreads the optional
-// key fragment (emits `key` ONLY when set — never `key=` when absent, CRED-04).
-function seUrl(path, params) {
-  const qs = new URLSearchParams({
+// Build a SE request URL + a secret-free cache key (WR-01). The authed URL folds
+// in the optional key fragment (emits `key` ONLY when set — never `key=` when
+// absent, CRED-04); the cache key deliberately OMITS the key so a credential can
+// never become part of the cache key (http_client's cacheKey contract: "NEVER a
+// secret"). getJson's error text is separately redacted (redactUrl), so the key
+// also never leaks into a thrown error. Callers: `const { url, cacheKey } =
+// seUrl(...); await getJson(url, { cacheKey })`.
+export function seUrl(path, params) {
+  const publicQs = new URLSearchParams({ ...params, filter: "withbody" });
+  const authedQs = new URLSearchParams({
     ...params,
     filter: "withbody",
     ...stackExchangeParams(),
   });
-  return `${SE}${path}?${qs.toString()}`;
+  return {
+    url: `${SE}${path}?${authedQs.toString()}`,
+    cacheKey: `${SE}${path}?${publicQs.toString()}`,
+  };
 }
 
 // --- MCP wiring (identical shape to the HN template) ---------------------
@@ -130,14 +139,13 @@ server.registerTool(
     outputSchema: listEnvelopeShape,
   },
   async ({ limit = 20, site = "stackoverflow", sort = "hot" }) => {
-    const raw = await getJson(
-      seUrl("/questions", {
-        site,
-        sort,
-        order: "desc",
-        pagesize: String(limit),
-      }),
-    );
+    const { url, cacheKey } = seUrl("/questions", {
+      site,
+      sort,
+      order: "desc",
+      pagesize: String(limit),
+    });
+    const raw = await getJson(url, { cacheKey });
     const env = buildListEnvelope({
       source: SOURCE,
       query: null, // hot list has no query
@@ -164,15 +172,14 @@ server.registerTool(
     outputSchema: listEnvelopeShape,
   },
   async ({ query, limit = 20, site = "stackoverflow" }) => {
-    const raw = await getJson(
-      seUrl("/search/advanced", {
-        site,
-        q: query,
-        sort: "relevance",
-        order: "desc",
-        pagesize: String(limit),
-      }),
-    );
+    const { url, cacheKey } = seUrl("/search/advanced", {
+      site,
+      q: query,
+      sort: "relevance",
+      order: "desc",
+      pagesize: String(limit),
+    });
+    const raw = await getJson(url, { cacheKey });
     const env = buildListEnvelope({
       source: SOURCE,
       query,
@@ -198,14 +205,14 @@ server.registerTool(
   },
   async ({ id, site = "stackoverflow" }) => {
     const encId = encodeURIComponent(id);
-    const raw = await getJson(seUrl(`/questions/${encId}`, { site }));
-    const answers = await getJson(
-      seUrl(`/questions/${encId}/answers`, {
-        site,
-        sort: "votes",
-        order: "desc",
-      }),
-    );
+    const q = seUrl(`/questions/${encId}`, { site });
+    const raw = await getJson(q.url, { cacheKey: q.cacheKey });
+    const a = seUrl(`/questions/${encId}/answers`, {
+      site,
+      sort: "votes",
+      order: "desc",
+    });
+    const answers = await getJson(a.url, { cacheKey: a.cacheKey });
     const { item, comments } = mapSeDetail(raw.items?.[0], answers.items ?? []);
     const env = buildDetailEnvelope({ source: SOURCE, item, comments });
     return toolResult(env);

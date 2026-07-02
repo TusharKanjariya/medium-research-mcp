@@ -153,6 +153,42 @@ test("a 408 is NOT retried — strict no-4xx-retry (fetch called once)", async (
   assert.equal(fetchImpl.calls, 1, "408 must never be retried");
 });
 
+// --- WR-01: credential/query-string redaction in error messages ----------
+test("getJson error message strips the URL query string so a key= secret cannot leak (WR-01)", async () => {
+  const fetchImpl = fetchStub([res(404, null)]);
+  await assert.rejects(
+    () =>
+      getJson("https://example.test/questions/42?site=so&key=SUPER_SECRET_KEY", {
+        fetchImpl,
+        sleep: sleepSpy(),
+        cacheKey: "http:redact-get",
+      }),
+    (err) => {
+      assert.ok(!/SUPER_SECRET_KEY/.test(err.message), "secret must NOT appear in error");
+      assert.ok(!/\?/.test(err.message), "query string dropped entirely");
+      assert.ok(/example\.test\/questions\/42/.test(err.message), "path preserved");
+      return true;
+    },
+  );
+});
+
+test("postJson error message strips the URL query string too (WR-01 parity)", async () => {
+  const fetchImpl = fetchStub([res(400, null)]);
+  await assert.rejects(
+    () =>
+      postJson("https://gql.test/graphql?token=SUPER_SECRET_TOKEN", {
+        fetchImpl,
+        sleep: sleepSpy(),
+        body: { q: 1 },
+        cacheKey: "http:redact-post",
+      }),
+    (err) => {
+      assert.ok(!/SUPER_SECRET_TOKEN/.test(err.message), "secret must NOT appear in error");
+      return true;
+    },
+  );
+});
+
 // --- stale fallback ------------------------------------------------------
 test("on total failure a previously cached (now stale) value is returned instead of throwing", async () => {
   cacheSet("http:stale", { cached: "old" }, -1000); // seed an expired entry

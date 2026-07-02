@@ -19,6 +19,7 @@ import { fileURLToPath } from "node:url";
 import {
   mapSeQuestion,
   mapSeDetail,
+  seUrl,
   server,
 } from "../servers/stackexchange/server.js";
 import {
@@ -166,6 +167,36 @@ test("mapSeDetail builds a detail envelope that parses against the contract sche
     ...mapSeDetail(detailQuestion, answers.items),
   });
   assert.doesNotThrow(() => DetailEnvelopeSchema.parse(env));
+});
+
+// --- WR-01: API key never enters the cache key ---------------------------
+
+test("seUrl sends the API key in the request URL but NEVER in the cache key (WR-01)", () => {
+  const prev = process.env.STACKEXCHANGE_KEY;
+  process.env.STACKEXCHANGE_KEY = "SECRET_SE_KEY_XYZ";
+  try {
+    const { url, cacheKey } = seUrl("/questions/42", { site: "stackoverflow" });
+    assert.ok(url.includes("SECRET_SE_KEY_XYZ"), "authed URL carries the key");
+    assert.ok(
+      !cacheKey.includes("SECRET_SE_KEY_XYZ"),
+      "cache key must be secret-free (http_client contract: NEVER a secret)",
+    );
+    assert.ok(!cacheKey.includes("key="), "no key param in the cache key at all");
+  } finally {
+    if (prev === undefined) delete process.env.STACKEXCHANGE_KEY;
+    else process.env.STACKEXCHANGE_KEY = prev;
+  }
+});
+
+test("seUrl emits no key param at all when STACKEXCHANGE_KEY is unset (keyless degrade, CRED-04)", () => {
+  const prev = process.env.STACKEXCHANGE_KEY;
+  delete process.env.STACKEXCHANGE_KEY;
+  try {
+    const { url } = seUrl("/questions/42", { site: "stackoverflow" });
+    assert.ok(!url.includes("key="), "keyless mode sends no key= param");
+  } finally {
+    if (prev !== undefined) process.env.STACKEXCHANGE_KEY = prev;
+  }
 });
 
 // --- registration smoke (FOUND-05) --------------------------------------

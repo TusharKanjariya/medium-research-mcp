@@ -30,6 +30,20 @@ const realSleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 // Marks an error that should trigger a retry (5xx / non-JSON body).
 class RetryableError extends Error {}
 
+// Strip the query string from a URL before it appears in a thrown error message
+// (WR-01, CLAUDE.md security: keys are "never logged or echoed in output/errors").
+// A credential carried as a query param (e.g. Stack Exchange's `key=`) must never
+// leak into an error surfaced back through an MCP tool result. Callers that also
+// key the cache must pass a secret-free `cacheKey` — this only guards error text.
+function redactUrl(url) {
+  try {
+    const u = new URL(url);
+    return `${u.origin}${u.pathname}`;
+  } catch {
+    return String(url).split("?")[0];
+  }
+}
+
 // `init` carries the fetch RequestInit (headers, and for POST also method/body);
 // the abort `signal` is merged in so every verb shares one timeout path.
 async function fetchWithTimeout(fetchImpl, url, init, timeoutMs) {
@@ -86,7 +100,7 @@ export async function getJson(url, opts = {}) {
         } catch {
           // Non-JSON body (e.g. an HTML block page) — treat as a failed attempt
           // (Pitfall 6), never an uncaught crash.
-          throw new RetryableError(`getJson: non-JSON body from ${url}`);
+          throw new RetryableError(`getJson: non-JSON body from ${redactUrl(url)}`);
         }
         set(cacheKey, value, ttlMs);
         return value;
@@ -94,11 +108,11 @@ export async function getJson(url, opts = {}) {
 
       const { status } = response;
       if (RETRYABLE_5XX.has(status)) {
-        throw new RetryableError(`getJson: HTTP ${status} from ${url}`);
+        throw new RetryableError(`getJson: HTTP ${status} from ${redactUrl(url)}`);
       }
 
       // Any 4xx (incl. 429/408) or other non-retryable status: do NOT retry.
-      lastError = new Error(`getJson: HTTP ${status} from ${url}`);
+      lastError = new Error(`getJson: HTTP ${status} from ${redactUrl(url)}`);
       break;
     } catch (err) {
       lastError = err;
@@ -120,7 +134,7 @@ export async function getJson(url, opts = {}) {
   const stale = getStale(cacheKey);
   if (stale !== undefined) return stale;
 
-  throw lastError ?? new Error(`getJson: request to ${url} failed`);
+  throw lastError ?? new Error(`getJson: request to ${redactUrl(url)} failed`);
 }
 
 /**
@@ -182,7 +196,7 @@ export async function postJson(url, opts = {}) {
         try {
           value = await response.json();
         } catch {
-          throw new RetryableError(`postJson: non-JSON body from ${url}`);
+          throw new RetryableError(`postJson: non-JSON body from ${redactUrl(url)}`);
         }
         set(key, value, ttlMs);
         return value;
@@ -190,11 +204,11 @@ export async function postJson(url, opts = {}) {
 
       const { status } = response;
       if (RETRYABLE_5XX.has(status)) {
-        throw new RetryableError(`postJson: HTTP ${status} from ${url}`);
+        throw new RetryableError(`postJson: HTTP ${status} from ${redactUrl(url)}`);
       }
 
       // Any 4xx (incl. 429/408) or other non-retryable status: do NOT retry.
-      lastError = new Error(`postJson: HTTP ${status} from ${url}`);
+      lastError = new Error(`postJson: HTTP ${status} from ${redactUrl(url)}`);
       break;
     } catch (err) {
       lastError = err;
@@ -216,5 +230,5 @@ export async function postJson(url, opts = {}) {
   const stale = getStale(key);
   if (stale !== undefined) return stale;
 
-  throw lastError ?? new Error(`postJson: request to ${url} failed`);
+  throw lastError ?? new Error(`postJson: request to ${redactUrl(url)} failed`);
 }
