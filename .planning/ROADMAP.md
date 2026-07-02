@@ -39,7 +39,7 @@ in addition to the phase's own success criteria:
 
 - [x] **Phase 1: Foundation & Credential Infrastructure** - Shared cache/HTTP layer, the output contract, the HN reference server, and env-only credential + token-auth infrastructure (completed 2026-07-01)
 - [x] **Phase 2: Keyless Source Breadth** - Stack Exchange, Lobsters, Lemmy, and Dev.to servers, proving the copy-a-folder pattern at breadth (completed 2026-07-02; Hashnode dropped — upstream retired free GraphQL API)
-- [ ] **Phase 3: Keyed Ecosystem & Launch Sources** - GitHub, Libraries.io, and Product Hunt servers, exercising optional-PAT and required-credential paths
+- [x] **Phase 3: Keyed Ecosystem & Launch Sources** - GitHub, Libraries.io, and Product Hunt servers, exercising optional-PAT and required-credential paths (completed 2026-07-02)
 - [ ] **Phase 4: RSS Multiplier & Output Proof** - Generic RSS/Atom fetcher (incl. subreddit `.rss`), a real 5+-source uniform run, and the Python YouTube→blog wrapper
 
 ## Phase Details
@@ -104,7 +104,7 @@ Plans:
   3. Product Hunt server returns today/this-week launches by topic and fails with a clear "set X" error when its required token is missing.
   4. All three servers pass the Universal Server Bar, with required-credential error behavior explicitly verified.
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans complete
 
 Plans:
 **Wave 1**
@@ -113,7 +113,7 @@ Plans:
 
 **Wave 2** *(depends on 03-01 — shared `contract.js` TYPE extension must land first)*
 
-- [ ] 03-02-PLAN.md — Libraries.io (`librariesio_search`/`_get`, required key) + Product Hunt (`producthunt_launches`/`_get`, GraphQL, required token) — the required-credential pair [SRC-07, SRC-08] (wave 2)
+- [x] 03-02-PLAN.md — Libraries.io (`librariesio_search`/`_get`, required key) + Product Hunt (`producthunt_launches`/`_get`, GraphQL, required token) — the required-credential pair [SRC-07, SRC-08] (wave 2)
 
 ### Phase 4: RSS Multiplier & Output Proof
 
@@ -161,5 +161,5 @@ Phase 1 and may run in parallel; Phase 4 depends on both).
 |-------|----------------|--------|-----------|
 | 1. Foundation & Credential Infrastructure | 3/3 | Complete    | 2026-07-01 |
 | 2. Keyless Source Breadth | 3/3 | Complete    | 2026-07-02 |
-| 3. Keyed Ecosystem & Launch Sources | 1/2 | In Progress|  |
+| 3. Keyed Ecosystem & Launch Sources | 2/2 | Complete   | 2026-07-02 |
 | 4. RSS Multiplier & Output Proof | 0/3 | Not started | - |

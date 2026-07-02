@@ -30,8 +30,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [~] **SRC-04**: ~~Hashnode server (trending by tag, search, article) via public GraphQL, no auth~~ — **DROPPED 2026-07-02**: Hashnode retired free/keyless GraphQL access (Pro plan required for all queries as of 2026-05-13), which breaks the public-keyless premise and conflicts with the project's keyless/non-commercial constraint. Server was built + offline-tested, then removed.
 - [x] **SRC-05**: Dev.to server (trending by tag, search, article), no auth
 - [x] **SRC-06**: GitHub server — trending repos (Search API) + issues/discussions pain-point mining; optional PAT
-- [ ] **SRC-07**: Libraries.io server (rising/most-depended packages); required key
-- [ ] **SRC-08**: Product Hunt server (today/this-week launches by topic); required token
+- [x] **SRC-07**: Libraries.io server (rising/most-depended packages); required key
+- [x] **SRC-08**: Product Hunt server (today/this-week launches by topic); required token
 - [ ] **SRC-09**: Generic RSS/Atom fetcher (any feed → newsletters, dev blogs, and read-only subreddit `.rss`); emits feed-items with `score`/`num_comments` null
 
 ### Output & Consumer
@@ -91,8 +91,8 @@ Which phases cover which requirements. Finalized during roadmap creation.
 | SRC-04 | Phase 2 | Dropped (upstream paywalled 2026-05-13) |
 | SRC-05 | Phase 2 | Complete |
 | SRC-06 | Phase 3 | Complete |
-| SRC-07 | Phase 3 | Pending |
-| SRC-08 | Phase 3 | Pending |
+| SRC-07 | Phase 3 | Complete |
+| SRC-08 | Phase 3 | Complete |
 | SRC-09 | Phase 4 | Pending |
 | OUT-01 | Phase 1 | Complete |
 | OUT-02 | Phase 4 | Pending |
