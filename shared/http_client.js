@@ -152,6 +152,19 @@ function isBlockedAddress(address) {
  * with no real DNS. Errors use redactUrl (origin+path only) so no query-string
  * secret can leak (T-04-08 / V7); hostnames are not secrets.
  *
+ * ACCEPTED RESIDUAL — TOCTOU / DNS rebinding (WR-02): this guard resolves-and-
+ * checks the host here, but the subsequent fetch performs its OWN, INDEPENDENT
+ * DNS resolution inside undici when it opens the socket. The checked address is
+ * not pinned to the connected address, so a resolver returning a public IP at
+ * check time and an internal IP at connect time (short-TTL DNS rebinding) is NOT
+ * fully closed. Per-hop redirect re-validation (fetchTextManual) narrows the
+ * redirect vector, but the check-vs-connect gap on every host remains open
+ * without IP pinning (pass a custom `lookup` to a per-request undici dispatcher
+ * so the socket connects to the exact validated IP, or re-check the peer IP
+ * post-connect). This is a knowingly-accepted low risk for a LOCAL, single-user,
+ * personal-use MCP tool (matches 04-CONTEXT / 04-RESEARCH "Security Domain") — it
+ * is documented here rather than silently left as a hole.
+ *
  * @param {string} rawUrl
  * @param {object} [opts]
  * @param {Function} [opts.lookup=dnsLookup] injectable dns.lookup (tests)
