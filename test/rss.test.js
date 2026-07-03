@@ -82,6 +82,50 @@ test("mapRssItem author falls back dc:creator -> author -> null", () => {
   assert.equal(mapRssItem({ title: "t" }).author, null);
 });
 
+// WR-01: a <dc:creator>/<author>/<name> carrying an XML attribute parses to an
+// OBJECT ({ "#text": "...", "@_...": "..." }). Un-coerced it lands in author and
+// fails author:z.string().nullable(), hard-erroring the whole tool on an odd feed
+// (violates the never-hard-error rule). Author must be coerced to a string-or-null,
+// and the built envelope must still validate against the contract schema.
+test("mapRssItem coerces an object-valued dc:creator (attribute present) to a string (WR-01)", () => {
+  const m = mapRssItem({
+    title: "t",
+    link: "http://x/1",
+    "dc:creator": { "#text": "Jane Doe", "@_role": "author" },
+  });
+  assert.equal(typeof m.author, "string");
+  assert.equal(m.author, "Jane Doe");
+  const env = buildListEnvelope({ source: "rss", query: "q", results: [m] });
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env), "object author must not break the contract");
+});
+
+test("mapAtomEntry coerces an object-valued author.name (attribute present) to a string (WR-01)", () => {
+  const m = mapAtomEntry({
+    title: "t",
+    link: { "@_rel": "alternate", "@_href": "http://x/1" },
+    author: { name: { "#text": "Chan Nel", "@_lang": "en" } },
+  });
+  assert.equal(typeof m.author, "string");
+  assert.equal(m.author, "Chan Nel");
+  const env = buildListEnvelope({ source: "rss", query: "q", results: [m] });
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env), "object author must not break the contract");
+});
+
+test("rss_fetch does not hard-error on a feed whose author element carries an attribute (WR-01)", () => {
+  // Full parse -> normalize -> envelope path (what rss_fetch runs) over an RSS 2.0
+  // feed whose <dc:creator> carries an attribute — must yield a contract-valid item.
+  const xml =
+    `<?xml version="1.0"?>` +
+    `<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"><channel><title>c</title>` +
+    `<item><title>odd</title><link>http://x/odd</link>` +
+    `<dc:creator role="author">Jane Doe</dc:creator></item></channel></rss>`;
+  const items = normalizeFeed(parseFeed(xml), "http://x/feed");
+  const env = buildListEnvelope({ source: "rss", query: "http://x/feed", results: items });
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env));
+  assert.equal(typeof env.results[0].author, "string");
+  assert.equal(env.results[0].author, "Jane Doe");
+});
+
 // --- (b) Atom 1.0 field map (link[rel=alternate] / author.name / ISO date) --
 
 test("mapAtomEntry maps a real Atom entry (link[rel=alternate], author.name, ISO date)", () => {

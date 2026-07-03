@@ -139,7 +139,10 @@ export function mapRssItem(item) {
     ),
     type: "article",
     title: textOf(item.title) ?? "",
-    author: item["dc:creator"] ?? textOf(item.author) ?? null,
+    // WR-01: coerce through textOf — a <dc:creator>/<author> carrying an XML
+    // attribute parses to an object, which would fail author:z.string().nullable()
+    // and hard-error the tool. textOf collapses it to its #text string or null.
+    author: textOf(item["dc:creator"]) ?? textOf(item.author) ?? null,
     score: null, // D-05
     num_comments: null, // D-05
     created_utc: toIso(item.pubDate),
@@ -168,7 +171,9 @@ export function mapAtomEntry(entry) {
     id: String(entry.id ?? href ?? textOf(entry.title) ?? ""),
     type: "article",
     title: textOf(entry.title) ?? "",
-    author: entry.author?.name ?? null, // channel name for a YouTube feed
+    // WR-01: coerce through textOf — an Atom <name> with an attribute parses to an
+    // object; textOf yields its #text string (or null) so author is never a non-string.
+    author: textOf(entry.author?.name) ?? null, // channel name for a YouTube feed
     score: null, // D-05
     num_comments: null, // D-05
     created_utc: toIso(entry.updated ?? entry.published),
