@@ -4,13 +4,14 @@
 **Status:** Ready for planning
 
 > **Note on how this was gathered:** the discuss-phase area-selection question
-> timed out (user away). Phase 4 is well-scoped by the ROADMAP and every decision
-> below is a reversible, planner-actionable choice, so Claude captured
-> **recommended defaults** for the four gray areas rather than blocking. Each
-> carries a **[RECOMMENDED — revise before planning if desired]** tag. **ONE item
-> genuinely needs user input — the YouTube wrapper's OCR-script logistics (D-13) —
-> flagged [NEEDS CONFIRMATION].** Re-run `/gsd-discuss-phase 4` or edit this file
-> to change any of them.
+> timed out (user away), so Claude captured **recommended defaults** for the four
+> gray areas (each tagged **[RECOMMENDED — revise before planning if desired]**).
+> **D-13 was then resolved by the user (2026-07-03):** the Python Tesseract OCR
+> wrapper is **NOT built** — the user has their own OCR→draft script and runs it
+> manually; the project's YouTube job is only to **surface YouTube video links +
+> short explanations** (met via the RSS fetcher's YouTube recipe, D-15). This
+> **drops the separate Python `youtube-blog-mcp` server** and re-scopes YT-01 —
+> see D-13/D-14/D-15 and the ROADMAP-change note at the end.
 
 <domain>
 ## Phase Boundary
@@ -25,14 +26,19 @@ Deliver three things (SRC-09, OUT-02, YT-01), per the ROADMAP:
 2. **5+-source uniform-run proof** (OUT-02) — demonstrate a single research run
    pulling from 5+ of the shipped sources into one uniform list the consumer
    ranks/filters with **zero per-source branches**.
-3. **YouTube→blog wrapper** (YT-01) — a structurally different **Python**,
-   local-only MCP server using the async job pattern (`start_youtube_job` → id,
-   `check_job_status(id)`) around an OCR/transcript step, producing blog **draft**
-   material (the one output-contract exception).
+3. **YouTube link surfacing** (YT-01, re-scoped 2026-07-03) — **NOT** a Python
+   OCR wrapper. The user owns a local Tesseract OCR→draft script and runs it
+   **manually**. This project's only YouTube job is to **surface candidate video
+   links, each with a short explanation**, as normalized items the user eyeballs
+   and then feeds into their own script by hand. Delivered as a **YouTube RSS
+   recipe** on top of the SRC-09 fetcher (D-15) — no Python, no OCR code, no
+   separate `youtube-blog-mcp` server.
 
-**Out of scope:** any new normalized source beyond RSS; the v2 deferred sources
-(Discourse SRC-10, Mastodon SRC-11, Bluesky SRC-12); `.mcpb` packaging (PKG-01,
-v2); changing the output contract for the Node sources.
+**Out of scope:** the Python `youtube-blog-mcp` OCR wrapper (dropped — user runs
+their own script); the OCR/draft-generation step itself (user's local tool); any
+new normalized source beyond RSS; the v2 deferred sources (Discourse SRC-10,
+Mastodon SRC-11, Bluesky SRC-12); `.mcpb` packaging (PKG-01, v2); changing the
+output contract for the Node sources.
 </domain>
 
 <decisions>
@@ -109,30 +115,31 @@ input**, so SSRF is a first-class threat (internal services, cloud metadata
   live sources for a real demo — the live run is a documented manual smoke (like
   the Phase 3 keyed smokes), not a CI gate.
 
-### YouTube→blog wrapper (Python, local-only)
-- **D-11 [RECOMMENDED]:** **Location** — a sibling subdirectory `youtube-blog-mcp/`
-  **inside this repo** (matching ARCHITECTURE §7), NOT a literal separate git repo.
-  "Separate" means a separate runtime/package (Python, own `requirements.txt`,
-  `FastMCP`, stdio) — kept alongside the Node servers for cohesion.
-- **D-12 [RECOMMENDED]:** **Async job pattern** — `start_youtube_job(url)` returns
-  a job id immediately; `check_job_status(id)` returns `queued|running|done|error`
-  plus the drafted output when done. **In-memory job store** (dict keyed by id) —
-  local-only single-process bursts don't need persistence across restarts;
-  file-based only if that requirement emerges (it doesn't for v1).
-- **D-13 [NEEDS CONFIRMATION]:** The ROADMAP/PROJECT say the wrapper "wraps an
-  **existing** Tesseract OCR script," but **no such script exists in this repo.**
-  Recommended default: build the **async-job MCP scaffold + a pluggable OCR/
-  transcript adapter** (a clearly-marked integration point) so the job lifecycle
-  is real and testable, with the actual OCR step behind an adapter the operator
-  points at their Tesseract script (or a ytdlp+tesseract pipeline). **Please
-  confirm:** do you have the existing OCR script to wrap (and where), should the
-  phase build the full OCR pipeline, or is the scaffold+adapter the right v1 line?
-- **D-14 [RECOMMENDED]:** **Output-contract exemption** — the YouTube wrapper
-  produces blog **draft** material, not normalized research items (PROJECT.md
-  names it "the one exception"). Its tools return job id / status / drafted text
-  and are **exempt** from `{ source, query, count, results[] }`. Documented as an
-  explicit, intentional exception so the contract's universality still reads true
-  for the research sources.
+### YouTube (re-scoped — link surfacing only, NO Python OCR wrapper)
+- **D-13 [RESOLVED by user 2026-07-03]:** **The Python `youtube-blog-mcp` OCR
+  wrapper is DROPPED.** The user already has a local Tesseract OCR→draft script
+  and will run it **manually** on chosen links. This phase builds **no Python
+  server, no async-job scaffold, and no OCR/transcript code.** (Supersedes the
+  earlier ARCHITECTURE §7 `youtube-blog-mcp/` plan and the original YT-01
+  wording.)
+- **D-14 [RESOLVED]:** The project's YouTube deliverable is **surfacing candidate
+  video links with a short explanation each** — normalized items (url = watch
+  link, title, `text` = video description, author = channel) the user reviews and
+  then hand-feeds into their own OCR/draft script. No output-contract exception is
+  needed anymore, because YouTube is now just normal contract-shaped RSS output
+  (not a draft-producing wrapper).
+- **D-15 [RECOMMENDED]:** **Delivery = a YouTube RSS recipe on the SRC-09 fetcher**
+  (same pattern as the subreddit `.rss` recipe, D-06): call `rss_fetch(
+  "https://www.youtube.com/feeds/videos.xml?channel_id=<ID>")` (or the
+  `?playlist_id=<ID>` variant) → each recent video maps to a contract item with
+  the watch URL, title, description (→ `text`, HTML-stripped), channel (→ author),
+  publish time; `score`/`num_comments` null. Documented in the tool description +
+  README as the "YouTube channel/playlist" recipe.
+  - **Known limitation (documented):** YouTube RSS is **per-channel/playlist, not
+    keyword search** (YouTube retired the search RSS feed). Keyword-search-across-
+    YouTube would require the YouTube Data API key — **out of the keyless scope
+    and not built.** The user supplies channel/playlist IDs (or a channel's
+    `youtube.com/@handle` → resolve to `channel_id`).
 
 ### Claude's Discretion
 - Exact `getText` signature and redirect-validation mechanism, the chosen XML
@@ -151,8 +158,8 @@ input**, so SSRF is a first-class threat (internal services, cloud metadata
 ### Output contract & MCP layer (linchpin)
 - `docs/ARCHITECTURE.md` §4 — list/detail envelopes + item schema; `score`/`num_comments` may be null but never renamed/dropped.
 - `docs/ARCHITECTURE.md` §5 — RSS/Atom row: `score` null, `num_comments` null, `feed URLs`, no auth.
-- `docs/ARCHITECTURE.md` §3 — `McpServer` + `registerTool` (Node, raw Zod shapes, stdio) AND the Python side (`mcp` package, `FastMCP`, stdio) for the YouTube wrapper.
-- `docs/ARCHITECTURE.md` §7 — the `youtube-blog-mcp/` layout (Python, separate, local-only, `server.py`, async job pattern).
+- `docs/ARCHITECTURE.md` §3 — `McpServer` + `registerTool` (Node, raw Zod shapes, stdio). *(The Python/FastMCP side is no longer used — D-13 dropped the Python wrapper.)*
+- `docs/ARCHITECTURE.md` §7 — the `youtube-blog-mcp/` layout is **superseded** (D-13); ignore it. YouTube is now a Node RSS recipe (D-15).
 - `docs/ARCHITECTURE.md` §8 — cache ~15 min, retry 0.5s/1s/2s, never retry 4xx, stale fallback (the plumbing `getText` must reuse).
 
 ### The reference implementation to copy / extend
@@ -166,7 +173,7 @@ input**, so SSRF is a first-class threat (internal services, cloud metadata
 - `docs/ARCHITECTURE.md` §6 + `CLAUDE.md` — never `fetch` directly / never `process.env` outside `credentials.js`; SSRF precedent (Lemmy `lemmyInstance` is operator-set env, not tool input — RSS is the opposite and needs D-01/D-02).
 - `docs/server-spec-template.md` — per-server spec + Universal Server Bar the RSS fetcher must satisfy (criterion 4).
 - `.planning/REQUIREMENTS.md` — SRC-09, OUT-02, YT-01 (the Phase 4 set).
-- `.planning/ROADMAP.md` §"Phase 4" — goal, 4 success criteria, and the plan split (04-01 RSS · 04-02 uniform-run harness · 04-03 Python YouTube wrapper).
+- `.planning/ROADMAP.md` §"Phase 4" — goal + success criteria. **Plan split revised (D-13): 04-01 RSS fetcher incl. the subreddit + YouTube recipes · 04-02 5+-source uniform-run proof. The former 04-03 Python YouTube wrapper is dropped.** (ROADMAP/REQUIREMENTS YT-01 text needs updating — see the note at the end of this file.)
 
 </canonical_refs>
 
@@ -193,8 +200,9 @@ input**, so SSRF is a first-class threat (internal services, cloud metadata
 - Output consumed by the `medium-blog-pro` skill — the RSS items must be
   rank/filterable with zero source-specific logic, and OUT-02 is the explicit
   proof of exactly that across 5+ sources.
-- The Python YouTube wrapper is a separate runtime (local-only) — no shared code
-  with the Node servers; it is the contract exception (D-14).
+- YouTube needs **no new code** beyond a documented `rss_fetch` recipe (D-15) —
+  it reuses the RSS fetcher entirely. The user's own local OCR/draft script is
+  outside this repo and run manually on the surfaced links.
 
 </code_context>
 
@@ -223,14 +231,33 @@ input**, so SSRF is a first-class threat (internal services, cloud metadata
 - **v2 sources** — Discourse (SRC-10), Mastodon (SRC-11), Bluesky (SRC-12) remain
   deferred to a later milestone.
 - **`.mcpb` packaging (PKG-01)** — per-server bundles deferred to v2.
-- **Full YouTube OCR pipeline** — if D-13 is confirmed as scaffold+adapter for v1,
-  the complete ytdlp+Tesseract implementation is a follow-up.
+- **YouTube OCR/draft generation** — permanently the user's own local Tesseract
+  script, run manually; this project never builds it (D-13).
+- **Keyword YouTube search** (YouTube Data API) — out of the keyless scope; the
+  user supplies channel/playlist feed IDs (D-15).
 
 None of these are in Phase 4 scope.
 
 </deferred>
 
 ---
+
+## ⚠ ROADMAP / REQUIREMENTS change required (from D-13)
+
+The user's 2026-07-03 decision **drops the Python YouTube→blog wrapper**. Before
+or during planning, update the planning docs to match (e.g. via `/gsd-phase` /
+`/gsd-new-milestone` tooling, not a silent edit):
+
+- **REQUIREMENTS.md YT-01** — re-scope from "YouTube→blog wrapper (Python, async
+  job pattern, wraps Tesseract OCR)" to "Surface YouTube video links + short
+  explanations via the RSS fetcher's YouTube channel/playlist recipe (SRC-09);
+  OCR/draft generation is the user's own local, manual step — out of scope."
+- **ROADMAP.md Phase 4** — success criterion 3 (Python wrapper / async job
+  pattern) is removed; plan `04-03` is dropped. Phase 4 = RSS fetcher (with
+  subreddit + YouTube recipes) + the 5+-source uniform-run proof.
+- **PROJECT.md** — the "YouTube wrapper is the one output-contract exception" note
+  no longer applies; remove or soften it (no exception remains — YouTube is
+  normal RSS output).
 
 *Phase: 4-RSS Multiplier & Output Proof*
 *Context gathered: 2026-07-03*

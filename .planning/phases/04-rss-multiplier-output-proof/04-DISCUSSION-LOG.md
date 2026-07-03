@@ -55,17 +55,15 @@
 
 ---
 
-## YouTube wrapper scope
+## YouTube wrapper scope — RESOLVED by user (2026-07-03)
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| youtube-blog-mcp/ sibling subdir (Python/FastMCP), in-memory job store, contract-exempt draft output | Matches ARCHITECTURE §7; simplest local-only async job | ✓ [REC] (D-11/12/14) |
-| Literal separate git repo | More isolation, more overhead; not needed | |
-| Scaffold + pluggable OCR adapter (OCR script not in repo) | Real job lifecycle now; OCR behind an adapter the operator wires | ✓ [REC] but [NEEDS CONFIRMATION] (D-13) |
-| Build full ytdlp+Tesseract OCR pipeline now | Only if the user has/wants the full pipeline in this phase | |
+| Build Python youtube-blog-mcp OCR wrapper (async job, scaffold+adapter or full pipeline) | Original YT-01 plan | ✗ dropped |
+| No Python/OCR code — surface YouTube links + short explanations via the RSS fetcher's YouTube recipe; user runs their own local OCR script manually | User owns the OCR script; project just feeds it links | ✓ USER-CHOSEN (D-13/14/15) |
 
-**User's choice:** (timeout) — Claude defaults D-11/D-12/D-14; **D-13 flagged for user confirmation** (the "existing OCR script" is not in the repo).
-**Notes:** Wrapper is the documented output-contract exception (produces draft material, not research items).
+**User's choice:** "For Tesseract OCR script I have already there in my own system. So you don't need to generate the code now. But instead just give me youtube links with small explanation and I will run my script manually to generate draft from the link."
+**Notes:** Drops the Python `youtube-blog-mcp` server entirely. YouTube = a documented `rss_fetch` channel/playlist recipe (D-15), normal contract output (no exception). ROADMAP/REQUIREMENTS/PROJECT YT-01 text needs updating (noted in CONTEXT.md). Keyword YouTube search (Data API) stays out of scope — user supplies channel/playlist IDs.
 
 ---
 
