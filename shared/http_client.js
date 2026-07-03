@@ -184,6 +184,34 @@ export async function assertSafeUrl(rawUrl, { lookup = dnsLookup } = {}) {
   return u;
 }
 
+const MAX_REDIRECTS = 5;
+
+// Fetch `startUrl` with SSRF validation on the initial host AND on every redirect
+// Location, following manually (native fetch auto-follows up to 20 hops WITHOUT
+// re-checking the SSRF policy per hop — that is the redirect-to-internal /
+// DNS-rebinding hole, T-04-04). Returns the first non-3xx Response (its
+// status/body is handled by getText's attempt loop); throws past the hop cap.
+async function fetchTextManual(fetchImpl, startUrl, init, timeoutMs, lookup) {
+  let url = (await assertSafeUrl(startUrl, { lookup })).href;
+  for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+    const res = await fetchWithTimeout(
+      fetchImpl,
+      url,
+      { ...init, redirect: "manual" },
+      timeoutMs,
+    );
+    if (res.status >= 300 && res.status < 400) {
+      const loc = res.headers.get("location");
+      if (!loc) return res; // 3xx without Location — let the caller handle it
+      // RE-VALIDATE the redirect target before following (D-02 per-hop guard).
+      url = (await assertSafeUrl(new URL(loc, url).href, { lookup })).href;
+      continue;
+    }
+    return res; // 2xx/4xx/5xx — getText's loop classifies it
+  }
+  throw new Error(`rss: too many redirects`);
+}
+
 /**
  * GET url and parse JSON, with caching + resilient retry.
  *
@@ -384,4 +412,110 @@ export async function postJson(url, opts = {}) {
   }
 
   throw lastError ?? new Error(`postJson: request to ${redactUrl(url)} failed`);
+}
+
+/**
+ * GET url and return the RAW response text, with the SAME caching + resilient
+ * retry/backoff + stale-fallback machinery as getJson() (BACKOFF_MS,
+ * RETRYABLE_5XX, strict no-4xx-retry, transient-only stale gate). This is the
+ * shared SSRF-guarded text-fetch path the RSS server builds on (D-07): the
+ * outbound host comes from untrusted tool input, so assertSafeUrl runs on the
+ * initial host AND every redirect hop (redirect:"manual" — see fetchTextManual).
+ *
+ * Deltas from getJson: (1) response.text() instead of response.json() — an empty
+ * body is a NORMAL result, feed validity is the parser's concern (04-03), not the
+ * HTTP layer's; (2) a default `User-Agent: userAgent()` header (reddit `.rss`
+ * needs a real UA) merged with caller headers; (3) an injectable `lookup` so SSRF
+ * tests force a resolved IP with no real DNS. An assertSafeUrl rejection (invalid
+ * URL, bad scheme, blocked host, redirect-to-internal) is a plain Error — NOT
+ * retryable and NOT served from stale — so a 302→internal-IP is rejected outright.
+ *
+ * @param {string} url
+ * @param {object} [opts]
+ * @param {Record<string,string>} [opts.headers]
+ * @param {number} [opts.ttlMs=900000]      cache TTL (~15 min)
+ * @param {number} [opts.timeoutMs=10000]   per-attempt AbortController timeout
+ * @param {string} [opts.cacheKey=url]      logical cache key — NEVER a secret
+ * @param {Function} [opts.fetchImpl=fetch] injectable fetch (tests)
+ * @param {Function} [opts.sleep]           injectable delay (tests)
+ * @param {Function} [opts.lookup=dnsLookup] injectable dns.lookup (SSRF tests)
+ * @returns {Promise<string>} raw response text (fresh, refreshed, or stale)
+ */
+export async function getText(url, opts = {}) {
+  const {
+    headers = {},
+    ttlMs = DEFAULT_TTL_MS,
+    timeoutMs = DEFAULT_TIMEOUT_MS,
+    cacheKey = url,
+    fetchImpl = fetch,
+    sleep = realSleep,
+    lookup = dnsLookup,
+  } = opts;
+
+  const fresh = getFresh(cacheKey);
+  if (fresh !== undefined) return fresh;
+
+  // Reddit `.rss` (and some feeds) 429/403 without a real UA — default one in.
+  const mergedHeaders = { "User-Agent": userAgent(), ...headers };
+
+  let lastError;
+  // WR-04: stale fallback only for TRANSIENT terminal failures (see getJson).
+  let transientFailure = false;
+
+  for (let attempt = 0; attempt <= BACKOFF_MS.length; attempt++) {
+    try {
+      // SSRF validate-then-fetch, re-validating every redirect Location (D-02).
+      const response = await fetchTextManual(
+        fetchImpl,
+        url,
+        { headers: mergedHeaders },
+        timeoutMs,
+        lookup,
+      );
+
+      if (response.ok) {
+        // Empty body is a normal result — no non-text special-casing (D-07).
+        const value = await response.text();
+        set(cacheKey, value, ttlMs);
+        return value;
+      }
+
+      const { status } = response;
+      if (RETRYABLE_5XX.has(status)) {
+        throw new RetryableError(`getText: HTTP ${status} from ${redactUrl(url)}`);
+      }
+
+      // Any 4xx (incl. 429/408) or other non-retryable status: do NOT retry, and
+      // do NOT serve stale — this is a definitive client-error terminal state.
+      lastError = new Error(`getText: HTTP ${status} from ${redactUrl(url)}`);
+      transientFailure = false;
+      break;
+    } catch (err) {
+      lastError = err;
+
+      const isTimeout = err && err.name === "AbortError";
+      const isNetwork = err instanceof TypeError;
+      const isRetryable = err instanceof RetryableError || isTimeout || isNetwork;
+
+      if (!isRetryable) {
+        // Includes an assertSafeUrl SSRF rejection — fail closed, never retry/stale.
+        transientFailure = false;
+        break;
+      }
+
+      if (attempt < BACKOFF_MS.length) {
+        await sleep(BACKOFF_MS[attempt]);
+        continue;
+      }
+      // Retries exhausted on a transient failure — stale fallback is allowed.
+      transientFailure = true;
+    }
+  }
+
+  if (transientFailure) {
+    const stale = getStale(cacheKey);
+    if (stale !== undefined) return stale;
+  }
+
+  throw lastError ?? new Error(`getText: request to ${redactUrl(url)} failed`);
 }

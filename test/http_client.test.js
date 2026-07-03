@@ -3,7 +3,7 @@
 // fetch and sleep are injected so no real network and no real waiting occur.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { getJson, postJson, assertSafeUrl } from "../shared/http_client.js";
+import { getJson, postJson, getText, assertSafeUrl } from "../shared/http_client.js";
 import { set as cacheSet } from "../shared/cache.js";
 
 // --- helpers -------------------------------------------------------------
@@ -537,4 +537,146 @@ test("assertSafeUrl error for a blocked host does not leak a query-string secret
       return true;
     },
   );
+});
+
+// ========================================================================
+// getText() — raw-text GET sharing getJson's cache/retry/stale core, with
+// SSRF validation (redirect:"manual" + per-hop re-validation) on the fetch
+// path (D-07). Responses expose text()/headers/status; lookup is injected so
+// every case runs offline.
+// ========================================================================
+
+// A Response-like object for the text path. `location` sets a Location header
+// (for 3xx redirect cases); text() returns the raw body.
+function textRes(status, body = "", { location } = {}) {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    headers: {
+      get: (k) => (String(k).toLowerCase() === "location" ? location ?? null : null),
+    },
+    async text() {
+      return body;
+    },
+  };
+}
+
+// --- caching -------------------------------------------------------------
+test("an in-TTL repeated getText() is served from cache — fetch runs exactly once", async () => {
+  const fetchImpl = fetchStub([textRes(200, "<rss>ok</rss>")]);
+  const opts = {
+    fetchImpl,
+    sleep: sleepSpy(),
+    lookup: publicLookup,
+    cacheKey: "text:cache-hit",
+  };
+  const first = await getText("https://feeds.example.test/a", opts);
+  const second = await getText("https://feeds.example.test/a", opts);
+  assert.equal(first, "<rss>ok</rss>");
+  assert.equal(second, "<rss>ok</rss>");
+  assert.equal(fetchImpl.calls, 1, "second call must be cache-served");
+});
+
+// --- default User-Agent + manual redirect mode ---------------------------
+test("getText sends a default User-Agent header and requests redirect:manual (D-07)", async () => {
+  let seenInit;
+  const fetchImpl = async (_url, init) => {
+    seenInit = init;
+    return textRes(200, "ok");
+  };
+  await getText("https://ua.example.test/feed", {
+    fetchImpl,
+    sleep: sleepSpy(),
+    lookup: publicLookup,
+    cacheKey: "text:ua",
+  });
+  assert.ok(seenInit.headers["User-Agent"], "a default User-Agent header is present");
+  assert.equal(seenInit.redirect, "manual", "redirects are followed manually");
+});
+
+// --- retry / backoff parity with getJson ---------------------------------
+test("getText() retries a 500 then resolves on 200; first backoff step is 500ms", async () => {
+  const fetchImpl = fetchStub([textRes(500), textRes(200, "recovered")]);
+  const sleep = sleepSpy();
+  const out = await getText("https://feeds.example.test/retry", {
+    fetchImpl,
+    sleep,
+    lookup: publicLookup,
+    cacheKey: "text:retry-500",
+  });
+  assert.equal(out, "recovered");
+  assert.equal(fetchImpl.calls, 2);
+  assert.deepEqual(sleep.waited, [500]);
+});
+
+// --- stale fallback on total transient failure ---------------------------
+test("getText() serves a stale entry on total (5xx) failure instead of throwing", async () => {
+  cacheSet("text:stale", "<rss>old</rss>", -1000); // expired seed
+  const fetchImpl = fetchStub([textRes(503)]); // always fails
+  const sleep = sleepSpy();
+  const out = await getText("https://feeds.example.test/stale", {
+    fetchImpl,
+    sleep,
+    lookup: publicLookup,
+    cacheKey: "text:stale",
+  });
+  assert.equal(out, "<rss>old</rss>", "stale text served on total failure");
+  assert.equal(fetchImpl.calls, 4, "retries attempted before stale fallback");
+});
+
+// --- strict no-4xx-retry + no stale on 4xx -------------------------------
+test("getText() does NOT retry a 404 and does NOT serve stale for it (WR-04 parity)", async () => {
+  cacheSet("text:stale-404", "<rss>deleted</rss>", -1000);
+  const fetchImpl = fetchStub([textRes(404)]);
+  const sleep = sleepSpy();
+  await assert.rejects(
+    () =>
+      getText("https://feeds.example.test/gone", {
+        fetchImpl,
+        sleep,
+        lookup: publicLookup,
+        cacheKey: "text:stale-404",
+      }),
+    /404/,
+  );
+  assert.equal(fetchImpl.calls, 1, "404 not retried");
+  assert.deepEqual(sleep.waited, []);
+});
+
+// --- SSRF: a 302 → internal IP is REJECTED, not followed (T-04-04) --------
+test("getText() rejects a 302 whose Location points at an internal IP (redirect re-validation)", async () => {
+  // First hop: a 302 to the cloud-metadata IP. assertSafeUrl must reject the
+  // Location before it is followed, so only ONE fetch happens.
+  const fetchImpl = fetchStub([
+    textRes(302, "", { location: "http://169.254.169.254/latest/meta-data" }),
+  ]);
+  const sleep = sleepSpy();
+  await assert.rejects(
+    () =>
+      getText("https://feeds.example.test/redirect", {
+        fetchImpl,
+        sleep,
+        lookup: publicLookup, // initial public host passes; the literal redirect target is blocked
+        cacheKey: "text:redir-internal",
+      }),
+    /blocked address/,
+  );
+  assert.equal(fetchImpl.calls, 1, "the internal redirect target is never fetched");
+  assert.deepEqual(sleep.waited, [], "an SSRF rejection is not retried");
+});
+
+// --- SSRF: an initial blocked host is rejected before any fetch ----------
+test("getText() rejects an initial private-resolving host before fetching (D-02)", async () => {
+  const fetchImpl = fetchStub([textRes(200, "should-never-be-read")]);
+  await assert.rejects(
+    () =>
+      getText("http://intranet.example.test/feed", {
+        fetchImpl,
+        sleep: sleepSpy(),
+        lookup: privateLookup,
+        cacheKey: "text:initial-blocked",
+      }),
+    /blocked address/,
+  );
+  assert.equal(fetchImpl.calls, 0, "no fetch when the initial host is blocked");
 });
