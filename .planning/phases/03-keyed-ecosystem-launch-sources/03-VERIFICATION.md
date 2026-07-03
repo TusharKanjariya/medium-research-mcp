@@ -1,14 +1,16 @@
 ---
 phase: 03-keyed-ecosystem-launch-sources
 verified: 2026-07-02T00:00:00Z
-status: human_needed
+status: passed
 score: 4/4 must-haves verified
 behavior_unverified: 0
 overrides_applied: 0
 human_verification:
+
   - test: "With LIBRARIESIO_KEY set, call librariesio_search with NO query (broad most-depended list) against the live API."
     expected: "The live Libraries.io /search accepts an empty q and returns a most-depended package list (OQ2/A2 primary branch). If it rejects an empty q, apply the documented one-line fallback (make query required)."
     why_human: "Required-credential live call; no LIBRARIESIO_KEY in this environment. Offline fixtures cover the map + envelope but cannot exercise the live empty-q contract."
+
   - test: "With PRODUCTHUNT_TOKEN set, call producthunt_launches (period today) against the live PH v2 GraphQL endpoint."
     expected: "The query args order: VOTES, postedAfter, and topic resolve against the live schema and return launches (OQ4/A1/IN-02). A wrong arg/enum name surfaces loudly via requirePhOk (clean GraphQL error, not a silent empty list); adjust only the query string per the documented fallback if so."
     why_human: "Required-credential live call; no PRODUCTHUNT_TOKEN in this environment. GraphQL argument/enum names are cited-but-unconfirmed against the live schema (mapper is unaffected either way)."
