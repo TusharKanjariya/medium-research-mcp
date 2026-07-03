@@ -1,0 +1,1035 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+<channel>
+	<title>CSS-Tricks</title>
+	<atom:link href="https://css-tricks.com/feed/" rel="self" type="application/rss+xml" />
+	<link>https://css-tricks.com</link>
+	<description>Tips, Tricks, and Techniques on using Cascading Style Sheets.</description>
+	<lastBuildDate>Wed, 01 Jul 2026 01:44:13 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	
+
+<image>
+	<url>https://i0.wp.com/css-tricks.com/wp-content/uploads/2021/07/star.png?fit=32%2C32&#038;ssl=1</url>
+	<title>CSS-Tricks</title>
+	<link>https://css-tricks.com</link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+<site xmlns="com-wordpress:feed-additions:1">45537868</site>	<item>
+		<title>What’s !important #14: Gap Decorations, random(), &#060;select&gt; field sizing, and More</title>
+		<link>https://css-tricks.com/whats-important-14/</link>
+					<comments>https://css-tricks.com/whats-important-14/#comments</comments>
+		
+		<dc:creator><![CDATA[Daniel Schwarz]]></dc:creator>
+		<pubDate>Tue, 30 Jun 2026 13:54:14 +0000</pubDate>
+				<category><![CDATA[Articles]]></category>
+		<category><![CDATA[news]]></category>
+		<guid isPermaLink="false">https://css-tricks.com/?p=395894</guid>
+
+					<description><![CDATA[<p>I know you’re busy, so for What’s !important #14, I’ll be sprinting through what’s been a stacked couple of weeks despite few browser updates. From CSS Quake to CSS Gap Decorations, this isn’t one to miss!</p>
+<hr />
+<p><small><a rel="nofollow" href="https://css-tricks.com/whats-important-14/">What’s !important #14: Gap Decorations, random(), &lt;select&gt; field sizing, and More</a> originally handwritten and published with love on <a rel="nofollow" href="https://css-tricks.com">CSS-Tricks</a>. You should really <a href="https://css-tricks.com/newsletters/">get the newsletter</a> as well.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p class="wp-block-paragraph">I know you’re busy, so for <strong>What’s !important #14</strong>, I’ll be sprinting through what’s been a stacked couple of weeks despite few browser updates. From CSS Quake to CSS Gap Decorations, this isn’t one to miss!</p>
+
+
+
+<span id="more-395894"></span>
+
+
+
+<h2 id="hyperblam-make-music-with-html" class="wp-block-heading">Hyperblam: Make music with HTML</h2>
+
+
+
+<p class="wp-block-paragraph">Heydon Pickering created <a href="https://hyperblam.how/" rel="noopener">Hyperblam</a>, a HTML-driven implementation of the Web Audio API that uses Web Components to create music without JavaScript.</p>
+
+
+
+<figure class="wp-block-image size-large"><img data-recalc-dims="1" fetchpriority="high" decoding="async" width="1024" height="642" src="https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/06/1-1.png?resize=1024%2C642&#038;ssl=1" alt="A website screenshot for Hyperblam featuring a black background with a stylized white logo above navigation links, large hand-drawn text reading WRITE MUSIC NOT JAVASCRIPT, followed by a brief introductory sentence explaining that Hyperblam lets users make music with HTML." class="wp-image-395896" srcset="https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/06/1-1-scaled.png?resize=1024%2C642&amp;ssl=1 1024w, https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/06/1-1-scaled.png?resize=300%2C188&amp;ssl=1 300w, https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/06/1-1-scaled.png?resize=768%2C482&amp;ssl=1 768w, https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/06/1-1-scaled.png?resize=1536%2C963&amp;ssl=1 1536w, https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/06/1-1-scaled.png?resize=2048%2C1285&amp;ssl=1 2048w" sizes="(min-width: 735px) 864px, 96vw" /></figure>
+
+
+
+<p class="wp-block-paragraph">Okay, not very CSS-y, but still pretty cool!</p>
+
+
+
+<h2 id="css-quake" class="wp-block-heading">CSS Quake</h2>
+
+
+
+<p class="wp-block-paragraph">Powered by <a href="https://polycss.com/" rel="noopener">PolyCSS</a>, Layoutit created <a href="https://cssquake.com/" rel="noopener">CSS Quake</a>, a port of the groundbreaking 1996 game, Quake.</p>
+
+
+
+<figure class="wp-block-image size-large"><img data-recalc-dims="1" decoding="async" width="1024" height="642" src="https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/06/2.png?resize=1024%2C642&#038;ssl=1" alt="A screenshot of the first playable moment of Quake." class="wp-image-395897" srcset="https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/06/2-scaled.png?resize=1024%2C642&amp;ssl=1 1024w, https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/06/2-scaled.png?resize=300%2C188&amp;ssl=1 300w, https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/06/2-scaled.png?resize=768%2C482&amp;ssl=1 768w, https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/06/2-scaled.png?resize=1536%2C963&amp;ssl=1 1536w, https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/06/2-scaled.png?resize=2048%2C1284&amp;ssl=1 2048w" sizes="(min-width: 735px) 864px, 96vw" /></figure>
+
+
+
+<p class="wp-block-paragraph"><em>Very</em> CSS-y, and a perfect companion to <a href="https://css-tricks.com/whats-important-7/#doom-in-css">CSS DOOM</a>, which also shipped recently.</p>
+
+
+
+<h2 id="a-headfirst-dive-into-css-gap-decorations" class="wp-block-heading">A head-first dive into CSS Gap Decorations</h2>
+
+
+
+<p class="wp-block-paragraph"><a href="https://css-tricks.com/author/afiftemani/">Temani Afif</a> showed us <a href="https://master.dev/blog/lets-play-with-gap-decorations/" rel="noopener">how to style gap decorations</a>. As you might’ve guessed, ‘gaps’ are the spaces that <code>gap</code>s take up when using flexbox, grid layout, or multi-column layout. To be honest, gap decorations have been a long time coming, but as Temani demonstrated, there’s actually a lot that we can do with them.</p>
+
+
+
+<div class="wp-block-cp-codepen-gutenberg-embed-block cp_embed_wrapper"><iframe id="cp_embed_xbggQgj/f8fd92ac42f4d00a63df914c70439a39" src="//codepen.io/anon/embed/xbggQgj/f8fd92ac42f4d00a63df914c70439a39?height=450&amp;theme-id=1&amp;slug-hash=xbggQgj/f8fd92ac42f4d00a63df914c70439a39&amp;default-tab=css,result" height="450" scrolling="no" frameborder="0" allowfullscreen allowpaymentrequest name="CodePen Embed xbggQgj/f8fd92ac42f4d00a63df914c70439a39" title="CodePen Embed xbggQgj/f8fd92ac42f4d00a63df914c70439a39" class="cp_embed_iframe" style="width:100%;overflow:hidden">CodePen Embed Fallback</iframe></div>
+
+
+
+<h2 id="css-random-experiments" class="wp-block-heading">CSS <code>random()</code> experiments</h2>
+
+
+
+<p class="wp-block-paragraph">Polypane demonstrated their <a href="https://polypane.app/blog/experimenting-with-random-in-css/" rel="noopener">CSS <code>random()</code> experiments</a>. If you’ve been wondering about this elusive CSS function, which still isn’t supported by any browser but Safari, Polypane has created a bokeh effect, some falling petals, an untidy stack of polaroids, a poem, an animated aurora, and more. It’s a pretty deep dive that seemingly shows us everything that we can do with <code>random()</code>.</p>
+
+
+
+<figure class="wp-block-video"><video height="974" style="aspect-ratio: 2314 / 974;" width="2314" controls src="https://css-tricks.com/wp-content/uploads/2026/06/3.mp4"></video><figcaption class="wp-element-caption">Source: <a href="https://polypane.app/blog/experimenting-with-random-in-css/" rel="noopener">Polypane</a>.</figcaption></figure>
+
+
+
+<h2 id="how-to-make-ltselectgts-fluid" class="wp-block-heading">How to make <code>&lt;select&gt;</code>s fluid</h2>
+
+
+
+<p class="wp-block-paragraph">Manuel Matuzović showed us <a href="https://matuzo.at/blog/2026/select-fieldsize" rel="noopener">how to set the width of <code>&lt;select&gt;</code>s to the width of their selected <code>&lt;option&gt;</code> with <code>field-sizing</code></a> (<code>field-sizing: content</code>, to be more specific), which became Baseline when Firefox 152 shipped it a fortnight ago.</p>
+
+
+
+<p class="wp-block-paragraph">Another thing to note is that if we use the <code>size</code> attribute (e.g., <code>&lt;select size="3"&gt;</code>), which turns the <code>&lt;select&gt;</code> into a scrollable list box showing three <code>&lt;option&gt;</code>s by default, <code>field-sizing: content</code> overrides that to show all <code>&lt;option&gt;</code>s.</p>
+
+
+
+<h2 id="the-new-standard-for-css-theming" class="wp-block-heading">The new standard for CSS theming</h2>
+
+
+
+<p class="wp-block-paragraph">Una Kravets explained <a href="https://una.im/modern-css-theming" rel="noopener">how modern CSS theming works</a>. We’ve seen a whole lot of this lately, but Una talks about <code><a href="https://css-tricks.com/almanac/rules/p/property/">@property</a></code>, <code><a href="https://css-tricks.com/almanac/functions/l/light-dark/">light-dark()</a></code>, <code><a href="https://css-tricks.com/almanac/functions/c/contrast-color/">contrast-color()</a></code>, <em>and</em> <code>@container style()</code>, all of which are also Baseline as of recently, so this is a great opportunity to see how all of these features work together.</p>
+
+
+
+<div class="wp-block-cp-codepen-gutenberg-embed-block cp_embed_wrapper"><iframe id="cp_embed_MYJeKdb" src="//codepen.io/anon/embed/MYJeKdb?height=450&amp;theme-id=1&amp;slug-hash=MYJeKdb&amp;default-tab=css,result" height="450" scrolling="no" frameborder="0" allowfullscreen allowpaymentrequest name="CodePen Embed MYJeKdb" title="CodePen Embed MYJeKdb" class="cp_embed_iframe" style="width:100%;overflow:hidden">CodePen Embed Fallback</iframe></div>
+
+
+
+<p class="wp-block-paragraph">Speaking of which, <a href="https://css-tricks.com/exploring-the-css-contrast-color-function-a-second-time/">I wrote up a thing about <code>contrast-color()</code></a> after exploring it for the first time.</p>
+
+
+
+<h2 id="why-websites-dont-need-to-work-the-same-way-for-everybody" class="wp-block-heading">Why websites don’t need to work the same way for everybody</h2>
+
+
+
+<p class="wp-block-paragraph">Bramus explained <a href="https://www.bram.us/2026/06/21/do-websites-need-to-function-exactly-the-same-on-every-platform/" rel="noopener">why websites don’t need to work the same way for everybody</a>. For example, different platforms have different primary input modalities, and even then, users might have a secondary one hooked up that they prefer, which is why we need to abandon the idea of making websites identical across platforms.</p>
+
+
+
+<p class="wp-block-paragraph">He also talks about three incredibly interesting web platform features — interest invokers, overscroll actions, and the Document Picture-in-Picture API — that must function differently depending on the platform.</p>
+
+
+
+<h2 id="marina-aisa-at-web-engines-hackfest" class="wp-block-heading">Marina Aísa at Web Engines Hackfest</h2>
+
+
+
+<p class="wp-block-paragraph">While everybody was still talking about CSS Day (<a href="https://css-tricks.com/whats-important-13/#what-happened-at-css-day-2026">including me</a>), <a href="https://webengineshackfest.org/" rel="noopener">Web Engines Hackfest</a> was kicking off in A Coruña, Galicia. What I love about these events (besides the talks, of course) is attendees talking about the talks, the people that they met, what else they did while they was in town, and so on.</p>
+
+
+
+<p class="wp-block-paragraph">Here’s <a href="https://bsky.app/profile/marinaaisa.com/post/3moifdog32k23" rel="noopener">Marina Aísa documenting the two-day event</a>, starting off with a hike in a Galician forest, then two days of talks about web engines and web standards (interspersed with some wall climbing), then finally some discussion about what browsers can do to help improve web accessibility:</p>
+
+
+
+<blockquote class="bluesky-embed" data-bluesky-uri="at://did:plc:tpem4cjgzwlpu5cvevvcsfwn/app.bsky.feed.post/3mofvqz72g22m" data-bluesky-cid="bafyreibt25wi4idfxr5fruxvla4tll4wybmhz2fjtkpivev2viijhybl64" data-bluesky-embed-color-mode="system"><p lang="en">This week I&#x27;m in A Coruña, Galicia, attending the @webengineshackfest.org &#x1f469;&#x200d;&#x1f4bb; where we are discussing the future of web engines and standards.
+
+Given the potential impact on future web development, I thought it would be helpful to share some of my personal notes from the event. &#x270d;&#xfe0f;&#x1f447;</p>&mdash; Marina Aísa (<a href="https://bsky.app/profile/did:plc:tpem4cjgzwlpu5cvevvcsfwn?ref_src=embed" rel="noopener">@marinaaisa.com</a>) <a href="https://bsky.app/profile/did:plc:tpem4cjgzwlpu5cvevvcsfwn/post/3mofvqz72g22m?ref_src=embed" rel="noopener">14:31 · Jun 16, 2026</a></blockquote><script async src="https://embed.bsky.app/static/embed.js" charset="utf-8"></script>
+
+
+
+<p class="wp-block-paragraph">Personal goal for next year: to attend one of these events!</p>
+
+
+
+<h2 id="new-web-platform-features" class="wp-block-heading">New web platform feature<del>s</del></h2>
+
+
+
+<ul class="wp-block-list">
+<li><a href="https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/152" rel="noopener">Firefox 152</a>
+<ul class="wp-block-list">
+<li><a href="https://css-tricks.com/almanac/properties/f/field-sizing/"><code>field-sizing</code></a> (now Baseline)</li>
+</ul>
+</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Yes, it’s been a dull couple of weeks for stable browsers, but there are some really exciting things coming up. Keep your eyes on our <a href="https://css-tricks.com/category/quick-hits/">Quick Hits</a>, because that’s where I share these web platform updates first (plus those from developmental browsers). In fact, Chrome 150 will be shipping later today.</p>
+
+
+
+<p class="wp-block-paragraph">See ya’ll in two weeks!</p>
+<hr />
+<p><small><a rel="nofollow" href="https://css-tricks.com/whats-important-14/">What’s !important #14: Gap Decorations, random(), &lt;select&gt; field sizing, and More</a> originally handwritten and published with love on <a rel="nofollow" href="https://css-tricks.com">CSS-Tricks</a>. You should really <a href="https://css-tricks.com/newsletters/">get the newsletter</a> as well.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>https://css-tricks.com/whats-important-14/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		<enclosure url="https://css-tricks.com/wp-content/uploads/2026/06/3.mp4" length="35551592" type="video/mp4" />
+
+		<post-id xmlns="com-wordpress:feed-additions:1">395894</post-id>	</item>
+		<item>
+		<title>The Shifting Line Between CSS States and JavaScript Events</title>
+		<link>https://css-tricks.com/css-states-and-javascript-events/</link>
+					<comments>https://css-tricks.com/css-states-and-javascript-events/#comments</comments>
+		
+		<dc:creator><![CDATA[Daniel Schwarz]]></dc:creator>
+		<pubDate>Mon, 29 Jun 2026 13:03:32 +0000</pubDate>
+				<category><![CDATA[Articles]]></category>
+		<category><![CDATA[pseudo elements]]></category>
+		<category><![CDATA[state]]></category>
+		<guid isPermaLink="false">https://css-tricks.com/?p=395223</guid>
+
+					<description><![CDATA[<p>CSS has always had pseudo-classes that style things based on user interactions. Recent features, however, are blurring the line between what CSS "listens" for and how they are alternatives to what Javascript typically listens for.</p>
+<hr />
+<p><small><a rel="nofollow" href="https://css-tricks.com/css-states-and-javascript-events/">The Shifting Line Between CSS States and JavaScript Events</a> originally handwritten and published with love on <a rel="nofollow" href="https://css-tricks.com">CSS-Tricks</a>. You should really <a href="https://css-tricks.com/newsletters/">get the newsletter</a> as well.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p class="wp-block-paragraph">CSS is listening to us. <a href="https://www.snopes.com/fact-check/is-amazons-alexa-emitting-unprompted-creepy-laughing/" rel="noopener">No, not like <em>that</em></a>. Rather, CSS is accumulating more and more pseudo-classes to help us respond to JavaScript events so that we don’t have to do so with JavaScript itself. But while pseudo-classes track states, not events, they sure can feel like event listeners sometimes (not that it really matters in the context of CSS).</p>
+
+
+
+<p class="wp-block-paragraph">Then again, what <em>is</em> CSS these days? For example, there’s a <a href="https://drafts.csswg.org/animation-triggers-1//#event-triggers" rel="noopener">proposal for <code>event-trigger</code></a> in the Animation Triggers spec, which would basically listen for events and trigger animations. If you ask me though, the syntax is capable of a lot more than that (think: <a href="https://css-tricks.com/invoker-commands-additional-ways-to-work-with-dialog-popover-and-more/">invoker commands</a> but for CSS).</p>
+
+
+
+<p class="wp-block-paragraph">But to stay in today’s reality, I’ll walk you through the different CSS pseudo-classes out there that are kind of like event listeners, before doing the same for <code>event-trigger</code>, where I’ll show you how (I think) this currently unsupported feature would work.</p>
+
+
+
+<span id="more-395223"></span>
+
+
+
+<h2 class="wp-block-heading" id="-event-listening-pseudo-classes">“Event listening” pseudo-classes</h2>
+
+
+
+<h3 class="wp-block-heading" id="-hover-and-active-"><code>:hover</code> and <code>:active</code></h3>
+
+
+
+<p class="wp-block-paragraph">The <a href="https://css-tricks.com/almanac/pseudo-selectors/h/hover/"><code>:hover</code></a> state captures the moment from when the <code>pointerenter</code> event fires to when the <code>pointerleave</code> event fires, which perfectly illustrates why pseudo-classes are states, not events.</p>
+
+
+
+<p class="wp-block-paragraph"><a href="https://css-tricks.com/almanac/pseudo-selectors/a/active/"><code>:active</code></a> matches the target (e.g., a link or button) that’s currently being pressed with a mouse, finger, or stylus, which makes it akin to <code>pointerdown</code> and <code>pointerup</code>/<code>pointercancel</code>.</p>
+
+
+
+<p class="wp-block-paragraph">By the way, the <a href="https://css-tricks.com/almanac/properties/p/pointer-events/"><code>pointer-events: none</code></a> CSS declaration prevents pointer events from firing on the selected element!</p>
+
+
+
+<h3 class="wp-block-heading" id="-focus-and-focus-visible-"><code>:focus</code> and <code>:focus-visible</code></h3>
+
+
+
+<p class="wp-block-paragraph">The <a href="https://css-tricks.com/almanac/pseudo-selectors/f/focus/"><code>:focus</code></a> pseudo-class is akin to the <code>focus</code> and <code>blur</code> (unfocus) JavaScript events, but <a href="https://css-tricks.com/almanac/pseudo-selectors/f/focus-visible/"><code>:focus-visible</code></a> is a bit more complex. <code>:focus-visible</code> triggers when <code>:focus</code> does, but in addition, the browser uses a variety of heuristics to determine whether or not a focus indicator should be shown. Is the user operating with a keyboard? Is the element a form control? This really makes me appreciate what CSS offers. In fact, the best way to handle this using JavaScript is to query the CSS pseudo-class:</p>
+
+
+
+<pre rel="JavaScript" class="wp-block-csstricks-code-block language-javascript" data-line=""><code markup="tt">element.addEventListener("focus", (event) => {
+  if (event.target.matches(":focus-visible")) {
+    /* Do something */
+  }
+});</code></pre>
+
+
+
+<h3 class="wp-block-heading" id="-focus-within-and-has-"><code>:focus-within</code> (and <code>:has()</code>)</h3>
+
+
+
+<p class="wp-block-paragraph">JavaScript excels at the “if A is Y, then do Z to B” kind of stuff. We can traverse the DOM, leverage event propagation, and much more. In that regard, CSS can feel a bit limited. However, CSS is evolving quickly. It has many new if-this-do-that features such as <a href="https://css-tricks.com/unleash-the-power-of-scroll-driven-animations/">scroll-driven animations</a>, and it’ll have more in the future. HTML is doing the same with dedicated components such as <a href="https://css-tricks.com/more-details-on-details/"><code>&lt;details></code></a>, which all have accompanying CSS features.</p>
+
+
+
+<p class="wp-block-paragraph">I’ll mention some of that later, actually. In a more holistic sense, what we have is <a href="https://css-tricks.com/almanac/pseudo-selectors/f/focus-within/"><code>:focus-within</code></a>, which matches if a child has focus, and <a href="https://css-tricks.com/almanac/pseudo-selectors/h/has/"><code>:has()</code></a>, which accepts any valid selector and matches if such a relationship exists between the two selectors.</p>
+
+
+
+<p class="wp-block-paragraph">For example, these two selectors do the exact same thing:</p>
+
+
+
+<pre rel="CSS" class="wp-block-csstricks-code-block language-css" data-line=""><code markup="tt">form:focus-within {
+  /* Style the form when something within has focus */
+}
+
+form:has(:focus) {
+  /* Style the form when something within has focus */
+}</code></pre>
+
+
+
+<h3 class="wp-block-heading" id="-checked-"><code>:checked</code></h3>
+
+
+
+<p class="wp-block-paragraph">It’s fairly obvious what <code><a href="https://css-tricks.com/almanac/pseudo-selectors/c/checked/">:checked</a></code> does. The JavaScript event that’s most synonymous with it is <code>change</code>, which fires when the value of an <code>&lt;input&gt;</code>, <code>&lt;select&gt;</code>, or <code>&lt;textarea&gt;</code> changes (although, in this context, the <code>input</code> event is quite similar).</p>
+
+
+
+<p class="wp-block-paragraph">To listen for a check, we’d do something like this:</p>
+
+
+
+<pre rel="JavaScript" class="wp-block-csstricks-code-block language-javascript" data-line=""><code markup="tt">checkbox.addEventListener("change", (event) => {
+  if (event.target.checked) {
+    /* Checked */
+  } else {
+    /* Not checked */
+  }
+});</code></pre>
+
+
+
+<p class="wp-block-paragraph">CSS pseudo-classes often capture the moment between two JavaScript events (e.g., <code>pointerenter</code> and <code>pointerleave</code>), but when they’re not doing that, they’re handling logic instead, as above.</p>
+
+
+
+<p class="wp-block-paragraph">Let’s look at some more examples of hidden logic handling.</p>
+
+
+
+<h3 class="wp-block-heading" id="-valid-invalid-user-valid-user-invalid-autofill-"><code>:valid/:invalid/:user-valid/:user-invalid/:autofill</code></h3>
+
+
+
+<p class="wp-block-paragraph">We don’t need the <a href="https://css-tricks.com/almanac/pseudo-selectors/n/not/"><code>:not()</code></a> pseudo-class function here, as validity can be checked using both the <a href="https://css-tricks.com/almanac/pseudo-selectors/v/valid/"><code>:valid</code></a> and <a href="https://css-tricks.com/almanac/pseudo-selectors/i/invalid/"><code>:invalid</code></a> pseudo-classes, but on the JavaScript side of things, there’s no <code>valid</code> event (only <code>invalid</code>). That being said, if using JavaScript, you’ll likely want to call the <code>checkValidity()</code> method (which actually fires the <code>invalid</code> event if it returns <code>false</code>) within the callback of the event listener for <code>input</code>, <code>change</code>, <code>blur</code> (to check validity when unfocusing from an element), or <code>submit</code> (to check validity of the entire form when submitting it, as below).</p>
+
+
+
+<pre rel="JavaScript" class="wp-block-csstricks-code-block language-javascript" data-line=""><code markup="tt">form.addEventListener("submit", () => {
+  if (form.checkValidity()) {
+    /* All form controls are valid */
+  } else {
+    /* A form control is invalid (the invalid event fires) */
+  }
+});</code></pre>
+
+
+
+<p class="wp-block-paragraph">We can also do this with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/ValidityState" rel="noopener"><code>ValidityState</code></a> object, which doesn’t fire the <code>invalid</code> event, but does tell us why a form control is valid or invalid in the same way that HTML form validation does:</p>
+
+
+
+<pre rel="JavaScript" class="wp-block-csstricks-code-block language-javascript" data-line=""><code markup="tt">input.addEventListener("input", () => {
+  if (input.validity.valid) {
+    /* Input is valid */
+  } else {
+    /* Input is invalid (the invalid event doesn’t fire) */
+  }
+});</code></pre>
+
+
+
+<p class="wp-block-paragraph">The thing about HTML form validation is that it takes care of the entire front end, but if there’s a non-default behavior that you need, <code>checkValidity()</code> or <code>ValidityState</code> is what you’re looking for.</p>
+
+
+
+<p class="wp-block-paragraph">The pseudo-classes will work either way. A little too well, in fact! An easy thing to miss is that form controls trigger either <code>:valid</code> or <code>:invalid</code> immediately. However, <code>:user-valid</code> and <code>:user-invalid</code> wait for users to supply a value and unfocus before triggering. This is actually what the <code>change</code> event does (unless the element is a checkbox, radio button, dropdown list, color picker, or range slider), and what makes it different from the <code>input</code> event.</p>
+
+
+
+<p class="wp-block-paragraph">There isn’t a JavaScript event for auto-filling or even a clean way to detect it using JavaScript, but there <em>is</em> an <code>:autofill</code> pseudo-class.</p>
+
+
+
+<h2 class="wp-block-heading" id="media-element-pseudo-classes">Media element pseudo-classes</h2>
+
+
+
+<p class="wp-block-paragraph">Media element pseudo-classes are still new. They aren’t supported by Chrome yet and only landed in Firefox recently, but they are a part of <a href="https://css-tricks.com/interop-2026/">Interop 2026</a> and soon we’ll be able to style <code>&lt;audio></code> and <code>&lt;video></code> elements based on their state without listening to JavaScript events. I’m sure you understand how this works by now, so here’s a quick rundown:</p>
+
+
+
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Pseudo-class</th><th>JavaScript event equivalent</th></tr></thead><tbody><tr><td><code>:buffering</code></td><td><code>waiting</code></td></tr><tr><td><code>:muted</code></td><td><code>volumechange</code> (but see below)</td></tr><tr><td><code>:paused</code></td><td><code>pause</code></td></tr><tr><td><code>:playing</code></td><td><code>playing</code> (not <code>play</code>)</td></tr><tr><td><code>:seeking</code></td><td><code>seeking</code></td></tr><tr><td><code>:stalled</code></td><td><code>stalled</code></td></tr><tr><td><code>:volume-locked</code></td><td>N/A, see below</td></tr></tbody></table></figure>
+
+
+
+<p class="wp-block-paragraph">Use the <code>volumechange</code> event to detect mute:</p>
+
+
+
+<pre rel="JavaScript" class="wp-block-csstricks-code-block language-javascript" data-line=""><code markup="tt">audio.addEventListener("volumechange", () => {
+  if (audio.muted) {
+    // Muted
+  } else {
+    // Not muted
+  }
+});</code></pre>
+
+
+
+<p class="wp-block-paragraph">Detecting volume lock means trying to change the volume and checking for success. The best approach is to create an entirely new element so that we don’t trigger <code>volumechange</code> on the real one:</p>
+
+
+
+<pre rel="JavaScript" class="wp-block-csstricks-code-block language-javascript" data-line=""><code markup="tt">// Create video
+const video = document.createElement("video");
+
+// Change volume
+video.volume = 0.5;
+
+if (video.volume !== 0.5) {
+  // Volume locked
+} else {
+  // Volume not locked
+}</code></pre>
+
+
+
+<p class="wp-block-paragraph">(Or to use the <code>:volume-locked</code> pseudo-class, if writing CSS.)</p>
+
+
+
+<h3 id="popoveropen-open-modal" class="wp-block-heading"><code>:popover-open / :open / :modal</code></h3>
+
+
+
+<p class="wp-block-paragraph">As we might expect, there’s no JavaScript event for when a popover, <code>&lt;dialog&gt;</code>, or <code>&lt;details&gt;</code> opens or closes, but we can listen for the <code>toggle</code> event and then check the state:</p>
+
+
+
+<pre rel="JavaScript" class="wp-block-csstricks-code-block language-javascript" data-line=""><code markup="tt">element.addEventListener("toggle", () => {
+  if (element.open) {
+    /* Popover/dialog/details open */
+  } else {
+    /* Popover/dialog/details not open */
+  }
+});</code></pre>
+
+
+
+<p class="wp-block-paragraph">However, CSS offers these pseudo-classes right out of the box:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code><a href="https://css-tricks.com/almanac/pseudo-selectors/p/popover-open/)">:popover-open</a></code> (for popovers)</li>
+
+
+
+<li><a href="https://css-tricks.com/almanac/pseudo-selectors/o/open/"><code>:open</code></a> (for <code>&lt;dialog&gt;</code> and <code>&lt;details&gt;</code> elements)</li>
+
+
+
+<li><code>:modal</code> (for modal <code>&lt;dialog&gt;</code>s and fullscreen elements)</li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">Speaking of fullscreen elements…</p>
+
+
+
+<h3 class="wp-block-heading" id="-fullscreen-"><code>:fullscreen</code></h3>
+
+
+
+<p class="wp-block-paragraph">The <a href="https://css-tricks.com/almanac/pseudo-selectors/f/fullscreen/"><code>:fullscreen</code></a> pseudo-class is synonymous with the <code>fullscreenchange</code> JavaScript event with a conditional baked in:</p>
+
+
+
+<pre rel="JavaScript" class="wp-block-csstricks-code-block language-javascript" data-line=""><code markup="tt">document.addEventListener("fullscreenchange", () => {
+  if (document.fullscreenElement) {
+    /* fullscreenElement is fullscreen */
+  } else {
+    /* Nothing is fullscreen (fullscreenElement is null) */
+  }
+});</code></pre>
+
+
+
+<h3 class="wp-block-heading" id="-target-"><code>:target</code></h3>
+
+
+
+<p class="wp-block-paragraph">When a URL hash (e.g., <code>#contact</code>) matches an element’s ID (e.g., <code>&lt;div id="contact"&gt;</code>), that element matches the <a href="https://css-tricks.com/almanac/pseudo-selectors/t/target/"><code>:target</code></a> pseudo-class. When using JavaScript, we have to listen for the <code>hashchange</code> event and then see if a matching element is found:</p>
+
+
+
+<pre rel="JavaScript" class="wp-block-csstricks-code-block language-javascript" data-line=""><code markup="tt">window.addEventListener("hashchange", () => {
+  const target = document.getElementById(window.location.hash.substring(1));
+
+  if (target) {
+    /* Matching element found */
+  } else {
+    /* Matching element not found */
+  }
+});</code></pre>
+
+
+
+<h2 class="wp-block-heading" id="conclusion-but-not-really-">Conclusion (but not really)</h2>
+
+
+
+<p class="wp-block-paragraph">This isn’t a “JavaScript bad” rant but rather an appreciation for what CSS simplifies without forgetting the surgical control that JavaScript offers. More ways to do things is never a bad thing.</p>
+
+
+
+<p class="wp-block-paragraph">And on that note, I want to quickly mention <code>event-trigger</code>.</p>
+
+
+
+<h2 class="wp-block-heading" id="actual-event-listeners-event-trigger-">Actual event listeners (<code>event-trigger</code>)</h2>
+
+
+
+<p class="wp-block-paragraph">I came across <a href="https://drafts.csswg.org/animation-triggers-1/#event-triggers" rel="noopener">event triggers</a> when Chrome implemented scroll-triggered animations, as they’re in the same module, but they’re not supported by any web browser yet, so if I make any mistakes, I apologize. Let’s dive in.</p>
+
+
+
+<p class="wp-block-paragraph"><code>event-trigger-name</code> will accept a simple dashed ident:</p>
+
+
+
+<pre rel="CSS" class="wp-block-csstricks-code-block language-css" data-line=""><code markup="tt">button {
+  event-trigger-name: --event;
+}</code></pre>
+
+
+
+<p class="wp-block-paragraph"><code>event-trigger-source</code> will be the event listener, essentially.</p>
+
+
+
+<p class="wp-block-paragraph">It’ll accept the following keywords:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code>activate</code></li>
+
+
+
+<li><code>interest</code></li>
+
+
+
+<li><code>click</code></li>
+
+
+
+<li><code>touch</code></li>
+
+
+
+<li><code>dblclick</code></li>
+
+
+
+<li><code>keypress(&lt;string&gt;)</code></li>
+</ul>
+
+
+
+<pre rel="CSS" class="wp-block-csstricks-code-block language-css" data-line=""><code markup="tt">button {
+  event-trigger-source: click;
+}</code></pre>
+
+
+
+<p class="wp-block-paragraph">I believe the <code>interest</code> keyword refers to the upcoming <a href="https://css-tricks.com/a-first-look-at-the-interest-invoker-api-for-hover-triggered-popovers/">Interest Invoker API</a> whereas the <code>activate</code> keyword could depend on the element. For <code>&lt;details&gt;</code> for example, activation could mean <em>when opened</em>, but I’m not sure. Subsequent drafts of the spec should tell us more, and reveal more events.</p>
+
+
+
+<p class="wp-block-paragraph">Anyway, the events will trigger animations. First we’d create a <code>@keyframes</code> animation, then we’d attach it to the element to be animated, but the animation wouldn’t run until triggered by the event (whereas normally they’d run immediately).</p>
+
+
+
+<pre rel="CSS" class="wp-block-csstricks-code-block language-css" data-line=""><code markup="tt">@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+div {
+  animation: fade-in 300ms both;
+}</code></pre>
+
+
+
+<p class="wp-block-paragraph">Then we ensure that when the event fires, the animation triggers. We do this by setting <code>animation-trigger</code> alongside <code>animation</code>, referencing the dashed ident (<code>--event</code>). This has the optional benefit of allowing the event of one element to trigger the animation of another. Here’s a quick example, using the <code>event-trigger</code> shorthand this time:</p>
+
+
+
+<pre rel="CSS" class="wp-block-csstricks-code-block language-css" data-line=""><code markup="tt">@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+button {    
+  /* On click, trigger --event animation */
+  event-trigger: --event click;
+}
+
+div {
+  /* When --event fires, play animation forwards */
+  animation-trigger: --event play-forwards;
+
+  /* Animation */
+  animation: fade-in 300ms both;
+}</code></pre>
+
+
+
+<p class="wp-block-paragraph">This is what’s called a state<em>less</em> event trigger. Think about it — you can’t unclick a click, right? But we can lose interest, so here’s what a state<em>full</em> event-triggered animation would look like (notice the syntax for <em>two</em> events separated by a <code>/</code> and <em>two</em> animation actions, one for each state):</p>
+
+
+
+<pre rel="CSS" class="wp-block-csstricks-code-block language-css" data-line=""><code markup="tt">@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+button {    
+  /* interest (entry) / interest (exit) */
+  event-trigger: --event interest / interest;
+}
+
+div {
+  /* Play forward with interest, backward when losing it */
+  animation-trigger: --event play-forwards play-backwards;
+
+  /* Animation */
+  animation: fade-in 300ms both;
+}</code></pre>
+
+
+
+<p class="wp-block-paragraph">Acceptable animation actions include:</p>
+
+
+
+<ul class="wp-block-list">
+<li><code>none</code></li>
+
+
+
+<li><code>play</code></li>
+
+
+
+<li><code>play-once</code></li>
+
+
+
+<li><code>play-forwards</code></li>
+
+
+
+<li><code>play-backwards</code></li>
+
+
+
+<li><code>pause</code></li>
+
+
+
+<li><code>reset</code></li>
+
+
+
+<li><code>replay</code></li>
+</ul>
+
+
+
+<p class="wp-block-paragraph">There are many combinations of events and animation actions that wouldn’t work, but these would be easy to sidestep because it wouldn’t make sense to use them. We could, however, trigger multiple different animations because <code>animation-trigger</code> is a reset-only sub-property <code>animation</code>. Here’s a rough example:</p>
+
+
+
+<pre rel="CSS" class="wp-block-csstricks-code-block language-css" data-line=""><code markup="tt">animation-name: animationA, animationB;
+animation-trigger: --eventA play, --eventB replay;</code></pre>
+
+
+
+<p class="wp-block-paragraph">The possibilities are endless depending on how the W3C move forward with this feature (the spec mentions allowing for event bubbling!), but I kinda wish we could invoke JavaScript methods with event triggers like how HTML can with the Invoker Commands API.</p>
+
+
+
+<p class="wp-block-paragraph">What do you think? A step in the right direction, or does CSS need to stay in its lane?</p>
+<hr />
+<p><small><a rel="nofollow" href="https://css-tricks.com/css-states-and-javascript-events/">The Shifting Line Between CSS States and JavaScript Events</a> originally handwritten and published with love on <a rel="nofollow" href="https://css-tricks.com">CSS-Tricks</a>. You should really <a href="https://css-tricks.com/newsletters/">get the newsletter</a> as well.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>https://css-tricks.com/css-states-and-javascript-events/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+		<post-id xmlns="com-wordpress:feed-additions:1">395223</post-id>	</item>
+		<item>
+		<title>translateZ()</title>
+		<link>https://css-tricks.com/almanac/functions/t/translatez/</link>
+		
+		<dc:creator><![CDATA[Gabriel Shoyombo]]></dc:creator>
+		<pubDate>Thu, 25 Jun 2026 13:18:56 +0000</pubDate>
+				<category><![CDATA[3d]]></category>
+		<category><![CDATA[transform]]></category>
+		<guid isPermaLink="false">https://css-tricks.com/?page_id=394786</guid>
+
+					<description><![CDATA[<p>The <code>translateZ()</code> function moves an element closer to or farther from the user. </p>
+<hr />
+<p><small><a rel="nofollow" href="https://css-tricks.com/almanac/functions/t/translatez/">translateZ()</a> originally handwritten and published with love on <a rel="nofollow" href="https://css-tricks.com">CSS-Tricks</a>. You should really <a href="https://css-tricks.com/newsletters/">get the newsletter</a> as well.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p class="wp-block-paragraph">The CSS&nbsp;<code>translateZ()</code>&nbsp;function adds depth to an element, drawing it closer or farther in space. In other words, it shifts an element along the Z-axis in a 3D space.</p>
+
+
+
+<span id="more-394786"></span>
+
+
+
+<pre rel="CSS" class="wp-block-csstricks-code-block language-css" data-line=""><code markup="tt">.box:hover {
+  transform: translateZ(100px);
+}
+
+.box.perspective:hover {
+  transform: perspective(500px) translateZ(100px);
+}</code></pre>
+
+
+
+<p class="is-style-explanation wp-block-paragraph"><strong>Either the&nbsp;<code>perspective()</code>&nbsp;function or <code><a href="https://css-tricks.com/almanac/properties/p/perspective/">perspective</a></code> property is necessary for <code>translateZ()</code> to work.</strong> Without either one, there&#8217;s no effect.</p>
+
+
+
+<p class="wp-block-paragraph">Activate the switch in the following demo, then hover over the box to see it appear closer:</p>
+
+
+
+<div class="wp-block-cp-codepen-gutenberg-embed-block cp_embed_wrapper"><iframe id="cp_embed_bNeyaWp" src="//codepen.io/anon/embed/bNeyaWp?height=450&amp;theme-id=1&amp;slug-hash=bNeyaWp&amp;default-tab=result" height="450" scrolling="no" frameborder="0" allowfullscreen allowpaymentrequest name="CodePen Embed bNeyaWp" title="CodePen Embed bNeyaWp" class="cp_embed_iframe" style="width:100%;overflow:hidden">CodePen Embed Fallback</iframe></div>
+
+
+
+<p class="wp-block-paragraph">While it looks like the&nbsp;<code>.box</code>&nbsp;element is getting bigger&#8221; on hover, that&#8217;s not what is happening. When you hover over the box, it actually moves <em>closer</em> to you a length of 100 pixels, making it appear larger. We&#8217;ll get more into that in just a bit so it&#8217;s more obvious what&#8217;s happening there.</p>
+
+
+
+<p class="is-style-explanation wp-block-paragraph"><code>translateZ()</code>&nbsp;should not be mistaken for an alternative to the&nbsp;<code>scale()</code>&nbsp;function or <code><a href="https://css-tricks.com/almanac/properties/s/scale/">scale</a></code> property. Perspective and scale are two different concepts.</p>
+
+
+
+<p class="wp-block-paragraph">The&nbsp;<code>translateZ()</code>&nbsp;function is defined in the&nbsp;<a href="https://drafts.csswg.org/css-transforms-2/#funcdef-translatez" rel="noopener">CSS Transform Module Level 2</a>&nbsp;specification</p>
+
+
+
+<h2 id="syntax" class="wp-block-heading">Syntax</h2>
+
+
+
+<pre rel="CSS" class="wp-block-csstricks-code-block language-css" data-line=""><code markup="tt">translateZ() = translateZ(&lt;length>)</code></pre>
+
+
+
+<p class="wp-block-paragraph">The&nbsp;<code>translateZ()</code>&nbsp;function takes a single&nbsp;<code>&lt;length&gt;</code>&nbsp;argument that defines how far the element is from the front of the screen. It&#8217;s used with the&nbsp;<code>transform</code>&nbsp;property</p>
+
+
+
+<h2 id="argument" class="wp-block-heading">Arguments</h2>
+
+
+
+<pre rel="CSS" class="wp-block-csstricks-code-block language-css" data-line=""><code markup="tt">/* Positive lengths */
+transform: translateZ(100px);
+transform: translateZ(5rem);
+
+/* Negative lengths */
+transform: translateZ(-50px);
+transform: translateZ(-8em);</code></pre>
+
+
+
+<p class="wp-block-paragraph">The&nbsp;<code>translateZ()</code>&nbsp;function takes a single argument:</p>
+
+
+
+<ul class="wp-block-list is-style-almanac-list">
+<li><strong><code>&lt;length></code>:</strong> the distance of the element from the front of the screen. When it is positive, the element moves closer to the user, and further away when it&#8217;s negative.</li>
+</ul>
+
+
+
+<h2 id="how-it-works" class="wp-block-heading">How it works</h2>
+
+
+
+<p class="wp-block-paragraph">The&nbsp;<code>translateZ()</code>&nbsp;function is tricky because it moves an element along the Z-axis, which is not visually perceptible in a browser by default. Since browsers only render elements by their height and width, not their depth, the&nbsp;<code>translateZ()</code>&nbsp;function may appear to do nothing.</p>
+
+
+
+<figure class="wp-block-image size-full"><img data-recalc-dims="1" decoding="async" width="2560" height="1396" src="https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/05/xyz-plane-scaled.png?resize=2560%2C1396&#038;ssl=1" alt="A three-dimensional plane on top of a grid with perspective, showing the X, Y, and Z axes." class="wp-image-394787" srcset="https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/05/xyz-plane-scaled.png?w=2560&amp;ssl=1 2560w, https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/05/xyz-plane-scaled.png?resize=300%2C164&amp;ssl=1 300w, https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/05/xyz-plane-scaled.png?resize=1024%2C559&amp;ssl=1 1024w, https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/05/xyz-plane-scaled.png?resize=768%2C419&amp;ssl=1 768w, https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/05/xyz-plane-scaled.png?resize=1536%2C838&amp;ssl=1 1536w, https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/05/xyz-plane-scaled.png?resize=2048%2C1117&amp;ssl=1 2048w" sizes="(min-width: 735px) 864px, 96vw" /></figure>
+
+
+
+<p class="wp-block-paragraph">To show its depth and projection, we need to use either the&nbsp;<code><a href="https://css-tricks.com/almanac/properties/p/perspective/">perspective</a></code>&nbsp;property or&nbsp;<code>perspective()</code>&nbsp;function. Additionally, we can set&nbsp;<code>transform-style</code>&nbsp;to&nbsp;<code>preserve-3d</code>&nbsp;value on its parent, which lets CSS know that child elements should be positioned in 3D.</p>
+
+
+
+<h2 id="projection-and-perspective" class="wp-block-heading">Projection and perspective</h2>
+
+
+
+<p class="wp-block-paragraph">On a website, there isn&#8217;t a sense of depth — that is, &#8220;closeness&#8221; or &#8220;furtherness&#8221; — since elements are flattened on a 2D screen. Whether it&#8217;s&nbsp;<code>translate(200px)</code>&nbsp;or&nbsp;<code>translate(20px)</code>, we perceive the element at the same distance, so there isn&#8217;t any perspective at all unless we explicitly enable it. To show that, take for example the following HTML:</p>
+
+
+
+<pre rel="HTML" class="wp-block-csstricks-code-block language-markup" data-line=""><code markup="tt">&lt;div class="scene">
+  &lt;div class="parent">
+    &lt;div class="box">translateZ(100px)&lt;/div>
+  &lt;/div>
+&lt;/div></code></pre>
+
+
+
+<p class="wp-block-paragraph">Firstly, we&#8217;ll enable some perspective in the whole scene:</p>
+
+
+
+<pre rel="CSS" class="wp-block-csstricks-code-block language-css" data-line=""><code markup="tt">.scene {
+  perspective: 800px;
+}</code></pre>
+
+
+
+<p class="wp-block-paragraph">Then, we&#8217;ll set&nbsp;<code><a href="https://css-tricks.com/almanac/properties/t/transform-style/">transform-style</a></code>&nbsp;to&nbsp;<code>preserve-3d</code>&nbsp;in the parent, so children will also be transformed in 3D:</p>
+
+
+
+<pre rel="CSS" class="wp-block-csstricks-code-block language-css" data-line=""><code markup="tt">.parent {
+  transform-style: preserve-3d;
+}</code></pre>
+
+
+
+<p class="wp-block-paragraph">Now we move the&nbsp;<code>.box</code>&nbsp;<code>100px</code>&nbsp;closer to the user using&nbsp;<code>translateZ()</code>.</p>
+
+
+
+<pre rel="CSS" class="wp-block-csstricks-code-block language-css" data-line=""><code markup="tt">.box {
+  transform: translateZ(100px);
+}</code></pre>
+
+
+
+<div class="wp-block-cp-codepen-gutenberg-embed-block cp_embed_wrapper"><iframe id="cp_embed_QwEPJQb" src="//codepen.io/anon/embed/QwEPJQb?height=500&amp;theme-id=1&amp;slug-hash=QwEPJQb&amp;default-tab=result" height="500" scrolling="no" frameborder="0" allowfullscreen allowpaymentrequest name="CodePen Embed QwEPJQb" title="CodePen Embed QwEPJQb" class="cp_embed_iframe" style="width:100%;overflow:hidden">CodePen Embed Fallback</iframe></div>
+
+
+
+<p class="wp-block-paragraph">Even though it looks like the box grew&nbsp;<code>100px</code>&nbsp;in size, when you rotate the parent to the side, you&#8217;ll see that the&nbsp;<code>.box</code>&nbsp;size didn&#8217;t increase, but it&#8217;s the distance between the&nbsp;<code>.parent</code>&nbsp;and the&nbsp;<code>.box</code>&nbsp;that did.</p>
+
+
+
+<figure class="wp-block-image size-full"><img data-recalc-dims="1" loading="lazy" decoding="async" width="1040" height="570" src="https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/05/size-e1778684658246.png?resize=1040%2C570&#038;ssl=1" alt="A tall blue rectangle rotated left along the Y-axis adding perspective." class="wp-image-394789" srcset="https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/05/size-e1778684658246.png?w=1040&amp;ssl=1 1040w, https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/05/size-e1778684658246.png?resize=300%2C164&amp;ssl=1 300w, https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/05/size-e1778684658246.png?resize=1024%2C561&amp;ssl=1 1024w, https://i0.wp.com/css-tricks.com/wp-content/uploads/2026/05/size-e1778684658246.png?resize=768%2C421&amp;ssl=1 768w" sizes="auto, (min-width: 735px) 864px, 96vw" /></figure>
+
+
+
+<h2 id="-perspective-vs-perspective-" class="wp-block-heading"><code>perspective</code> vs. <code>perspective()</code></h2>
+
+
+
+<p class="wp-block-paragraph">Both do the same work: <em>define the element&#8217;s projection.</em> The&nbsp;<code>perspective</code>&nbsp;property is applied to the parent for all 3D elements, while the&nbsp;<code>perspective()</code>&nbsp;function can only be applied to a single 3D element, and must be declared before the 3D transform function.</p>
+
+
+
+<h3 id="the-perspective-property" class="wp-block-heading">The <strong><code>perspective</code></strong> property</h3>
+
+
+
+<pre rel="CSS" class="wp-block-csstricks-code-block language-css" data-line=""><code markup="tt">.parent {
+  perspective: 800px;
+}
+
+.child-1 {
+  transform: translateZ(200px); /* Defined within a projection of 800px */
+}
+
+.child-2 {
+  transform: translate3D(100px, 200px, 150px); /* Defined within a projection of 800px */
+}</code></pre>
+
+
+
+<h3 id="the-perspective-function" class="wp-block-heading">The <strong><code>perspective()</code></strong> function</h3>
+
+
+
+<pre rel="CSS" class="wp-block-csstricks-code-block language-css" data-line=""><code markup="tt">.element {
+  transform: translateZ(100px) perspective(800px); /* Nope &#x274c; */
+}
+
+.element {
+  transform: perspective(800px) translateZ(100px); /* Yep &#x2705; */
+}</code></pre>
+
+
+
+<h2 id="it-can-also-be-used-to-optimize-web-performance" class="wp-block-heading">It can also be used to optimize web performance</h2>
+
+
+
+<p class="wp-block-paragraph">Did you know that you can use the&nbsp;<code>translateZ()</code>&nbsp;function to boost our website&#8217;s performance? CSS 3D transform functions use the <em>GPU</em>, which is faster and more superior to the <em>CPU</em> for element rendering. This performance hack prevents flickering during animations and makes transitions smoother.</p>
+
+
+
+<p class="wp-block-paragraph">Developers add&nbsp;<code>translateZ(0)</code>&nbsp;to shift rendering from the CPU to the GPU, improving performance. If you&#8217;re struggling with a glitching animation, now you&#8217;ve s way to fix it!</p>
+
+
+
+<h2 id="demo" class="wp-block-heading">Demo</h2>
+
+
+
+<div class="wp-block-cp-codepen-gutenberg-embed-block cp_embed_wrapper"><iframe id="cp_embed_gbMyQjy" src="//codepen.io/anon/embed/preview/gbMyQjy?height=450&amp;theme-id=1&amp;slug-hash=gbMyQjy&amp;default-tab=result" height="450" scrolling="no" frameborder="0" allowfullscreen allowpaymentrequest name="CodePen Embed gbMyQjy" title="CodePen Embed gbMyQjy" class="cp_embed_iframe" style="width:100%;overflow:hidden">CodePen Embed Fallback</iframe></div>
+
+
+
+<h2 id="specification" class="wp-block-heading">Specification</h2>
+
+
+
+<p class="wp-block-paragraph">The&nbsp;<code>translateZ()</code>&nbsp;function is defined in the&nbsp;<a href="https://drafts.csswg.org/css-transforms-2/#funcdef-translatez" rel="noopener">CSS Transform Module Level 2</a>&nbsp;specification.</p>
+
+
+
+<h2 id="browser-support" class="wp-block-heading">Browser support</h2>
+
+
+
+<p class="wp-block-paragraph">The&nbsp;<code>translateZ()</code>&nbsp;function is available on all modern browsers.</p>
+
+
+
+
+<baseline-status class="wp-block-css-tricks-baseline-status" featureId="transforms3d"></baseline-status>
+
+
+
+<h2 id="references" class="wp-block-heading">References</h2>
+
+
+
+<ul class="wp-block-list">
+<li><a href="https://www.digitalocean.com/community/tutorials/css-translatez-and-perspective" rel="noopener">Tricks for Using CSS translateZ and perspective()</a>&nbsp;by William Le</li>
+</ul>
+
+
+
+<h2 id="more-on-3d-transforms" class="wp-block-heading">More on 3D transforms!</h2>
+
+
+
+    		
+    <div class="in-article-cards">
+      <article class="in-article-card articles" id="mini-post-320275">
+
+      <div class="tags">
+      <a href="https://css-tricks.com/tag/perspective/" rel="tag">perspective</a> <a href="https://css-tricks.com/tag/perspective-origin/" rel="tag">perspective-origin</a> <a href="https://css-tricks.com/tag/transform/" rel="tag">transform</a>    </div>
+  
+  <time datetime="2020-09-09" title="Originally published Sep 9, 2020">
+    <strong>
+                
+        Article
+      </strong>
+
+    on
+
+    Sep 9, 2020  </time>
+
+  <h3>
+    <a href="https://css-tricks.com/how-css-perspective-works/">
+      How CSS Perspective Works    </a>
+  </h3>
+
+  
+  <div class="author-row">
+    <a href="https://css-tricks.com/author/amitsheen/" aria-label="Author page of Amit Sheen">
+      <img data-recalc-dims="1" loading="lazy" decoding="async" alt="" class="avatar avatar-80 photo avatar-default" height="80" src="https://i0.wp.com/css-tricks.com/wp-content/uploads/2021/06/img3.png?resize=80%2C80&#038;ssl=1" width="80">    </a>
+  
+    <a class="author-name" href="https://css-tricks.com/author/amitsheen/">
+      Amit Sheen    </a>
+  </div>
+
+</article>
+<article class="in-article-card articles" id="mini-post-365706">
+
+      <div class="tags">
+      <a href="https://css-tricks.com/tag/3d/" rel="tag">3d</a> <a href="https://css-tricks.com/tag/animation/" rel="tag">animation</a> <a href="https://css-tricks.com/tag/animation-delay/" rel="tag">animation-delay</a>    </div>
+  
+  <time datetime="2022-05-12" title="Originally published May 12, 2022">
+    <strong>
+                
+        Article
+      </strong>
+
+    on
+
+    May 12, 2022  </time>
+
+  <h3>
+    <a href="https://css-tricks.com/a-css-slinky-in-3d/">
+      A CSS Slinky in 3D? Challenge Accepted!    </a>
+  </h3>
+
+  
+  <div class="author-row">
+    <a href="https://css-tricks.com/author/jheytompkins/" aria-label="Author page of Jhey Tompkins">
+      <img data-recalc-dims="1" alt='' src="https://i0.wp.com/css-tricks.com/wp-content/cache/breeze-extra/gravatars/88f05a8f8ee43ecf0e6752ed506b28f9ba34e86e3e0d887fba2c4c596a2c9531.jpg?resize=80%2C80&#038;ssl=1" srcset='https://css-tricks.com/wp-content/cache/breeze-extra/gravatars/88f05a8f8ee43ecf0e6752ed506b28f9ba34e86e3e0d887fba2c4c596a2c9531.jpg 2x' class='avatar avatar-80 photo' height="80" width="80" />    </a>
+  
+    <a class="author-name" href="https://css-tricks.com/author/jheytompkins/">
+      Jhey Tompkins    </a>
+  </div>
+
+</article>
+    </div>
+  
+
+
+
+<p class="wp-block-paragraph"></p>
+<hr />
+<p><small><a rel="nofollow" href="https://css-tricks.com/almanac/functions/t/translatez/">translateZ()</a> originally handwritten and published with love on <a rel="nofollow" href="https://css-tricks.com">CSS-Tricks</a>. You should really <a href="https://css-tricks.com/newsletters/">get the newsletter</a> as well.</p>
+]]></content:encoded>
+					
+		
+		
+		<post-id xmlns="com-wordpress:feed-additions:1">394786</post-id>	</item>
+
+	</channel>
+</rss>
+
+<!-- plugin=object-cache-pro client=phpredis metric#hits=8596 metric#misses=8 metric#hit-ratio=99.9 metric#bytes=6787194 metric#prefetches=452 metric#store-reads=28 metric#store-writes=3 metric#store-hits=460 metric#store-misses=4 metric#sql-queries=30 metric#ms-total=379.90 metric#ms-cache=17.79 metric#ms-cache-avg=0.5929 metric#ms-cache-ratio=4.7 sample#redis-hits=2373980372 sample#redis-misses=60802820 sample#redis-hit-ratio=97.5 sample#redis-ops-per-sec=337 sample#redis-evicted-keys=0 sample#redis-used-memory=1030975808 sample#redis-used-memory-rss=1102176256 sample#redis-memory-fragmentation-ratio=1.1 sample#redis-connected-clients=3 sample#redis-tracking-clients=0 sample#redis-rejected-connections=0 sample#redis-keys=1724803 -->
