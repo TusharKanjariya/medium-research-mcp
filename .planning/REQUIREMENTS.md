@@ -32,7 +32,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **SRC-06**: GitHub server — trending repos (Search API) + issues/discussions pain-point mining; optional PAT
 - [x] **SRC-07**: Libraries.io server (rising/most-depended packages); required key
 - [x] **SRC-08**: Product Hunt server (today/this-week launches by topic); required token
-- [x] **SRC-09**: Generic RSS/Atom fetcher (any feed → newsletters, dev blogs, and read-only subreddit `.rss`); emits feed-items with `score`/`num_comments` null _(shared SSRF fetch chokepoint + parser landed in 04-01/04-02; the `rss_fetch` server lands in 04-03 — not complete until then)_
+- [x] **SRC-09**: Generic RSS/Atom fetcher (any feed → newsletters, dev blogs, and read-only subreddit `.rss`); emits feed-items with `score`/`num_comments` null _(SSRF-hardened `getText` chokepoint 04-01, `fast-xml-parser@4` 04-02, `rss_fetch` server + subreddit/YouTube recipes 04-03)_
 
 ### Output & Consumer
 
@@ -93,7 +93,7 @@ Which phases cover which requirements. Finalized during roadmap creation.
 | SRC-06 | Phase 3 | Complete |
 | SRC-07 | Phase 3 | Complete |
 | SRC-08 | Phase 3 | Complete |
-| SRC-09 | Phase 4 | In progress (04-03 pending) |
+| SRC-09 | Phase 4 | Complete |
 | OUT-01 | Phase 1 | Complete |
 | OUT-02 | Phase 4 | Pending |
 | OUT-03 | Phase 1 | Complete |
