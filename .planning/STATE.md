@@ -6,14 +6,14 @@ current_phase: 4
 current_phase_name: RSS Multiplier & Output Proof
 status: executing
 stopped_at: Phase 4 context gathered
-last_updated: "2026-07-03T08:04:44.749Z"
+last_updated: "2026-07-03T10:15:02.849Z"
 last_activity: 2026-07-03
-last_activity_desc: Phase 3 complete, transitioned to Phase 4
+last_activity_desc: Phase 4 execution started
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 12
+  completed_plans: 9
   percent: 75
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-01)
 
 **Core value:** Uniform normalized output across every source, so `medium-blog-pro` consumes any source with zero per-source logic.
-**Current focus:** Phase 3 — Keyed Ecosystem & Launch Sources
+**Current focus:** Phase 4 — RSS Multiplier & Output Proof
 
 ## Current Position
 
-Phase: 4 — RSS Multiplier & Output Proof
-Plan: Not started
+Phase: 4 (RSS Multiplier & Output Proof) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-07-03 — Phase 3 complete, transitioned to Phase 4
+Last activity: 2026-07-03 — Phase 4 execution started
 
 Progress: [██████████] 100% (Phase 02: 3 of 3 plans complete)
 
@@ -62,6 +62,7 @@ Progress: [██████████] 100% (Phase 02: 3 of 3 plans complete
 | Phase 02 P03 | 25min | 3 tasks | 13 files |
 | Phase 03 P01 | 6 | 2 tasks | 10 files |
 | Phase 03 P02 | 4 | 2 tasks | 10 files |
+| Phase 04 P01 | 6min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 03 P01]: GitHub PAT rides only in the Authorization header via githubHeaders (anonymous degrade); host is a module constant, tool input fills only q + encoded path (SSRF-safe); repo url prefers non-blank homepage else html_url; issue id uses number.
 - [Phase ?]: 03-02: Libraries.io score maps dependents_count uniformly (D-04), independent of request sort
 - [Phase ?]: 03-02: Product Hunt is the one GraphQL server; requirePhOk guards 200-with-errors before reading data (Pitfall 4)
+- [Phase 04]: SSRF controls live on the shared getText chokepoint (assertSafeUrl), not in servers, so every future text source inherits them (D-01/D-02/D-03)
+- [Phase 04]: Canonicalize both dotted and WHATWG-hex IPv4-mapped IPv6 before BlockList to close the mapped-encoding SSRF bypass (T-04-05)
 
 ### Pending Todos
 
@@ -104,6 +107,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-03T06:33:05.830Z
+Last session: 2026-07-03T10:13:58.108Z
 Stopped at: Phase 4 context gathered
 Resume file: .planning/phases/04-rss-multiplier-output-proof/04-CONTEXT.md
