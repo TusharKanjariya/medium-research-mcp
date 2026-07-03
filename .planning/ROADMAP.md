@@ -127,12 +127,21 @@ Plans:
   3. YouTube video links are surfaced (each with a short explanation) via the RSS fetcher's YouTube channel/playlist recipe (`youtube.com/feeds/videos.xml?channel_id=…`) as contract-shaped items — the user runs their own local Tesseract OCR→draft script manually on chosen links (OCR/draft generation is out of scope; the Python wrapper is dropped, decision 2026-07-03).
   4. The RSS fetcher passes the Universal Server Bar.
 
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
+**Wave 1** *(disjoint files — run in parallel)*
 
-- [ ] 04-01: Generic RSS/Atom fetcher (SSRF-hardened; incl. subreddit `.rss` + YouTube channel/playlist recipes) [SRC-09, YT-01]
-- [ ] 04-02: 5+-source uniform-run verification harness (OUT-02)
+- [ ] 04-01-PLAN.md — Shared `getText` + SSRF `assertSafeUrl` guard + `RSS_ALLOWED_HOSTS` (D-01/02/03/07) [SRC-09] (wave 1)
+- [ ] 04-02-PLAN.md — `fast-xml-parser@^4.5.7` supply-chain gate (blocking-human checkpoint, D-08) [SRC-09] (wave 1)
+
+**Wave 2** *(depends on 04-01 + 04-02)*
+
+- [ ] 04-03-PLAN.md — `servers/rss/` RSS/Atom fetcher (`rss_fetch`) + subreddit `.rss` + YouTube channel/playlist recipes + fixtures + tests [SRC-09, YT-01] (wave 2)
+
+**Wave 3** *(depends on 04-03)*
+
+- [ ] 04-04-PLAN.md — OUT-02 5+-source uniform-run proof (`shared/rank.js` `mergeRank` + offline test + live demo) [OUT-02] (wave 3)
 
 ## Future / Deferred (v2)
 
@@ -161,4 +170,4 @@ Phase 1 and may run in parallel; Phase 4 depends on both).
 | 1. Foundation & Credential Infrastructure | 3/3 | Complete    | 2026-07-01 |
 | 2. Keyless Source Breadth | 3/3 | Complete    | 2026-07-02 |
 | 3. Keyed Ecosystem & Launch Sources | 2/2 | Complete    | 2026-07-02 |
-| 4. RSS Multiplier & Output Proof | 0/3 | Not started | - |
+| 4. RSS Multiplier & Output Proof | 0/4 | Not started | - |
