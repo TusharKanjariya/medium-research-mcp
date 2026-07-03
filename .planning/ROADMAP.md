@@ -9,9 +9,9 @@ foundation-first: prove the shared cache/HTTP layer, the output contract, and th
 credential/auth infrastructure against a Hacker News reference server; then fan out
 across keyless sources to validate the copy-a-folder pattern at breadth; then add the
 keyed ecosystem/launch sources that exercise required-credential handling; and finally
-land the generic RSS/Atom multiplier, prove a real 5+-source uniform run, and add the
-structurally different Python YouTube→blog wrapper last. Sources within a phase are
-largely independent and may be built in parallel.
+land the SSRF-hardened generic RSS/Atom multiplier (incl. subreddit `.rss` + YouTube
+channel/playlist recipes) and prove a real 5+-source uniform run. Sources within a phase
+are largely independent and may be built in parallel.
 
 ## Universal Server Bar
 

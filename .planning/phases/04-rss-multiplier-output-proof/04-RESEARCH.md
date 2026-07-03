@@ -497,14 +497,21 @@ Each pitfall maps to a test in `test/rss.test.js` / `test/http_client.test.js`:
 | A3 | Keeping RSS `score`/`num_comments` `null` even for YouTube (which exposes view counts) is the intended uniform behavior (per D-05/§5). | Anti-Patterns / Code Examples | If the user later wants YouTube views as `score`, that's a small map change — but it would break the "RSS row = null" uniformity (§5). Confirm during discuss if desired. |
 | A4 | The seam `SUS/too-new` on `fast-xml-parser`/`strnum` is a false positive (evidence: 81.8M/67.9M downloads, 2017 creation, canonical repo, no postinstall). | Package Legitimacy Audit | If the checkpoint reveals an unexpected tree (e.g. a typosquat resolving), stop. Low risk — cross-checked manually this session. |
 
-## Open Questions
+## Open Questions (RESOLVED — recommendations incorporated into the Phase 4 plans)
 
-1. **Reddit `.rss` User-Agent / rate-limits.**
+> Both questions below are resolved-with-recommendation; the recommendation is
+> already baked into an executable plan task (noted per item). Neither is a
+> blocker.
+
+1. **Reddit `.rss` User-Agent / rate-limits.** — RESOLVED: `getText` defaults its
+   `User-Agent` header to `userAgent()` (04-01) and a real reddit `.rss` fixture
+   is captured in 04-03.
    - What we know: `reddit.com/r/<sub>/.rss` is a public Atom feed; Reddit is strict about a real UA on its JSON API.
    - What's unclear: whether the `.rss` path 429s without a UA. `getText` should send `userAgent()` (already in `credentials.js`) as a default header — cheap insurance.
    - Recommendation: default `getText` headers to include `User-Agent: userAgent()`; capture a real reddit `.rss` fixture during planning to confirm.
 
-2. **Handle→channel_id resolution ergonomics (YT-01).**
+2. **Handle→channel_id resolution ergonomics (YT-01).** — RESOLVED: the manual
+   `externalId` lookup is documented in the 04-03 YouTube-recipe tool description.
    - What we know: the user supplies channel/playlist IDs (D-15); `@handle` isn't directly a feed param.
    - What's unclear: whether to document only the manual "view-source for `externalId`" method or also mention 3rd-party generator tools.
    - Recommendation: document the manual method (no dependency, always works) in the README recipe; mention generators as convenience only.
