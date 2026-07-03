@@ -28,6 +28,7 @@ const ENV_VAR = {
   lemmyUsername: "LEMMY_USERNAME",
   lemmyPassword: "LEMMY_PASSWORD",
   userAgent: "MCP_USER_AGENT",
+  rssAllowedHosts: "RSS_ALLOWED_HOSTS",
 };
 
 // The single process.env access point in the repo. Treats empty string as absent so a
@@ -119,4 +120,30 @@ export function lemmyCreds() {
   const user = get("lemmyUsername");
   const pass = get("lemmyPassword");
   return instance && user && pass ? { instance, user, pass } : undefined;
+}
+
+/**
+ * OPTIONAL operator allowlist of hostnames the RSS fetcher may reach (D-03).
+ *
+ * RSS_ALLOWED_HOSTS is a comma-separated list of hostnames. It is a HARDENING KNOB,
+ * NOT a credential, and it is OPERATOR-SET ENV — never a per-call tool parameter
+ * (untrusted `rss_fetch(url)` input must never widen the allowlist). Like the other
+ * optional helpers it degrades quietly (never throws):
+ *   - unset / blank / only-separators  -> returns `null`  = DEFAULT mode: any public
+ *     host is fetchable EXCEPT the private-range denylist enforced in http_client.js.
+ *   - set to one or more hostnames      -> returns a `Set<string>` of trimmed,
+ *     lowercased hostnames = LOCK-DOWN mode: only these hosts pass assertSafeUrl.
+ *
+ * The value is consumed by `assertSafeUrl` in shared/http_client.js (the SSRF
+ * chokepoint); this is the ONLY place RSS_ALLOWED_HOSTS is read (CRED-01).
+ * @returns {Set<string> | null}
+ */
+export function rssAllowedHosts() {
+  const raw = get("rssAllowedHosts");
+  if (!raw) return null;
+  const hosts = raw
+    .split(",")
+    .map((h) => h.trim().toLowerCase())
+    .filter(Boolean);
+  return hosts.length ? new Set(hosts) : null;
 }

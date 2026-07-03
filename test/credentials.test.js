@@ -15,6 +15,7 @@ import {
   redditCreds,
   lemmyCreds,
   lemmyInstance,
+  rssAllowedHosts,
 } from "../shared/credentials.js";
 
 // Every ENV_VAR credentials.js knows about — cleared before each case so a stray
@@ -32,6 +33,7 @@ const ALL_VARS = [
   "LEMMY_USERNAME",
   "LEMMY_PASSWORD",
   "MCP_USER_AGENT",
+  "RSS_ALLOWED_HOSTS",
 ];
 
 // Run `fn` with the given env vars applied on top of a cleared baseline, then
@@ -201,5 +203,36 @@ test("userAgent returns a non-blank default when MCP_USER_AGENT is unset", () =>
 test("userAgent returns the configured value when MCP_USER_AGENT is set", () => {
   withEnv({ MCP_USER_AGENT: "my-agent/2.0" }, () => {
     assert.equal(userAgent(), "my-agent/2.0");
+  });
+});
+
+// --- rssAllowedHosts: optional operator allowlist (D-03) ----------------------
+// unset/blank => null (default public-internet-minus-denylist mode); set => a
+// lowercased, trimmed Set (lock-down mode). Never throws (optional hardening knob).
+test("rssAllowedHosts returns null when RSS_ALLOWED_HOSTS is unset (default mode)", () => {
+  withEnv({}, () => {
+    assert.equal(rssAllowedHosts(), null);
+  });
+});
+
+test("rssAllowedHosts returns null when RSS_ALLOWED_HOSTS is blank/only-separators", () => {
+  withEnv({ RSS_ALLOWED_HOSTS: "  , , " }, () => {
+    assert.equal(rssAllowedHosts(), null, "blank/separator-only degrades to null, never throws");
+  });
+});
+
+test("rssAllowedHosts returns a one-host lowercased Set for a single hostname", () => {
+  withEnv({ RSS_ALLOWED_HOSTS: "Feeds.Example.COM" }, () => {
+    const set = rssAllowedHosts();
+    assert.ok(set instanceof Set);
+    assert.deepEqual([...set], ["feeds.example.com"], "hostname lowercased");
+  });
+});
+
+test("rssAllowedHosts trims spaces and drops blanks in a comma list (lowercased Set)", () => {
+  withEnv({ RSS_ALLOWED_HOSTS: " a.com , B.COM ,, c.org " }, () => {
+    const set = rssAllowedHosts();
+    assert.ok(set instanceof Set);
+    assert.deepEqual([...set].sort(), ["a.com", "b.com", "c.org"]);
   });
 });
