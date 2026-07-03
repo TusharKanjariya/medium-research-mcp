@@ -520,6 +520,31 @@ test("assertSafeUrl blocks a host resolving to ::ffff:169.254.169.254 (mapped-IP
   );
 });
 
+// --- WR-03: NAT64 well-known prefix + SIIT IPv4-translatable forms -------
+// A NAT64 gateway translates 64:ff9b::<v4> to the embedded IPv4, so an embedded
+// private/metadata target must be blocked by the denylist directly.
+test("assertSafeUrl rejects the NAT64 well-known prefix embedding metadata IP (WR-03)", async () => {
+  await assert.rejects(
+    () => assertSafeUrl("http://[64:ff9b::a9fe:a9fe]/", { lookup: noLookup }),
+    /blocked address/,
+  );
+});
+
+test("assertSafeUrl rejects the NAT64 well-known prefix embedding loopback (WR-03)", async () => {
+  await assert.rejects(
+    () => assertSafeUrl("http://[64:ff9b::7f00:1]/", { lookup: noLookup }),
+    /blocked address/,
+  );
+});
+
+// The SIIT ::ffff:0:HHHH:HHHH form canonicalizes to the embedded v4 (169.254.169.254).
+test("assertSafeUrl rejects the SIIT ::ffff:0:HHHH:HHHH mapped form of the metadata IP (WR-03)", async () => {
+  await assert.rejects(
+    () => assertSafeUrl("http://[::ffff:0:a9fe:a9fe]/", { lookup: noLookup }),
+    /blocked address/,
+  );
+});
+
 // --- D-03 RSS_ALLOWED_HOSTS lock-down -----------------------------------
 test("assertSafeUrl with RSS_ALLOWED_HOSTS accepts only a listed host (D-03)", async () => {
   await withAllowedHosts("feeds.example.test", async () => {

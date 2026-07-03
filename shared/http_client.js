@@ -91,6 +91,7 @@ DENY.addAddress("::1", "ipv6"); // loopback
 DENY.addSubnet("fc00::", 7, "ipv6"); // ULA (private)
 DENY.addSubnet("fe80::", 10, "ipv6"); // link-local
 DENY.addSubnet("ff00::", 8, "ipv6"); // multicast
+DENY.addSubnet("64:ff9b::", 96, "ipv6"); // NAT64 well-known prefix (RFC6052) — embeds a v4 target (WR-03)
 
 const ALLOWED_SCHEMES = new Set(["http:", "https:"]); // D-01
 
@@ -100,15 +101,25 @@ function unbracket(hostname) {
   return hostname.replace(/^\[/, "").replace(/\]$/, "");
 }
 
-// Canonicalize an IPv4-mapped IPv6 address (::ffff:a.b.c.d in dotted form, or the
-// WHATWG-normalized hex form ::ffff:HHHH:HHHH) down to its IPv4 form so a mapped
-// encoding of a blocked IP cannot slip past BlockList (T-04-05). Non-mapped
-// addresses pass through unchanged.
+// Canonicalize an IPv4-mapped IPv6 address (::ffff:a.b.c.d in dotted form, the
+// WHATWG-normalized hex form ::ffff:HHHH:HHHH, or the SIIT/IPv4-translatable
+// ::ffff:0:HHHH:HHHH form, WR-03) down to its IPv4 form so a mapped encoding of a
+// blocked IP cannot slip past BlockList (T-04-05). Non-mapped addresses pass
+// through unchanged. (The NAT64 well-known prefix 64:ff9b::/96 is caught directly
+// by the DENY BlockList above, not here.)
 function canonicalizeMappedV4(address) {
   const m = /^::ffff:(.+)$/i.exec(address);
   if (!m) return address;
   const tail = m[1];
   if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(tail)) return tail; // ::ffff:1.2.3.4
+  // SIIT / IPv4-translatable form ::ffff:0:HHHH:HHHH (RFC7915) — a leading 0 group
+  // precedes the two v4 hextets. Check BEFORE the bare HHHH:HHHH case.
+  const siit = /^0:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/i.exec(tail);
+  if (siit) {
+    const hi = parseInt(siit[1], 16);
+    const lo = parseInt(siit[2], 16);
+    return `${(hi >> 8) & 255}.${hi & 255}.${(lo >> 8) & 255}.${lo & 255}`;
+  }
   const hex = /^([0-9a-f]{1,4}):([0-9a-f]{1,4})$/i.exec(tail); // ::ffff:HHHH:HHHH
   if (hex) {
     const hi = parseInt(hex[1], 16);
