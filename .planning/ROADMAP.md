@@ -40,7 +40,7 @@ in addition to the phase's own success criteria:
 - [x] **Phase 1: Foundation & Credential Infrastructure** - Shared cache/HTTP layer, the output contract, the HN reference server, and env-only credential + token-auth infrastructure (completed 2026-07-01)
 - [x] **Phase 2: Keyless Source Breadth** - Stack Exchange, Lobsters, Lemmy, and Dev.to servers, proving the copy-a-folder pattern at breadth (completed 2026-07-02; Hashnode dropped — upstream retired free GraphQL API)
 - [x] **Phase 3: Keyed Ecosystem & Launch Sources** - GitHub, Libraries.io, and Product Hunt servers, exercising optional-PAT and required-credential paths (completed 2026-07-02)
-- [ ] **Phase 4: RSS Multiplier & Output Proof** - Generic RSS/Atom fetcher (incl. subreddit `.rss`), a real 5+-source uniform run, and the Python YouTube→blog wrapper
+- [ ] **Phase 4: RSS Multiplier & Output Proof** - SSRF-hardened generic RSS/Atom fetcher (incl. subreddit `.rss` + YouTube channel/playlist recipes) and a real 5+-source uniform run (Python YouTube→blog wrapper dropped 2026-07-03 — user runs own OCR script)
 
 ## Phase Details
 
@@ -117,23 +117,22 @@ Plans:
 
 ### Phase 4: RSS Multiplier & Output Proof
 
-**Goal**: Land the generic RSS/Atom fetcher (the biggest coverage-per-line multiplier, including read-only subreddit `.rss`), prove a real multi-source research run, and add the structurally different Python YouTube→blog wrapper last.
+**Goal**: Land the generic RSS/Atom fetcher (the biggest coverage-per-line multiplier, including the read-only subreddit `.rss` and YouTube channel/playlist recipes), and prove a real multi-source uniform research run.
 **Depends on**: Phase 2, Phase 3
 **Requirements**: SRC-09, OUT-02, YT-01
 **Success Criteria** (what must be TRUE):
 
-  1. The generic RSS/Atom fetcher ingests any feed URL — newsletters, dev blogs, and a subreddit `.rss` recipe — emitting contract-shaped feed items with `score`/`num_comments` null.
+  1. The generic RSS/Atom fetcher ingests any feed URL — newsletters, dev blogs, and the subreddit `.rss` recipe — emitting contract-shaped feed items with `score`/`num_comments` null, and is SSRF-hardened (untrusted feed URL: http/https-only, private-range/redirect denylist).
   2. A single research run pulls from 5+ sources and returns one uniform list the consumer ranks/filters with zero per-source branches.
-  3. The Python YouTube→blog wrapper implements the async job pattern (`start_youtube_job` → id, `check_job_status(id)`) around the existing Tesseract OCR script and runs local-only.
+  3. YouTube video links are surfaced (each with a short explanation) via the RSS fetcher's YouTube channel/playlist recipe (`youtube.com/feeds/videos.xml?channel_id=…`) as contract-shaped items — the user runs their own local Tesseract OCR→draft script manually on chosen links (OCR/draft generation is out of scope; the Python wrapper is dropped, decision 2026-07-03).
   4. The RSS fetcher passes the Universal Server Bar.
 
 **Plans**: TBD
 
 Plans:
 
-- [ ] 04-01: Generic RSS/Atom fetcher (incl. subreddit `.rss` recipe)
+- [ ] 04-01: Generic RSS/Atom fetcher (SSRF-hardened; incl. subreddit `.rss` + YouTube channel/playlist recipes) [SRC-09, YT-01]
 - [ ] 04-02: 5+-source uniform-run verification harness (OUT-02)
-- [ ] 04-03: Python YouTube→blog wrapper (async job pattern, separate repo)
 
 ## Future / Deferred (v2)
 

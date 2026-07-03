@@ -40,9 +40,9 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **OUT-02**: A single research run pulls from 5+ sources and returns a uniform list the skill ranks/filters with no per-source branches
 - [x] **OUT-03**: Tool output is trimmed and LLM-readable — only fields that matter, HTML stripped from text
 
-### Wrapper
+### YouTube link surfacing
 
-- [ ] **YT-01**: YouTube→blog wrapper (Python, separate repo) uses the async job pattern (`start_youtube_job` → id, `check_job_status(id)`), wrapping the existing Tesseract OCR script
+- [ ] **YT-01** *(re-scoped 2026-07-03 — Python OCR wrapper dropped)*: Surface YouTube video links, each with a short explanation, as contract-shaped items via the RSS fetcher's YouTube channel/playlist recipe (`youtube.com/feeds/videos.xml?channel_id=…` / `?playlist_id=…`). The user runs their own local Tesseract OCR→draft script **manually** on chosen links — OCR/draft generation and any Python/async-job wrapper are **out of scope**. Keyword YouTube search (Data API) is out of the keyless scope; the user supplies channel/playlist IDs.
 
 ## v2 Requirements
 

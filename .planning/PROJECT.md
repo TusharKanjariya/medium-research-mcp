@@ -38,9 +38,11 @@ across sources without a single source-specific branch.
       (network via `site`), Lobsters, Lemmy, Dev.to, GitHub
       (repos + issues/discussions), Libraries.io, Product Hunt
 - [ ] Generic RSS/Atom fetcher (the multiplier — newsletters, dev blogs, and
-      read-only subreddit `.rss`)
+      read-only subreddit `.rss` + YouTube channel/playlist recipes), SSRF-hardened
 - [ ] A single research run pulls from 5+ sources with uniform output
-- [ ] YouTube→blog wrapper (Python, async job pattern) — separate, local-only
+- [ ] YouTube video-link surfacing via the RSS fetcher's YouTube recipe — the
+      user runs their own local OCR→draft script manually (Python OCR wrapper
+      dropped 2026-07-03)
 
 ### Out of Scope
 
@@ -48,8 +50,9 @@ across sources without a single source-specific branch.
 
 - General-purpose Reddit/social **client** — read-only topic research only, no
   posting or account actions
-- **Writing the posts** — these are research tools; drafting is the skill's job
-  (the YouTube wrapper is the one exception, producing draft material)
+- **Writing the posts** — these are research tools; drafting is the skill's job.
+  (The YouTube angle is just link surfacing via RSS — OCR/draft generation is the
+  user's own local Tesseract script, run manually and outside this repo.)
 - **Scraping sources without a usable API** (Quora, Indie Hackers) — brittle and
   against the "mechanical to add" principle
 - **Real-time / streaming** — cached research bursts are sufficient
