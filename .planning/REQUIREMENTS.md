@@ -37,7 +37,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Output & Consumer
 
 - [x] **OUT-01**: Every server conforms to the output contract exactly, verified against ARCHITECTURE §4
-- [ ] **OUT-02**: A single research run pulls from 5+ sources and returns a uniform list the skill ranks/filters with no per-source branches
+- [x] **OUT-02**: A single research run pulls from 5+ sources and returns a uniform list the skill ranks/filters with no per-source branches
 - [x] **OUT-03**: Tool output is trimmed and LLM-readable — only fields that matter, HTML stripped from text
 
 ### YouTube link surfacing
@@ -95,7 +95,7 @@ Which phases cover which requirements. Finalized during roadmap creation.
 | SRC-08 | Phase 3 | Complete |
 | SRC-09 | Phase 4 | Complete |
 | OUT-01 | Phase 1 | Complete |
-| OUT-02 | Phase 4 | Pending |
+| OUT-02 | Phase 4 | Complete |
 | OUT-03 | Phase 1 | Complete |
 | YT-01 | Phase 4 | Complete |
 

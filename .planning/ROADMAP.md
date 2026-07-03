@@ -40,7 +40,7 @@ in addition to the phase's own success criteria:
 - [x] **Phase 1: Foundation & Credential Infrastructure** - Shared cache/HTTP layer, the output contract, the HN reference server, and env-only credential + token-auth infrastructure (completed 2026-07-01)
 - [x] **Phase 2: Keyless Source Breadth** - Stack Exchange, Lobsters, Lemmy, and Dev.to servers, proving the copy-a-folder pattern at breadth (completed 2026-07-02; Hashnode dropped — upstream retired free GraphQL API)
 - [x] **Phase 3: Keyed Ecosystem & Launch Sources** - GitHub, Libraries.io, and Product Hunt servers, exercising optional-PAT and required-credential paths (completed 2026-07-02)
-- [ ] **Phase 4: RSS Multiplier & Output Proof** - SSRF-hardened generic RSS/Atom fetcher (incl. subreddit `.rss` + YouTube channel/playlist recipes) and a real 5+-source uniform run (Python YouTube→blog wrapper dropped 2026-07-03 — user runs own OCR script)
+- [x] **Phase 4: RSS Multiplier & Output Proof** - SSRF-hardened generic RSS/Atom fetcher (incl. subreddit `.rss` + YouTube channel/playlist recipes) and a real 5+-source uniform run (Python YouTube→blog wrapper dropped 2026-07-03 — user runs own OCR script) (completed 2026-07-03)
 
 ## Phase Details
 
@@ -127,7 +127,7 @@ Plans:
   3. YouTube video links are surfaced (each with a short explanation) via the RSS fetcher's YouTube channel/playlist recipe (`youtube.com/feeds/videos.xml?channel_id=…`) as contract-shaped items — the user runs their own local Tesseract OCR→draft script manually on chosen links (OCR/draft generation is out of scope; the Python wrapper is dropped, decision 2026-07-03).
   4. The RSS fetcher passes the Universal Server Bar.
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans complete
 
 Plans:
 **Wave 1** *(disjoint files — run in parallel)*
@@ -141,7 +141,7 @@ Plans:
 
 **Wave 3** *(depends on 04-03)*
 
-- [ ] 04-04-PLAN.md — OUT-02 5+-source uniform-run proof (`shared/rank.js` `mergeRank` + offline test + live demo) [OUT-02] (wave 3)
+- [x] 04-04-PLAN.md — OUT-02 5+-source uniform-run proof (`shared/rank.js` `mergeRank` + offline test + live demo) [OUT-02] (wave 3)
 
 ## Future / Deferred (v2)
 
@@ -170,4 +170,4 @@ Phase 1 and may run in parallel; Phase 4 depends on both).
 | 1. Foundation & Credential Infrastructure | 3/3 | Complete    | 2026-07-01 |
 | 2. Keyless Source Breadth | 3/3 | Complete    | 2026-07-02 |
 | 3. Keyed Ecosystem & Launch Sources | 2/2 | Complete    | 2026-07-02 |
-| 4. RSS Multiplier & Output Proof | 3/4 | In Progress|  |
+| 4. RSS Multiplier & Output Proof | 4/4 | Complete   | 2026-07-03 |
