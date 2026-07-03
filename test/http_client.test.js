@@ -3,7 +3,7 @@
 // fetch and sleep are injected so no real network and no real waiting occur.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { getJson, postJson } from "../shared/http_client.js";
+import { getJson, postJson, assertSafeUrl } from "../shared/http_client.js";
 import { set as cacheSet } from "../shared/cache.js";
 
 // --- helpers -------------------------------------------------------------
@@ -409,4 +409,132 @@ test("postJson() serves a stale entry on total failure instead of throwing", asy
   });
   assert.deepEqual(out, { data: { cached: "old" } });
   assert.equal(fetchImpl.calls, 4, "retries attempted before stale fallback");
+});
+
+// ========================================================================
+// assertSafeUrl() — SSRF guard: scheme allowlist (D-01), private-range
+// denylist (D-02), optional RSS_ALLOWED_HOSTS allowlist (D-03). `lookup` is
+// injected so every case runs offline (no real DNS).
+// ========================================================================
+
+// Injected resolvers.
+const publicLookup = async () => [{ address: "93.184.216.34", family: 4 }];
+const privateLookup = async () => [{ address: "10.0.0.5", family: 4 }];
+const mappedMetadataLookup = async () => [
+  { address: "::ffff:169.254.169.254", family: 6 },
+];
+// Proves the IP-literal path never touches DNS.
+const noLookup = async () => {
+  throw new Error("DNS lookup must not be called for an IP-literal host");
+};
+
+// Set/clear RSS_ALLOWED_HOSTS around a test body (restores prior value).
+async function withAllowedHosts(value, fn) {
+  const prev = process.env.RSS_ALLOWED_HOSTS;
+  if (value === undefined) delete process.env.RSS_ALLOWED_HOSTS;
+  else process.env.RSS_ALLOWED_HOSTS = value;
+  try {
+    await fn();
+  } finally {
+    if (prev === undefined) delete process.env.RSS_ALLOWED_HOSTS;
+    else process.env.RSS_ALLOWED_HOSTS = prev;
+  }
+}
+
+// --- D-01 scheme allowlist ----------------------------------------------
+test("assertSafeUrl rejects a file:// scheme (D-01)", async () => {
+  await assert.rejects(
+    () => assertSafeUrl("file:///etc/passwd", { lookup: noLookup }),
+    /scheme .*not allowed/,
+  );
+});
+
+test("assertSafeUrl rejects an ftp:// scheme (D-01)", async () => {
+  await assert.rejects(
+    () => assertSafeUrl("ftp://example.test/x", { lookup: noLookup }),
+    /scheme .*not allowed/,
+  );
+});
+
+test("assertSafeUrl rejects a data: URL (D-01)", async () => {
+  await assert.rejects(
+    () => assertSafeUrl("data:text/plain,hi", { lookup: noLookup }),
+    /scheme .*not allowed/,
+  );
+});
+
+test("assertSafeUrl rejects a malformed URL", async () => {
+  await assert.rejects(() => assertSafeUrl("not a url", { lookup: noLookup }), /invalid URL/);
+});
+
+// --- D-02 private-range denylist (IP-literal hosts, no DNS) --------------
+test("assertSafeUrl rejects http://127.0.0.1 loopback without calling DNS (D-02)", async () => {
+  await assert.rejects(
+    () => assertSafeUrl("http://127.0.0.1/feed", { lookup: noLookup }),
+    /blocked address/,
+  );
+});
+
+test("assertSafeUrl rejects http://169.254.169.254 cloud metadata (D-02)", async () => {
+  await assert.rejects(
+    () => assertSafeUrl("http://169.254.169.254/latest/meta-data", { lookup: noLookup }),
+    /blocked address/,
+  );
+});
+
+test("assertSafeUrl rejects http://[::1] IPv6 loopback (D-02)", async () => {
+  await assert.rejects(
+    () => assertSafeUrl("http://[::1]/feed", { lookup: noLookup }),
+    /blocked address/,
+  );
+});
+
+// --- D-02 private-range denylist (DNS-resolved) -------------------------
+test("assertSafeUrl rejects a public hostname whose DNS resolves to a private IP (D-02)", async () => {
+  await assert.rejects(
+    () => assertSafeUrl("http://intranet.example.test/feed", { lookup: privateLookup }),
+    /blocked address/,
+  );
+});
+
+test("assertSafeUrl accepts a public host that resolves to a public IP", async () => {
+  const u = await assertSafeUrl("https://feeds.example.test/rss", { lookup: publicLookup });
+  assert.equal(u.hostname, "feeds.example.test");
+});
+
+// --- T-04-05 IPv4-mapped IPv6 canonicalization --------------------------
+test("assertSafeUrl blocks a host resolving to ::ffff:169.254.169.254 (mapped-IPv6 bypass, T-04-05)", async () => {
+  await assert.rejects(
+    () => assertSafeUrl("http://sneaky.example.test/x", { lookup: mappedMetadataLookup }),
+    /blocked address/,
+  );
+});
+
+// --- D-03 RSS_ALLOWED_HOSTS lock-down -----------------------------------
+test("assertSafeUrl with RSS_ALLOWED_HOSTS accepts only a listed host (D-03)", async () => {
+  await withAllowedHosts("feeds.example.test", async () => {
+    const u = await assertSafeUrl("https://feeds.example.test/rss", { lookup: publicLookup });
+    assert.equal(u.hostname, "feeds.example.test");
+  });
+});
+
+test("assertSafeUrl with RSS_ALLOWED_HOSTS rejects an unlisted host (D-03)", async () => {
+  await withAllowedHosts("feeds.example.test", async () => {
+    await assert.rejects(
+      () => assertSafeUrl("https://other.example.test/rss", { lookup: publicLookup }),
+      /not in RSS_ALLOWED_HOSTS/,
+    );
+  });
+});
+
+// --- V7 redaction: no query string in error text ------------------------
+test("assertSafeUrl error for a blocked host does not leak a query-string secret (V7)", async () => {
+  await assert.rejects(
+    () =>
+      assertSafeUrl("http://169.254.169.254/x?token=SUPER_SECRET", { lookup: noLookup }),
+    (err) => {
+      assert.ok(!/SUPER_SECRET/.test(err.message), "secret must NOT appear in error");
+      return true;
+    },
+  );
 });

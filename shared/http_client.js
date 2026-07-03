@@ -18,7 +18,10 @@
 // real network and without real waits.
 
 import { createHash } from "node:crypto";
+import { BlockList, isIP } from "node:net";
+import { lookup as dnsLookup } from "node:dns/promises";
 import { getFresh, getStale, set } from "./cache.js";
+import { rssAllowedHosts, userAgent } from "./credentials.js";
 
 const BACKOFF_MS = [500, 1000, 2000];
 const RETRYABLE_5XX = new Set([500, 502, 503, 504]);
@@ -54,6 +57,131 @@ async function fetchWithTimeout(fetchImpl, url, init, timeoutMs) {
   } finally {
     clearTimeout(timer);
   }
+}
+
+// ===========================================================================
+// SSRF guard (D-01 scheme allowlist, D-02 private-range denylist + per-hop
+// redirect re-validation, D-03 optional operator allowlist). This is the
+// project's FIRST fetch path whose outbound host comes from UNTRUSTED tool
+// input (rss_fetch(url)), so the controls live here on the single shared
+// chokepoint where no server can bypass them and every future text source
+// inherits them. See 04-RESEARCH "Security Domain" + OWASP SSRF (Node.js).
+// ===========================================================================
+
+// D-02 denylist — native subnet classification via node:net BlockList; NEVER
+// hand-rolled CIDR/bitmask math (a classic SSRF-bypass source). Ranges per
+// RFC1918 / RFC6598 (CGNAT) / RFC3927 (link-local, incl. 169.254.169.254 cloud
+// metadata) / RFC4193 (IPv6 ULA) plus loopback/multicast/reserved.
+const DENY = new BlockList();
+// IPv4
+DENY.addSubnet("0.0.0.0", 8, "ipv4"); // "this host"
+DENY.addSubnet("10.0.0.0", 8, "ipv4"); // RFC1918 private
+DENY.addSubnet("100.64.0.0", 10, "ipv4"); // CGNAT (RFC6598)
+DENY.addSubnet("127.0.0.0", 8, "ipv4"); // loopback
+DENY.addSubnet("169.254.0.0", 16, "ipv4"); // link-local incl. 169.254.169.254 metadata
+DENY.addSubnet("172.16.0.0", 12, "ipv4"); // RFC1918 private
+DENY.addSubnet("192.0.0.0", 24, "ipv4"); // IETF protocol assignments
+DENY.addSubnet("192.168.0.0", 16, "ipv4"); // RFC1918 private
+DENY.addSubnet("198.18.0.0", 15, "ipv4"); // benchmarking
+DENY.addSubnet("224.0.0.0", 4, "ipv4"); // multicast
+DENY.addSubnet("240.0.0.0", 4, "ipv4"); // reserved
+// IPv6
+DENY.addAddress("::1", "ipv6"); // loopback
+DENY.addSubnet("fc00::", 7, "ipv6"); // ULA (private)
+DENY.addSubnet("fe80::", 10, "ipv6"); // link-local
+DENY.addSubnet("ff00::", 8, "ipv6"); // multicast
+
+const ALLOWED_SCHEMES = new Set(["http:", "https:"]); // D-01
+
+// Strip surrounding brackets that WHATWG URL keeps on IPv6 hostnames
+// (new URL("http://[::1]/").hostname === "[::1]").
+function unbracket(hostname) {
+  return hostname.replace(/^\[/, "").replace(/\]$/, "");
+}
+
+// Canonicalize an IPv4-mapped IPv6 address (::ffff:a.b.c.d in dotted form, or the
+// WHATWG-normalized hex form ::ffff:HHHH:HHHH) down to its IPv4 form so a mapped
+// encoding of a blocked IP cannot slip past BlockList (T-04-05). Non-mapped
+// addresses pass through unchanged.
+function canonicalizeMappedV4(address) {
+  const m = /^::ffff:(.+)$/i.exec(address);
+  if (!m) return address;
+  const tail = m[1];
+  if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(tail)) return tail; // ::ffff:1.2.3.4
+  const hex = /^([0-9a-f]{1,4}):([0-9a-f]{1,4})$/i.exec(tail); // ::ffff:HHHH:HHHH
+  if (hex) {
+    const hi = parseInt(hex[1], 16);
+    const lo = parseInt(hex[2], 16);
+    return `${(hi >> 8) & 255}.${hi & 255}.${(lo >> 8) & 255}.${lo & 255}`;
+  }
+  return address;
+}
+
+// True if `address` (an IP literal or a DNS-resolved address) falls in the DENY
+// denylist after canonicalizing any IPv4-mapped IPv6 encoding.
+function isBlockedAddress(address) {
+  const ip = canonicalizeMappedV4(address);
+  const kind = isIP(ip);
+  if (kind === 0) return false; // not an IP we can classify — leave to DNS path
+  return DENY.check(ip, kind === 6 ? "ipv6" : "ipv4");
+}
+
+/**
+ * Validate a URL against the SSRF policy and return the parsed URL, or throw a
+ * clear (redacted) error. Called on the INITIAL host AND on every redirect
+ * Location before the socket is followed (see fetchTextManual).
+ *
+ * Policy: (D-01) scheme ∈ {http,https}; (D-03) if RSS_ALLOWED_HOSTS is set, host
+ * must be listed; (D-02) resolve the host and reject if ANY resolved address — or
+ * an IP-literal host itself — is loopback/private/link-local/CGNAT/ULA/reserved,
+ * including IPv4-mapped-IPv6 encodings.
+ *
+ * `lookup` is injectable so unit tests force a host to "resolve" to a private IP
+ * with no real DNS. Errors use redactUrl (origin+path only) so no query-string
+ * secret can leak (T-04-08 / V7); hostnames are not secrets.
+ *
+ * @param {string} rawUrl
+ * @param {object} [opts]
+ * @param {Function} [opts.lookup=dnsLookup] injectable dns.lookup (tests)
+ * @returns {Promise<URL>} the validated, parsed URL
+ */
+export async function assertSafeUrl(rawUrl, { lookup = dnsLookup } = {}) {
+  let u;
+  try {
+    u = new URL(rawUrl);
+  } catch {
+    throw new Error(`rss: invalid URL`);
+  }
+
+  if (!ALLOWED_SCHEMES.has(u.protocol)) {
+    throw new Error(
+      `rss: scheme ${u.protocol} not allowed (http/https only) [${redactUrl(u.href)}]`,
+    );
+  }
+
+  const host = unbracket(u.hostname);
+
+  const allow = rssAllowedHosts(); // D-03
+  if (allow && !allow.has(host.toLowerCase())) {
+    throw new Error(`rss: host ${host} not in RSS_ALLOWED_HOSTS`);
+  }
+
+  // An IP-literal host needs no DNS — classify it directly (offline, deterministic).
+  if (isIP(host)) {
+    if (isBlockedAddress(host)) {
+      throw new Error(`rss: host ${host} resolves to a blocked address`);
+    }
+    return u;
+  }
+
+  // Resolve EVERY address the host maps to and reject if ANY is internal (D-02).
+  const addrs = await lookup(host, { all: true });
+  for (const { address } of addrs) {
+    if (isBlockedAddress(address)) {
+      throw new Error(`rss: host ${host} resolves to a blocked address`);
+    }
+  }
+  return u;
 }
 
 /**
