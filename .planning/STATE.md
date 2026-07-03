@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 4
-status: verifying
+current_phase: 0
+status: Awaiting next milestone
 stopped_at: Phase 4 context gathered
-last_updated: "2026-07-03T11:01:13.046Z"
+last_updated: "2026-07-03T12:40:16.328Z"
 last_activity: 2026-07-03
-last_activity_desc: Phase 4 complete
+last_activity_desc: Milestone v1.0 completed and archived
 progress:
   total_phases: 4
   completed_phases: 4
@@ -21,19 +21,17 @@ current_phase_name: RSS Multiplier & Output Proof
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-07-01)
+See: .planning/PROJECT.md (updated 2026-07-03)
 
 **Core value:** Uniform normalized output across every source, so `medium-blog-pro` consumes any source with zero per-source logic.
-**Current focus:** Phase 4 — RSS Multiplier & Output Proof
+**Current focus:** Planning next milestone (v1.0 shipped — run `/gsd-new-milestone`)
 
 ## Current Position
 
-Phase: 4
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-07-03 — Phase 4 complete
-
-Progress: [██████████] 100% (Phase 02: 3 of 3 plans complete)
+Phase: Milestone v1.0 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-07-03 — Milestone v1.0 completed and archived
 
 ## Performance Metrics
 
@@ -113,9 +111,15 @@ Items acknowledged and carried forward from previous milestone close:
 |----------|------|--------|-------------|
 | Sources | Discourse (SRC-10), Mastodon (SRC-11), Bluesky (SRC-12) | v2 — deferred | 2026-07-01 |
 | Distribution | `.mcpb` bundles (PKG-01) | v2 — deferred | 2026-07-01 |
+| UAT (live smoke) | Phase 2 Lemmy authenticated read — needs `LEMMY_*` creds; `02-UAT.md` deferred, 0 pending scenarios | Acknowledged at v1.0 close | 2026-07-03 |
+| Security (accepted risk) | DNS-rebinding TOCTOU on `getText` (T-04-06) — acceptable for a local single-user tool; IP-pinning is the v2 follow-up | Accepted | 2026-07-03 |
 
 ## Session Continuity
 
 Last session: 2026-07-03T10:40:53.263Z
 Stopped at: Phase 4 context gathered
 Resume file: .planning/phases/04-rss-multiplier-output-proof/04-CONTEXT.md
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone

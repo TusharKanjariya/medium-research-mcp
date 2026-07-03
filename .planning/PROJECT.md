@@ -2,12 +2,16 @@
 
 ## What This Is
 
-A suite of small, single-purpose **MCP servers** (Node) that each wrap one
+A suite of nine small, single-purpose **MCP servers** (Node) that each wrap one
 developer-community source's public API — Hacker News, Stack Exchange, Lobsters,
-Lemmy, Dev.to, GitHub, Libraries.io, Product Hunt, and a generic
-RSS/Atom fetcher — plus a separate Python YouTube→blog wrapper. Every server
-emits the **same normalized JSON shape** so the `medium-blog-pro` skill can pull
-blog-topic research from many sources in one pass with zero per-source logic.
+Lemmy, Dev.to, GitHub, Libraries.io, Product Hunt, and a generic SSRF-hardened
+RSS/Atom fetcher (which also covers subreddit `.rss` and YouTube channel/playlist
+feeds via documented recipes). Every server emits the **same normalized JSON
+shape** so the `medium-blog-pro` skill can pull blog-topic research from many
+sources in one pass with zero per-source logic — proven live by a branch-free
+5+-source uniform-run merge. *(Shipped v1.0, 2026-07-03. The originally-planned
+Python YouTube→blog OCR wrapper was dropped — the user runs their own local OCR
+script manually on the YouTube links the RSS recipe surfaces.)*
 
 ## Core Value
 
@@ -23,26 +27,29 @@ across sources without a single source-specific branch.
 
 <!-- Shipped and confirmed valuable. -->
 
-- ✓ Shared foundation: TTL cache, `getJson()` HTTP client (retry + stale
-      fallback), and the normalized output contract, proven by a Hacker News
-      reference server — Phase 1 (FOUND-01..05, OUT-01, OUT-03; 64 tests)
+- ✓ Shared foundation: TTL cache, `getJson()`/`postJson()`/`getText()` HTTP client
+      (retry + stale fallback), and the normalized output contract, proven by a
+      Hacker News reference server — v1.0 Phase 1 (FOUND-01..05, OUT-01, OUT-03)
 - ✓ Credential + auth infrastructure: env-only `credentials.js`, `auth.js`
       token exchange (optional Reddit grant, Lemmy login), `.mcpb` keychain
-      pattern — Phase 1 (CRED-01..04)
+      pattern — v1.0 Phase 1 (CRED-01..04)
+- ✓ Eight source servers under one contract — Stack Exchange (network via `site`),
+      Lobsters, Lemmy (auth path), Dev.to, GitHub (repos + issues, optional PAT),
+      Libraries.io + Product Hunt (required-credential pair) — v1.0 Phases 2–3
+      (SRC-01..03, SRC-05..08)
+- ✓ Generic SSRF-hardened RSS/Atom fetcher (`rss_fetch`) incl. subreddit `.rss`
+      and YouTube channel/playlist recipes — v1.0 Phase 4 (SRC-09, YT-01)
+- ✓ Branch-free 5+-source uniform-run merge (`shared/rank.js` `mergeRank`),
+      proven offline + demoed live across 6 sources — v1.0 Phase 4 (OUT-02)
 
 ### Active
 
-<!-- Current scope. Building toward these. -->
+<!-- Current scope for the NEXT milestone. Empty until /gsd-new-milestone. -->
 
-- [ ] Source servers, each conforming exactly to the contract: Stack Exchange
-      (network via `site`), Lobsters, Lemmy, Dev.to, GitHub
-      (repos + issues/discussions), Libraries.io, Product Hunt
-- [ ] Generic RSS/Atom fetcher (the multiplier — newsletters, dev blogs, and
-      read-only subreddit `.rss` + YouTube channel/playlist recipes), SSRF-hardened
-- [ ] A single research run pulls from 5+ sources with uniform output
-- [ ] YouTube video-link surfacing via the RSS fetcher's YouTube recipe — the
-      user runs their own local OCR→draft script manually (Python OCR wrapper
-      dropped 2026-07-03)
+- (none — v1.0 shipped; start the next milestone with `/gsd-new-milestone`.
+  Candidate scope lives in ROADMAP.md "Future / Deferred (v2)": Discourse (SRC-10),
+  Mastodon (SRC-11), Bluesky (SRC-12), `.mcpb` packaging (PKG-01), and the optional
+  IP-pinning SSRF follow-up.)
 
 ### Out of Scope
 
@@ -74,12 +81,26 @@ across sources without a single source-specific branch.
 - Full technical detail lives in `docs/PRD.md` and `docs/ARCHITECTURE.md`;
   per-source spec template in `docs/server-spec-template.md`.
 
+## Current State
+
+**Shipped v1.0 (2026-07-03).** 9 MCP servers under one normalized contract + the
+live uniform-run proof. ~3,400 LOC source, ~3,700 LOC tests (**254 tests, 0 fail**),
+12 plans across 4 phases in 3 days. Runtime deps: `@modelcontextprotocol/sdk`,
+`zod`, `fast-xml-parser@4` (`+strnum`). Per-phase threat models; SSRF + supply-chain
+hardened. One known accepted residual: DNS-rebinding TOCTOU on `getText` (T-04-06,
+acceptable for a local single-user tool). One deferred live smoke: Phase 2 Lemmy
+authenticated-read (needs `LEMMY_*` creds).
+
+**Next milestone goals (candidates):** the v2 deferred sources (Discourse, Mastodon,
+Bluesky), `.mcpb` one-click packaging (PKG-01), and the optional IP-pinning SSRF
+follow-up. Start with `/gsd-new-milestone`.
+
 ## Constraints
 
-- **Tech stack**: Research servers are Node (`type: module`, `@modelcontextprotocol/sdk`
-  + `zod`, stdio, native `fetch`) — Claude Desktop ships a Node runtime so a Node
-  `.mcpb` needs no external runtime. YouTube wrapper is Python (wraps an existing
-  Tesseract OCR script; local-only).
+- **Tech stack**: Node (`type: module`, `@modelcontextprotocol/sdk` + `zod` +
+  `fast-xml-parser@4` for the RSS fetcher, stdio, native `fetch`) — Claude Desktop
+  ships a Node runtime so a Node `.mcpb` needs no external runtime. *(No Python: the
+  YouTube OCR wrapper was dropped 2026-07-03; the user's OCR script is external/manual.)*
 - **Output contract**: every server conforms exactly to ARCHITECTURE §4; `score`
   and `num_comments` may be `null` but must never be renamed or dropped.
 - **Security**: credentials never hardcoded, never read from `process.env`
@@ -96,11 +117,14 @@ across sources without a single source-specific branch.
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Node for research servers, Python only for YouTube wrapper | Claude Desktop bundles Node → zero-runtime `.mcpb`; YouTube wraps existing Python OCR | — Pending |
-| One server per source, shared cache/http/credentials/auth modules | Adding a source stays mechanical; uniformity enforced by the contract, not the language | — Pending |
-| Normalized output contract is the linchpin | Lets `medium-blog-pro` consume any source with no per-source code | — Pending |
-| Multi-source instead of single Reddit MCP | Removes the karma/join single point of failure | — Pending |
-| Coarse phase granularity, parallel execution | Solo operator with a clear design; sources are largely independent | — Pending |
+| One server per source, shared cache/http/credentials/auth modules | Adding a source stays mechanical; uniformity enforced by the contract, not the language | ✓ Good — 9 servers, each ~pure field-mapping |
+| Normalized output contract is the linchpin | Lets `medium-blog-pro` consume any source with no per-source code | ✓ Good — proven live by the branch-free `mergeRank` across 6 sources (OUT-02) |
+| Multi-source instead of single Reddit MCP | Removes the karma/join single point of failure | ✓ Good — Reddit coverage recovered via the subreddit `.rss` recipe, no OAuth |
+| Coarse phase granularity, parallel execution | Solo operator with a clear design; sources are largely independent | ✓ Good — 4 phases, 12 plans, 3 days |
+| Drop a source when it goes paid, not degrade the contract | Hashnode (SRC-04) retired free GraphQL; keyless/non-commercial premise is non-negotiable | ✓ Good — dropped cleanly, contract intact |
+| Drop the Python YouTube OCR wrapper; surface YouTube links via the RSS recipe | User owns the OCR script and runs it manually; avoids a second runtime + supply-chain surface | ✓ Good — YT-01 met with zero new code |
+| Add one vetted runtime dep (`fast-xml-parser@4`) behind a human supply-chain gate | Robust RSS 2.0/Atom parsing beats a fragile hand-roll; v4 keeps the tree to `+strnum` only | ✓ Good — `--ignore-scripts`, tree verified |
+| SSRF chokepoint on the shared `getText`, not per-server | RSS is the first user-controlled outbound host; centralizing the guard protects every future text source | ✓ Good — code review caught + fixed a real IPv6 `::` bypass |
 
 ## Evolution
 
@@ -120,4 +144,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-01 after Phase 1 (Foundation & Credential Infrastructure) completion*
+*Last updated: 2026-07-03 after v1.0 MVP milestone completion*
