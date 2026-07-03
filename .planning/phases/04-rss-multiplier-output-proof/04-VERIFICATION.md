@@ -1,11 +1,12 @@
 ---
 phase: 04-rss-multiplier-output-proof
 verified: 2026-07-03T00:00:00Z
-status: human_needed
+status: passed
 score: 4/4 ROADMAP success criteria verified (all plan must_haves verified)
 behavior_unverified: 0
 overrides_applied: 0
 human_verification:
+
   - test: "Run `node examples/uniform-run.mjs` on a machine with network access."
     expected: "Prints a single ranked list merging 5+ live sources (HN + Stack Exchange + Lobsters + Dev.to + a live rss_fetch, GitHub optional). RSS/null-score items sort last; one source erroring logs and continues. No per-source branching in the merge."
     why_human: "Requires the live network; per this project's 'live-API smokes deferred' convention it is a manual UAT smoke, not a CI gate. The offline fixture-based proof (test/uniform-run.test.js) already satisfies OUT-02 in CI — this is live confirmation only."
