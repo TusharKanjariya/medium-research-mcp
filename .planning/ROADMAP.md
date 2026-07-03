@@ -127,13 +127,13 @@ Plans:
   3. YouTube video links are surfaced (each with a short explanation) via the RSS fetcher's YouTube channel/playlist recipe (`youtube.com/feeds/videos.xml?channel_id=…`) as contract-shaped items — the user runs their own local Tesseract OCR→draft script manually on chosen links (OCR/draft generation is out of scope; the Python wrapper is dropped, decision 2026-07-03).
   4. The RSS fetcher passes the Universal Server Bar.
 
-**Plans**: 1/4 plans executed
+**Plans**: 2/4 plans executed
 
 Plans:
 **Wave 1** *(disjoint files — run in parallel)*
 
 - [x] 04-01-PLAN.md — Shared `getText` + SSRF `assertSafeUrl` guard + `RSS_ALLOWED_HOSTS` (D-01/02/03/07) [SRC-09] (wave 1)
-- [ ] 04-02-PLAN.md — `fast-xml-parser@^4.5.7` supply-chain gate (blocking-human checkpoint, D-08) [SRC-09] (wave 1)
+- [x] 04-02-PLAN.md — `fast-xml-parser@^4.5.7` supply-chain gate (blocking-human checkpoint, D-08) [SRC-09] (wave 1)
 
 **Wave 2** *(depends on 04-01 + 04-02)*
 
@@ -170,4 +170,4 @@ Phase 1 and may run in parallel; Phase 4 depends on both).
 | 1. Foundation & Credential Infrastructure | 3/3 | Complete    | 2026-07-01 |
 | 2. Keyless Source Breadth | 3/3 | Complete    | 2026-07-02 |
 | 3. Keyed Ecosystem & Launch Sources | 2/2 | Complete    | 2026-07-02 |
-| 4. RSS Multiplier & Output Proof | 1/4 | In Progress|  |
+| 4. RSS Multiplier & Output Proof | 2/4 | In Progress|  |
