@@ -86,6 +86,7 @@ DENY.addSubnet("198.18.0.0", 15, "ipv4"); // benchmarking
 DENY.addSubnet("224.0.0.0", 4, "ipv4"); // multicast
 DENY.addSubnet("240.0.0.0", 4, "ipv4"); // reserved
 // IPv6
+DENY.addAddress("::", "ipv6"); // unspecified (in6addr_any) — connect() routes to loopback (CR-01)
 DENY.addAddress("::1", "ipv6"); // loopback
 DENY.addSubnet("fc00::", 7, "ipv6"); // ULA (private)
 DENY.addSubnet("fe80::", 10, "ipv6"); // link-local

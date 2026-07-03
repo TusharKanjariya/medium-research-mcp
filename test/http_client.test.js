@@ -489,6 +489,16 @@ test("assertSafeUrl rejects http://[::1] IPv6 loopback (D-02)", async () => {
   );
 });
 
+// CR-01: the IPv6 unspecified address `::` (in6addr_any) routes to loopback on
+// connect() — the direct analog of the explicitly-blocked 0.0.0.0/8 — so it MUST
+// be rejected (was ALLOWED before the denylist gained DENY.addAddress("::")).
+test("assertSafeUrl rejects http://[::] IPv6 unspecified (CR-01)", async () => {
+  await assert.rejects(
+    () => assertSafeUrl("http://[::]/", { lookup: noLookup }),
+    /blocked address/,
+  );
+});
+
 // --- D-02 private-range denylist (DNS-resolved) -------------------------
 test("assertSafeUrl rejects a public hostname whose DNS resolves to a private IP (D-02)", async () => {
   await assert.rejects(
