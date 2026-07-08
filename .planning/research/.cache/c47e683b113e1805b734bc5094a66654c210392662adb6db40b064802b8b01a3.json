@@ -1,0 +1,1 @@
+{"content":"Dev.to Forem GET /api/articles?top=N returns most popular articles from last N days (official docs developers.forem.com/api/v1); state=fresh|rising|all; per_page 1..1000 default 30; keyless for public reads.","source":"web","provider":"websearch","confidence":"MEDIUM","fetched_at":"2026-07-08T10:56:48.961Z","ttl":86400000,"kind":"docs"}
