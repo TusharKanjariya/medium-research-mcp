@@ -6,8 +6,8 @@ current_phase: 0
 status: Awaiting next milestone
 stopped_at: Phase 4 context gathered
 last_updated: "2026-07-03T12:40:16.328Z"
-last_activity: 2026-07-03
-last_activity_desc: Milestone v1.0 completed and archived
+last_activity: 2026-07-08
+last_activity_desc: "Completed quick task 260708-h5g: CONCERNS.md bug fixes + CLAUDE.md drift"
 progress:
   total_phases: 4
   completed_phases: 4
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-07-03)
 Phase: Milestone v1.0 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-07-03 — Milestone v1.0 completed and archived
+Last activity: 2026-07-08 — Completed quick task 260708-h5g: CONCERNS.md bug fixes + CLAUDE.md drift
 
 ## Performance Metrics
 
@@ -102,6 +102,12 @@ None yet.
 ### Blockers/Concerns
 
 None yet.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260708-h5g | Fix CONCERNS.md bugs: astral entity decoding in shared/contract.js, content:encoded bypassing textOf in servers/rss/server.js, and CLAUDE.md drift (nonexistent build-mcpb.sh and inspect:hn) | 2026-07-08 | 80c05ff | [260708-h5g-fix-concerns-md-bugs-astral-entity-decod](./quick/260708-h5g-fix-concerns-md-bugs-astral-entity-decod/) |
 
 ## Deferred Items
 
