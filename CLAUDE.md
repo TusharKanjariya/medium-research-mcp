@@ -45,7 +45,8 @@ renamed or dropped**. Return a `dict`/object so the SDK emits both
    `shared/auth.js` (username/password). **Never read `process.env` in a server;
    never hardcode a secret.**
 6. Add `manifest.json` (+ `user_config` with `"sensitive": true` for any
-   credential) and `build-mcpb.sh`, mirroring `servers/hn/`.
+   credential), mirroring `servers/hn/`. Note: `.mcpb` packing itself is
+   deferred to v2 (PKG-01) — manifests are documentation/scaffold for now.
 7. Unit-test the `normalize*()` helpers and confirm tools register.
 
 ## Use the shared modules — don't reinvent
@@ -72,7 +73,7 @@ renamed or dropped**. Return a `dict`/object so the SDK emits both
 npm install
 npm run inspect:hn                       # MCP Inspector against a server
 node -e "..."                            # quick helper unit tests
-cd servers/<name> && ./build-mcpb.sh     # build a .mcpb (needs: npm i -g @anthropic-ai/mcpb)
+# .mcpb packaging is deferred to v2 (PKG-01) — no build script exists yet
 ```
 
 ## Don't
