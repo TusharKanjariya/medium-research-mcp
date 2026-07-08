@@ -149,7 +149,11 @@ export function mapRssItem(item) {
     url: link,
     permalink: link,
     tags: rssTags(item.category),
-    text: item["content:encoded"] ?? textOf(item.description) ?? null,
+    // WR-01 (same object-collapse as author above): a <content:encoded> carrying
+    // an XML attribute parses to an object, which would stringify to
+    // "[object Object]" downstream. textOf collapses it to its #text string
+    // (or null, letting description take over).
+    text: textOf(item["content:encoded"]) ?? textOf(item.description) ?? null,
   };
 }
 
