@@ -105,29 +105,29 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ABLOG-01 | — | Pending |
-| ABLOG-02 | — | Pending |
-| ABLOG-03 | — | Pending |
-| ABLOG-04 | — | Pending |
-| ABLOG-05 | — | Pending |
-| TREND-01 | — | Pending |
-| TREND-02 | — | Pending |
-| TREND-03 | — | Pending |
-| SRC-10 | — | Pending |
-| SRC-11 | — | Pending |
-| SRC-13 | — | Pending |
-| SEC-01 | — | Pending |
-| SEC-02 | — | Pending |
-| PKG-01 | — | Pending |
-| PKG-02 | — | Pending |
-| PKG-03 | — | Pending |
-| DOC-01 | — | Pending |
+| ABLOG-01 | Phase 6 | Pending |
+| ABLOG-02 | Phase 6 | Pending |
+| ABLOG-03 | Phase 6 | Pending |
+| ABLOG-04 | Phase 6 | Pending |
+| ABLOG-05 | Phase 6 | Pending |
+| TREND-01 | Phase 5 | Pending |
+| TREND-02 | Phase 5 | Pending |
+| TREND-03 | Phase 5 | Pending |
+| SRC-10 | Phase 7 | Pending |
+| SRC-11 | Phase 7 | Pending |
+| SRC-13 | Phase 7 | Pending |
+| SEC-01 | Phase 5 | Pending |
+| SEC-02 | Phase 7 | Pending |
+| PKG-01 | Phase 8 | Pending |
+| PKG-02 | Phase 8 | Pending |
+| PKG-03 | Phase 8 | Pending |
+| DOC-01 | Phase 8 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 17 total
-- Mapped to phases: 0 (roadmap pending)
-- Unmapped: 17 ⚠️ (expected — roadmap not yet created)
+- Mapped to phases: 17 ✓ (Phase 5: 4 · Phase 6: 5 · Phase 7: 4 · Phase 8: 4)
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-07-08*
-*Last updated: 2026-07-08 after initial definition*
+*Last updated: 2026-07-08 after v1.1 roadmap creation (traceability mapped)*

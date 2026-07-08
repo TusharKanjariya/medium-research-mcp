@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Writer-Aware, Universal Research
-status: planning
-last_updated: "2026-07-08T07:40:20.599Z"
+status: roadmap_created
+last_updated: "2026-07-08T11:15:10.000Z"
 last_activity: 2026-07-08
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,23 +17,30 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-07-03)
+See: .planning/PROJECT.md (updated 2026-07-08)
 
 **Core value:** Uniform normalized output across every source, so `medium-blog-pro` consumes any source with zero per-source logic.
-**Current focus:** Planning next milestone (v1.0 shipped — run `/gsd-new-milestone`)
+**Current focus:** Milestone v1.1 Writer-Aware, Universal Research — roadmap created (Phases 5–8), ready to plan Phase 5
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 5 of 8 — Guarded JSON Path & Trending Signals (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-07-08 — Milestone v1.1 started
+Status: Roadmap created — ready for `/gsd-plan-phase 5`
+Last activity: 2026-07-08 — v1.1 roadmap created (Phases 5–8, 17/17 requirements mapped)
+
+**v1.1 phase structure:**
+
+- Phase 5: Guarded JSON Path & Trending Signals (SEC-01, TREND-01..03)
+- Phase 6: Author-Blog Awareness (ABLOG-01..05) — parallelizable with Phase 5; coordinate the shared `http_client.js` UA change
+- Phase 7: Universal Sources & Parameterization Audit (SRC-10, SRC-11, SRC-13, SEC-02) — gated by Phase 5's guarded JSON path
+- Phase 8: Universal Distribution (PKG-01..03, DOC-01) — strictly last, ships the final tool surface
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 12
+- Total plans completed: 12 (v1.0)
 - Average duration: — min
 - Total execution time: 0.0 hours
 
@@ -72,6 +79,10 @@ Recent decisions affecting current work:
 - Init: Node for research servers, Python only for the YouTube wrapper.
 - Init: Normalized output contract is the linchpin — every server conforms exactly.
 - Init: Coarse granularity, parallel execution (Phases 2 and 3 can run in parallel after Phase 1).
+- [v1.1 roadmap]: SEC-01 (guarded JSON path) lands first in Phase 5 — it is the single gating dependency for every tool-param-host server (Discourse, Mastodon, Lemmy's parameterization move in Phase 7).
+- [v1.1 roadmap]: Distribution (PKG-01..03) is strictly last (Phase 8) — packaging ships the final tool surface once; nothing feeds back into code.
+- [v1.1 roadmap]: Author-blog tools live IN `servers/rss` (not a sibling server) — avoids duplicating the parser or breaking the `servers/* -> shared/*` dependency direction (per research SUMMARY.md).
+- [v1.1 roadmap]: Zero new runtime dependencies for v1.1 — `@anthropic-ai/mcpb` is devDependency-only; all new endpoints are keyless JSON/RSS through existing shared modules.
 - [Phase ?]: SE text mapped from body_markdown ?? body: built-in withbody filter returns HTML body not body_markdown (A1 corrected); stripHtml cleans downstream
 - [Phase 02 P02]: Lemmy authenticated reads require LEMMY_INSTANCE set explicitly (even to the default programming.dev) alongside LEMMY_USERNAME/LEMMY_PASSWORD — lemmyCreds() needs all three; username/password alone degrade to anonymous with no error. Documented in manifest + tool descriptions and asserted by tests.
 - [Phase 02 P02]: Lobsters author = plain-string submitter_user (Pitfall 6); Lemmy permalink = post.ap_id (federation URL); Lemmy posts have no tags (tags: []).
@@ -111,17 +122,18 @@ Items acknowledged and carried forward from previous milestone close:
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| Sources | Discourse (SRC-10), Mastodon (SRC-11), Bluesky (SRC-12) | v2 — deferred | 2026-07-01 |
-| Distribution | `.mcpb` bundles (PKG-01) | v2 — deferred | 2026-07-01 |
+| Sources | Discourse (SRC-10), Mastodon (SRC-11) | Promoted into v1.1 — Phase 7 | 2026-07-08 |
+| Sources | Bluesky (SRC-12) | v2+ — deferred | 2026-07-01 |
+| Distribution | `.mcpb` bundles (PKG-01) | Promoted into v1.1 — Phase 8 | 2026-07-08 |
 | UAT (live smoke) | Phase 2 Lemmy authenticated read — needs `LEMMY_*` creds; `02-UAT.md` deferred, 0 pending scenarios | Acknowledged at v1.0 close | 2026-07-03 |
-| Security (accepted risk) | DNS-rebinding TOCTOU on `getText` (T-04-06) — acceptable for a local single-user tool; IP-pinning is the v2 follow-up | Accepted | 2026-07-03 |
+| Security (accepted risk) | DNS-rebinding TOCTOU on `getText` (T-04-06) — acceptable for a local single-user tool; IP-pinning tracked as SEC-03 (v2+); reconsider during SEC-01's threat model | Accepted | 2026-07-03 |
 
 ## Session Continuity
 
-Last session: 2026-07-03T10:40:53.263Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-rss-multiplier-output-proof/04-CONTEXT.md
+Last session: 2026-07-08T11:15:10.000Z
+Stopped at: v1.1 roadmap created (Phases 5–8)
+Resume file: .planning/ROADMAP.md
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Plan the first v1.1 phase with /gsd-plan-phase 5
