@@ -126,6 +126,39 @@ test("rss_fetch does not hard-error on a feed whose author element carries an at
   assert.equal(env.results[0].author, "Jane Doe");
 });
 
+test("mapRssItem coerces an object-valued content:encoded (attribute present) to its #text string (WR-01)", () => {
+  // A <content:encoded type="html"> element parses to an object; un-coerced it
+  // lands in text and stringifies to "[object Object]" downstream.
+  const m = mapRssItem({
+    title: "t",
+    link: "http://x/1",
+    "content:encoded": { "#text": "<p>Full <b>body</b> &amp; more</p>", "@_type": "html" },
+  });
+  assert.equal(m.text, "<p>Full <b>body</b> &amp; more</p>");
+});
+
+test("mapRssItem falls back to description when content:encoded is an attribute-only object (WR-01)", () => {
+  const m = mapRssItem({
+    title: "t",
+    link: "http://x/2",
+    "content:encoded": { "@_type": "html" },
+    description: "short desc",
+  });
+  assert.equal(m.text, "short desc");
+});
+
+test("envelope text over an object-valued content:encoded is a readable string, never '[object Object]' (WR-01)", () => {
+  const m = mapRssItem({
+    title: "t",
+    link: "http://x/1",
+    "content:encoded": { "#text": "<p>Full <b>body</b> &amp; more</p>", "@_type": "html" },
+  });
+  const env = buildListEnvelope({ source: "rss", query: "q", results: [m] });
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env));
+  assert.equal(env.results[0].text, "Full body & more");
+  assert.ok(!env.results[0].text.includes("[object Object]"));
+});
+
 // --- (b) Atom 1.0 field map (link[rel=alternate] / author.name / ISO date) --
 
 test("mapAtomEntry maps a real Atom entry (link[rel=alternate], author.name, ISO date)", () => {
