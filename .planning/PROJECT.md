@@ -21,6 +21,26 @@ results[] }` for lists and `{ source, item }` for details, with a fixed item
 schema — because that is what lets the consuming skill rank, filter, and cite
 across sources without a single source-specific branch.
 
+## Current Milestone: v1.1 Writer-Aware, Universal Research
+
+**Goal:** Upgrade the suite into a writer-aware idea engine that any MCP-capable
+agent (Claude Desktop, OpenCode, Codex, GPT clients, …) can install and drive —
+with all targets (blogs, forums, instances) chosen by the agent at call time,
+never hardcoded.
+
+**Target features:**
+- Author-blog tools — local stdio server exposing Medium/Substack feed reading in
+  the normalized contract; author username/feed URL is a tool parameter; enables
+  topic dedup, follow-up detection, and cadence view for any author
+- Trending & pain-point mining — Dev.to top-of-week/month, Stack Exchange
+  high-view unanswered questions, HN rising — new tools/params on existing servers
+- Discourse server (SRC-10) — instance URL as tool parameter, any public forum
+- Mastodon server (SRC-11) — instance + hashtag as tool parameters, keyless
+- Universal distribution (PKG-01+) — `.mcpb` custom-connector bundles for Claude
+  Desktop and npm-published packages + config docs for all other MCP clients
+- Parameterization rule (cross-cutting) — no hardcoded accounts/instances/feeds;
+  targets are tool inputs, env only for credentials/optional defaults
+
 ## Requirements
 
 ### Validated
@@ -46,10 +66,17 @@ across sources without a single source-specific branch.
 
 <!-- Current scope for the NEXT milestone. Empty until /gsd-new-milestone. -->
 
-- (none — v1.0 shipped; start the next milestone with `/gsd-new-milestone`.
-  Candidate scope lives in ROADMAP.md "Future / Deferred (v2)": Discourse (SRC-10),
-  Mastodon (SRC-11), Bluesky (SRC-12), `.mcpb` packaging (PKG-01), and the optional
-  IP-pinning SSRF follow-up.)
+<!-- v1.1 scope — REQ-IDs assigned in REQUIREMENTS.md -->
+
+- [ ] Author-blog tools: Medium/Substack feed reading in the normalized contract,
+      author as tool parameter (dedup, follow-up, cadence)
+- [ ] Trending & pain-point mining on existing servers (Dev.to top window,
+      Stack Exchange high-view unanswered, HN rising)
+- [ ] Discourse generic fetcher (SRC-10), instance as tool parameter
+- [ ] Mastodon public/hashtag timelines (SRC-11), instance as tool parameter
+- [ ] Universal distribution: `.mcpb` bundles + npm packages + client config docs
+      (PKG-01+)
+- [ ] Parameterization rule: no hardcoded accounts/instances/feeds anywhere
 
 ### Out of Scope
 
@@ -144,4 +171,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-03 after v1.0 MVP milestone completion*
+*Last updated: 2026-07-08 after starting milestone v1.1 Writer-Aware, Universal Research*
