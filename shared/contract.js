@@ -82,6 +82,18 @@ export const DetailEnvelopeSchema = z.object(detailEnvelopeShape);
 // --- HTML stripping (OUT-03, D-02) --------------------------------------
 // Centralized so trimming/decoding is applied identically everywhere. Returns
 // null when the result is empty so blank/tag-only text normalizes to null.
+
+// Decode one numeric character reference. fromCodePoint (NOT fromCharCode —
+// which truncates astral code points like emoji to surrogate halves), guarded
+// so an out-of-range reference (> 0x10FFFF) is left as-is instead of throwing:
+// a RangeError here would hard-error every tool call whose source text carries
+// a malformed entity, violating the never-hard-error resilience rule.
+function decodeCodePoint(match, cp) {
+  return Number.isInteger(cp) && cp >= 0 && cp <= 0x10ffff
+    ? String.fromCodePoint(cp)
+    : match;
+}
+
 export function stripHtml(html) {
   if (html == null) return null;
   const out = String(html)
@@ -95,8 +107,8 @@ export function stripHtml(html) {
     .replace(/&quot;/g, '"')
     .replace(/&#x27;|&#39;/g, "'")
     .replace(/&nbsp;/g, " ")
-    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (m, n) => decodeCodePoint(m, Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (m, h) => decodeCodePoint(m, parseInt(h, 16)))
     .replace(/\n{3,}/g, "\n\n")
     .trim();
   return out || null;
