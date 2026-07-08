@@ -130,6 +130,33 @@ test("stripHtml removes tags and decodes named + numeric entities", () => {
   assert.equal(stripHtml("<p>Hello &amp; <b>world</b></p>"), "Hello & world");
 });
 
+test("stripHtml decodes astral-plane decimal entities to a single code point (no surrogate mangling)", () => {
+  // U+1F600 GRINNING FACE — fromCharCode would truncate 128512 to a lone
+  // surrogate half; the decoded output must be the actual emoji.
+  assert.equal(stripHtml("&#128512;"), "\u{1F600}");
+});
+
+test("stripHtml decodes astral-plane hex entities, case-insensitively", () => {
+  assert.equal(stripHtml("Launch &#x1F680; now"), "Launch \u{1F680} now");
+  // the existing /gi flag must keep matching an uppercase-X hex reference
+  assert.equal(stripHtml("&#X1F680;"), "\u{1F680}");
+});
+
+test("stripHtml never throws on an out-of-range numeric entity — leaves it untouched", () => {
+  // 1114112 === 0x110000, one past the Unicode maximum; String.fromCodePoint
+  // would throw RangeError. stripHtml must not hard-error a tool call on it.
+  let out;
+  assert.doesNotThrow(() => {
+    out = stripHtml("bad &#1114112; entity");
+  });
+  assert.equal(out, "bad &#1114112; entity");
+});
+
+test("stripHtml still decodes BMP numeric entities (regression)", () => {
+  assert.equal(stripHtml("&#65;"), "A");
+  assert.equal(stripHtml("&#x42;"), "B");
+});
+
 test("stripHtml returns null for empty, blank, or tag-only input", () => {
   assert.equal(stripHtml(""), null);
   assert.equal(stripHtml("   "), null);
