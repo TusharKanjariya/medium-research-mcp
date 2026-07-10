@@ -22,6 +22,7 @@ import {
   mapSeUnanswered,
   seThrottle,
   requireSeQuestion,
+  fetchQuestionDetail,
   seUrl,
   server,
 } from "../servers/stackexchange/server.js";
@@ -338,6 +339,76 @@ test("seThrottle does NOT sleep for a normal response with no backoff", async ()
   const sleep = sleepSpy();
   await seThrottle(noAnswers, { sleep });
   assert.deepEqual(sleep.waited, [], "no backoff field -> no wait");
+});
+
+// WR-01: a pathological/hostile backoff must be clamped so it cannot hang the tool.
+test("seThrottle clamps a pathological backoff at the 30s ceiling (WR-01)", async () => {
+  const sleep = sleepSpy();
+  // backoff:100000s would be a ~27-hour uncancellable hang without the cap.
+  await seThrottle({ backoff: 100_000 }, { sleep });
+  assert.deepEqual(
+    sleep.waited,
+    [30_000],
+    "the honored wait is capped at MAX_BACKOFF_MS (30_000ms), not backoff*1000",
+  );
+});
+
+test("seThrottle leaves a small in-range backoff unclamped (WR-01 does not shorten legit waits)", async () => {
+  const sleep = sleepSpy();
+  await seThrottle({ backoff: 5 }, { sleep });
+  assert.deepEqual(sleep.waited, [5000], "a normal 5s backoff is honored exactly");
+});
+
+// WR-02: the GENUINE sequential double-fetch (so_get_question / fetchQuestionDetail)
+// must honor a first-response backoff BETWEEN the two fetches — the self-inflicted
+// throttle/ban scenario seThrottle exists to prevent. `get`/`sleep` are injected so
+// the wiring is provable offline.
+test("fetchQuestionDetail honors a first-response backoff BETWEEN the question and answers fetches (WR-02)", async () => {
+  const sleep = sleepSpy();
+  const calls = [];
+  const get = async (url) => {
+    calls.push(url);
+    if (calls.length === 1) {
+      // question response carries a backoff SE wants honored before the next call
+      return { items: [detailQuestion], backoff: 2 };
+    }
+    return { items: answers.items }; // answers response
+  };
+  const { item, comments } = await fetchQuestionDetail(
+    { id: detailQuestion.question_id, site: "stackoverflow" },
+    { get, sleep },
+  );
+  assert.equal(calls.length, 2, "both the question and answers fetches ran");
+  assert.match(calls[0], /\/questions\//, "first fetch is the question");
+  assert.match(calls[1], /\/answers/, "second fetch is the answers");
+  assert.deepEqual(
+    sleep.waited,
+    [2000],
+    "the backoff from the FIRST response is slept before the SECOND (answers) fetch",
+  );
+  assert.equal(item.id, String(detailQuestion.question_id));
+  assert.equal(comments.length, answers.items.length);
+});
+
+test("fetchQuestionDetail does not sleep when the first response carries no backoff (WR-02)", async () => {
+  const sleep = sleepSpy();
+  const get = async (url) =>
+    /\/answers/.test(url) ? { items: answers.items } : { items: [detailQuestion] };
+  await fetchQuestionDetail(
+    { id: detailQuestion.question_id, site: "stackoverflow" },
+    { get, sleep },
+  );
+  assert.deepEqual(sleep.waited, [], "no backoff on the question response -> no wait");
+});
+
+test("fetchQuestionDetail surfaces the not-found guard when the question is absent (WR-02 keeps CR-01)", async () => {
+  const sleep = sleepSpy();
+  const get = async () => ({ items: [] }); // SE 200 empty for a bad id
+  await assert.rejects(
+    () => fetchQuestionDetail({ id: "999999999", site: "stackoverflow" }, { get, sleep }),
+    /not found/,
+  );
+  assert.deepEqual(sleep.waited, [], "no throttle wait once the question is missing");
 });
 
 test("a list envelope built from mapSeUnanswered parses against the frozen contract (OQ-1 — no extra fields)", () => {

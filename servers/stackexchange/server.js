@@ -108,6 +108,14 @@ export function mapSeUnanswered(q) {
 // tests so the backoff wait is observable without real time passing.
 const realSleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// WR-01: hard ceiling on the honored backoff. `backoff` is an arbitrary,
+// server-controlled response field that gates WALL-CLOCK time; a pathological or
+// stale-served value would otherwise hang the MCP tool call for that many seconds
+// with no cancellation (the sleep runs AFTER getJson returns, outside any
+// AbortController/timeoutMs). SE's real backoffs are small, so clamping to 30s
+// keeps every legitimate wait intact while capping a hostile/garbage value.
+const MAX_BACKOFF_MS = 30_000;
+
 /**
  * Honor SE's throttle signals BEHAVIORALLY without touching the frozen envelope
  * (OQ-1 resolved — no backoff/quota_remaining field is ever added to the contract).
@@ -130,7 +138,9 @@ export async function seThrottle(raw, { sleep = realSleep } = {}) {
     );
   }
   if (typeof raw?.backoff === "number" && raw.backoff > 0) {
-    await sleep(raw.backoff * 1000);
+    // Clamp to MAX_BACKOFF_MS (WR-01) so a huge/hostile backoff cannot hang the
+    // tool call — the honored wait never exceeds the ceiling.
+    await sleep(Math.min(raw.backoff * 1000, MAX_BACKOFF_MS));
   }
   return raw;
 }
@@ -256,6 +266,38 @@ server.registerTool(
   },
 );
 
+/**
+ * Fetch one SE question and its answers, mapped to { item, comments } (D-02).
+ *
+ * This is a GENUINE sequential double-fetch (question, THEN answers), so it is the
+ * one path that can trip SE's self-inflicted throttle/ban if the first response
+ * carries a `backoff`. WR-02: honor `seThrottle(raw)` BETWEEN the two fetches —
+ * after the question response, before the answers request — which is exactly the
+ * contract seThrottle was written for ("honor the wait BEFORE any follow-up SE
+ * request"). `get`/`sleep` are injectable so the throttle-between-fetches wiring is
+ * observable offline (no network, no real wait); production uses getJson/realSleep.
+ */
+export async function fetchQuestionDetail(
+  { id, site = "stackoverflow" },
+  { get = getJson, sleep = realSleep } = {},
+) {
+  const encId = encodeURIComponent(id);
+  const q = seUrl(`/questions/${encId}`, { site });
+  const raw = await get(q.url, { cacheKey: q.cacheKey });
+  // SE answers HTTP 200 { items: [] } for a missing id — guard before mapping.
+  const question = requireSeQuestion(raw?.items?.[0], id, site);
+  // WR-02: honor SE's backoff / surface quota-zero BEFORE the follow-up answers
+  // fetch — the real sequential path the throttle exists to protect.
+  await seThrottle(raw, { sleep });
+  const a = seUrl(`/questions/${encId}/answers`, {
+    site,
+    sort: "votes",
+    order: "desc",
+  });
+  const answers = await get(a.url, { cacheKey: a.cacheKey });
+  return mapSeDetail(question, answers?.items ?? []);
+}
+
 server.registerTool(
   "so_get_question",
   {
@@ -271,18 +313,7 @@ server.registerTool(
     outputSchema: detailEnvelopeShape,
   },
   async ({ id, site = "stackoverflow" }) => {
-    const encId = encodeURIComponent(id);
-    const q = seUrl(`/questions/${encId}`, { site });
-    const raw = await getJson(q.url, { cacheKey: q.cacheKey });
-    // SE answers HTTP 200 { items: [] } for a missing id — guard before mapping.
-    const question = requireSeQuestion(raw.items?.[0], id, site);
-    const a = seUrl(`/questions/${encId}/answers`, {
-      site,
-      sort: "votes",
-      order: "desc",
-    });
-    const answers = await getJson(a.url, { cacheKey: a.cacheKey });
-    const { item, comments } = mapSeDetail(question, answers.items ?? []);
+    const { item, comments } = await fetchQuestionDetail({ id, site });
     const env = buildDetailEnvelope({ source: SOURCE, item, comments });
     return toolResult(env);
   },
