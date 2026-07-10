@@ -87,6 +87,36 @@ export function mapHnHit(hit) {
   };
 }
 
+// --- HN rising (TREND-03): velocity-approximation helpers ----------------
+//
+// Algolia has no "rising" endpoint, so hn_rising queries search_by_date over a
+// recency+points window (numericFilters) and re-sorts server-side by points/hour
+// velocity so genuine fast-climbers surface first (D-11, Pitfall 3). Both helpers
+// are PURE and take an injected `nowSeconds` clock so ordering is deterministic
+// offline — never call Date.now() inside them (D-11 testability). Velocity is an
+// ordering signal ONLY; it never enters the item (frozen contract).
+
+/**
+ * Build the Algolia `numericFilters` value for the rising window. numericFilters
+ * ANDs comma-separated comparisons (verified live), so this yields the
+ * points-floor AND created-after-cutoff constraint. `nowSeconds` is injected.
+ */
+export function risingNumericFilters({ hours = 24, minPoints = 10, nowSeconds }) {
+  const cutoff = nowSeconds - hours * 3600;
+  return `points>${minPoints},created_at_i>${cutoff}`;
+}
+
+/**
+ * Return a NEW array of hits sorted descending by points/hour velocity. The
+ * 1/60-hour age floor guards divide-by-zero on very-fresh posts (A4). Input is
+ * not mutated.
+ */
+export function rankByVelocity(hits, nowSeconds) {
+  const velocity = (h) =>
+    (h.points ?? 0) / Math.max((nowSeconds - h.created_at_i) / 3600, 1 / 60);
+  return [...hits].sort((a, b) => velocity(b) - velocity(a));
+}
+
 /**
  * Map one Algolia /items/:id detail node onto { item, comments }. Only the
  * TOP-LEVEL children become comments (the nested reply tree is intentionally
@@ -166,6 +196,47 @@ server.registerTool(
       source: SOURCE,
       query,
       results: (raw.hits ?? []).map(mapHnHit),
+    });
+    return toolResult(env);
+  },
+);
+
+server.registerTool(
+  "hn_rising",
+  {
+    title: "Hacker News rising stories",
+    description:
+      "Rising Hacker News stories, APPROXIMATED by re-sorting a recent-window " +
+      "search by points/hour velocity (fast climbers first). This is NOT HN's " +
+      "real front-page algorithm — Algolia has no rising endpoint, so results " +
+      "are date-window stories re-ordered by velocity. Defaults: last 24h, " +
+      ">=10 points; both tunable. Optional query scopes rising to matching stories.",
+    inputSchema: {
+      query: z.string().optional(),
+      hours: z.number().int().min(1).max(168).optional(),
+      minPoints: z.number().int().min(0).max(1000).optional(),
+      limit: z.number().int().min(1).max(50).optional(),
+    },
+    outputSchema: listEnvelopeShape,
+  },
+  async ({ query, hours = 24, minPoints = 10, limit = 20 }) => {
+    // Capture the clock once so the numericFilters cutoff and the velocity
+    // re-sort share a single, consistent `now` (injectable in tests via helpers).
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    const numericFilters = risingNumericFilters({ hours, minPoints, nowSeconds });
+    let url =
+      `${ALGOLIA}/search_by_date?tags=story` +
+      `&numericFilters=${encodeURIComponent(numericFilters)}` +
+      `&hitsPerPage=${limit}`;
+    if (query) url += `&query=${encodeURIComponent(query)}`;
+    const raw = await getJson(url);
+    // Re-sort by velocity BEFORE mapping so we never return raw date order
+    // (Pitfall 3 — that would silently reorder downstream mergeRank output).
+    const results = rankByVelocity(raw.hits ?? [], nowSeconds).map(mapHnHit);
+    const env = buildListEnvelope({
+      source: SOURCE,
+      query: query ?? null,
+      results,
     });
     return toolResult(env);
   },
