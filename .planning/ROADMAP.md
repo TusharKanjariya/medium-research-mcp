@@ -37,7 +37,11 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
   2. User can get Dev.to's top articles for the last N days and rising articles, combinable with a tag parameter, in the normalized contract
   3. User can mine high-view unanswered Stack Exchange questions per tag, ranked by `view_count`, and repeated calls honor the API `backoff` field instead of triggering throttling
   4. User can get rising Hacker News stories with tunable hours / min-points parameters, in the normalized contract
-**Plans**: TBD
+**Plans**: 4 plans (all Wave 1 — parallel, disjoint file sets)
+- [ ] 05-01-PLAN.md — SEC-01 guarded getJson `untrustedHost` path (content-type gate + creds-in-URL reject) + move Lemmy onto the guarded path
+- [ ] 05-02-PLAN.md — TREND-03 `hn_rising` (search_by_date + numericFilters, points/hour velocity re-sort)
+- [ ] 05-03-PLAN.md — TREND-02 SE `so_unanswered` (high-view no-answers mining, view_count re-rank, backoff/quota handling)
+- [ ] 05-04-PLAN.md — TREND-01 `devto_top` extended with `mode`/`days`/`tag` (top + rising, forbidden-combo guard)
 
 ### Phase 6: Author-Blog Awareness
 **Goal**: Any agent can read a chosen author's Medium/Substack/raw-feed posts in the normalized contract — author always a tool parameter — with honest coverage windows and documented dedup/cadence recipes
@@ -93,7 +97,7 @@ Not part of the v1.1 milestone. Tracked for a later milestone (start via `/gsd-n
 | 2. Keyless Source Breadth | v1.0 | 3/3 | Complete | 2026-07-02 |
 | 3. Keyed Ecosystem & Launch Sources | v1.0 | 2/2 | Complete | 2026-07-02 |
 | 4. RSS Multiplier & Output Proof | v1.0 | 4/4 | Complete | 2026-07-03 |
-| 5. Guarded JSON Path & Trending Signals | v1.1 | 0/? | Not started | - |
+| 5. Guarded JSON Path & Trending Signals | v1.1 | 0/4 | Planned | - |
 | 6. Author-Blog Awareness | v1.1 | 0/? | Not started | - |
 | 7. Universal Sources & Parameterization Audit | v1.1 | 0/? | Not started | - |
 | 8. Universal Distribution | v1.1 | 0/? | Not started | - |
