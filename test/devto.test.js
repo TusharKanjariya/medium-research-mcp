@@ -22,6 +22,7 @@ import {
   mapDevtoArticle,
   mapDevtoDetail,
   requireDevtoArticle,
+  devtoTopUrl,
   server,
 } from "../servers/devto/server.js";
 import {
@@ -196,11 +197,78 @@ test("mapDevtoDetail builds a detail envelope that parses against the contract s
   assert.doesNotThrow(() => DetailEnvelopeSchema.parse(env));
 });
 
+// --- devtoTopUrl: top vs rising URL building (TREND-01, D-15) -------------
+
+test("devtoTopUrl top mode builds top=<days>+per_page and NOT state=rising", () => {
+  const url = devtoTopUrl({ mode: "top", days: 30, limit: 10 });
+  assert.ok(url.includes("top=30"), "explicit days honored as integer");
+  assert.ok(url.includes("per_page=10"));
+  assert.ok(!url.includes("state=rising"), "top mode never sends state=rising");
+});
+
+test("devtoTopUrl top mode falls back to the TOP_DAYS default (top=7) when days omitted", () => {
+  const url = devtoTopUrl({ mode: "top", limit: 5 });
+  assert.ok(url.includes("top=7"), "default window is the past 7 days");
+  assert.ok(url.includes("per_page=5"));
+});
+
+test("devtoTopUrl rising mode builds state=rising+per_page and NOT top=", () => {
+  const url = devtoTopUrl({ mode: "rising", limit: 10 });
+  assert.ok(url.includes("state=rising"));
+  assert.ok(url.includes("per_page=10"));
+  assert.ok(!url.includes("top="), "rising mode never sends a top window");
+});
+
+test("devtoTopUrl throws on the forbidden mode=rising + days combo BEFORE any fetch (D-15)", () => {
+  assert.throws(
+    () => devtoTopUrl({ mode: "rising", days: 7, limit: 10 }),
+    /days/,
+    "rising + days must be rejected in the helper (raw-shape schema cannot refine)",
+  );
+});
+
+test("devtoTopUrl honors an optional tag in BOTH modes (encodeURIComponent-ed)", () => {
+  const top = devtoTopUrl({ mode: "top", tag: "rust", limit: 10 });
+  const rising = devtoTopUrl({ mode: "rising", tag: "rust", limit: 10 });
+  assert.ok(top.includes("tag=rust"), "tag folded into top mode");
+  assert.ok(rising.includes("tag=rust"), "tag folded into rising mode");
+  // a tag needing escaping (e.g. "c#") must be URL-encoded, never raw.
+  const escaped = devtoTopUrl({ mode: "top", tag: "c#", limit: 10 });
+  assert.ok(escaped.includes("tag=c%23"), "special chars encodeURIComponent-ed");
+  assert.ok(!escaped.includes("tag=c#"), "raw '#' must not leak into the query");
+});
+
+// --- devto_top schema: integer days + mode enum (raw-shape per-field) -----
+
+test("devto_top schema accepts integer days but rejects a string like 'week'", () => {
+  const schema = server._registeredTools["devto_top"].inputSchema;
+  assert.doesNotThrow(() => schema.parse({ days: 7 }), "integer days accepted");
+  assert.throws(
+    () => schema.parse({ days: "week" }),
+    "days must be an integer number of days, not a word",
+  );
+});
+
+test("devto_top schema accepts mode top|rising but rejects an unknown mode", () => {
+  const schema = server._registeredTools["devto_top"].inputSchema;
+  assert.doesNotThrow(() => schema.parse({ mode: "top" }));
+  assert.doesNotThrow(() => schema.parse({ mode: "rising" }));
+  assert.throws(() => schema.parse({ mode: "hot" }), "unknown mode rejected");
+});
+
 // --- registration smoke --------------------------------------------------
 
 test("devto server registers exactly devto_get, devto_search, devto_tag, devto_top", () => {
   const names = Object.keys(server._registeredTools ?? {}).sort();
+  // devto_top was EXTENDED in place (D-14) — still exactly four tools, no 5th.
   assert.deepEqual(names, ["devto_get", "devto_search", "devto_tag", "devto_top"]);
+});
+
+test("devto_top remains a single extended tool with an outputSchema (no 5th tool added)", () => {
+  assert.ok(
+    server._registeredTools["devto_top"].outputSchema,
+    "extended devto_top still declares its outputSchema",
+  );
 });
 
 test("each devto tool declares an outputSchema (contract validation on return)", () => {
