@@ -94,6 +94,48 @@ export function requireSeQuestion(question, id, site) {
 }
 
 /**
+ * Map one raw SE no-answers question onto a raw contract item (TREND-02, D-08).
+ * Identical to mapSeQuestion EXCEPT `score` is overridden with `view_count` — for
+ * unmet-need mining, views (not votes) are the engagement signal. Everything else
+ * (num_comments = answer_count, which is 0 for the no-answers set — contract-legal)
+ * is inherited unchanged. The frozen item schema gains no new field.
+ */
+export function mapSeUnanswered(q) {
+  return { ...mapSeQuestion(q), score: q.view_count ?? null };
+}
+
+// Behavioral throttle honoring for SE (D-10, OQ-1). Default sleeper; injectable in
+// tests so the backoff wait is observable without real time passing.
+const realSleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Honor SE's throttle signals BEHAVIORALLY without touching the frozen envelope
+ * (OQ-1 resolved — no backoff/quota_remaining field is ever added to the contract).
+ *
+ * - `quota_remaining === 0` → throw a clear, actionable error telling the user their
+ *   Stack Exchange quota is exhausted and to set STACKEXCHANGE_KEY for a higher quota
+ *   (mirrors requireSeQuestion's actionable style; routes exhaustion through the
+ *   error path per D-10).
+ * - a positive `backoff` field → `await sleep(backoff * 1000)` to honor the API's
+ *   mandated wait BEFORE any follow-up SE request (D-10). SE only emits `backoff`
+ *   when it wants the next call delayed; sleeping here prevents a self-inflicted ban.
+ *
+ * The common single-page fetch never issues a follow-up, so a present backoff simply
+ * costs one honored wait; callers that never re-fetch still satisfy the API contract.
+ */
+export async function seThrottle(raw, { sleep = realSleep } = {}) {
+  if (raw?.quota_remaining === 0) {
+    throw new Error(
+      "stackexchange: API quota exhausted (quota_remaining=0) — set STACKEXCHANGE_KEY for a higher quota",
+    );
+  }
+  if (typeof raw?.backoff === "number" && raw.backoff > 0) {
+    await sleep(raw.backoff * 1000);
+  }
+  return raw;
+}
+
+/**
  * Map a raw SE question + its answers onto { item, comments }. Only the top-level
  * answers become comments (SE answers carry no nested reply tree here); text
  * stripping happens downstream in buildDetailEnvelope.
@@ -242,6 +284,48 @@ server.registerTool(
     const answers = await getJson(a.url, { cacheKey: a.cacheKey });
     const { item, comments } = mapSeDetail(question, answers.items ?? []);
     const env = buildDetailEnvelope({ source: SOURCE, item, comments });
+    return toolResult(env);
+  },
+);
+
+server.registerTool(
+  "so_unanswered",
+  {
+    title: "Stack Exchange high-view unanswered questions",
+    description:
+      "Mine high-view questions with ZERO answers (the /questions/no-answers " +
+      "set) for a required `tag`, ranked by view_count descending — the purest " +
+      "unmet-need signal for a blog topic (TREND-02). `site` defaults to " +
+      "\"stackoverflow\"; pass any SE network site string to target it. `score` " +
+      "in each result is the question's view_count (not votes) for this tool.",
+    inputSchema: {
+      tag: z.string(), // REQUIRED (D-09) — no-answers is only meaningful per tag
+      site: z.string().optional(),
+      limit: z.number().int().min(1).max(50).optional(),
+    },
+    outputSchema: listEnvelopeShape,
+  },
+  async ({ tag, site = "stackoverflow", limit = 20 }) => {
+    // Single-page window (OQ-2): SE has NO server-side view sort (`sort=views` is
+    // rejected — Pitfall 2), so fetch a modest window with a VALID sort and re-rank
+    // by views client-side. pagesize = min(limit*2, 100) gives the re-rank headroom
+    // while staying single-fetch, so the common case never needs a backoff sleep.
+    const { url, cacheKey } = seUrl("/questions/no-answers", {
+      site,
+      tagged: tag,
+      sort: "activity",
+      order: "desc",
+      pagesize: String(Math.min(limit * 2, 100)),
+    });
+    const raw = await getJson(url, { cacheKey });
+    // Honor backoff / surface quota-zero via the error+behavioral path (OQ-1/D-10)
+    // before any use of the response — no throttle field leaks into the envelope.
+    await seThrottle(raw);
+    const results = [...(raw.items ?? [])]
+      .sort((a, b) => (b.view_count ?? 0) - (a.view_count ?? 0))
+      .slice(0, limit)
+      .map(mapSeUnanswered);
+    const env = buildListEnvelope({ source: SOURCE, query: tag, results });
     return toolResult(env);
   },
 );

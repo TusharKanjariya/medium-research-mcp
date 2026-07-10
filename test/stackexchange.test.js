@@ -256,12 +256,13 @@ test("so_search advertises only /search/advanced-valid sorts and rejects hot-que
 
 // --- registration smoke (FOUND-05) --------------------------------------
 
-test("stackexchange server registers exactly so_get_question, so_hot_questions, so_search", () => {
+test("stackexchange server registers so_get_question, so_hot_questions, so_search, so_unanswered", () => {
   const names = Object.keys(server._registeredTools ?? {}).sort();
   assert.deepEqual(names, [
     "so_get_question",
     "so_hot_questions",
     "so_search",
+    "so_unanswered",
   ]);
 });
 
