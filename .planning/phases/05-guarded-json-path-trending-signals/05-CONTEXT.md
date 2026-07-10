@@ -74,12 +74,19 @@ everything is keyless JSON through `shared/http_client.js`.
 - **D-09:** **Tag is required**; `site` defaults to `stackoverflow` and is overridable
   via the existing `site` param the suite already supports (matches
   `so_search`/`so_hot_questions`). Unbounded site-wide no-answer mining is noise.
-- **D-10:** **`backoff` handling: sleep-within + record-in-output.** Inside a
-  multi-fetch tool call, sleep the `backoff` seconds before any follow-up SE request.
-  Always surface `backoff` and `quota_remaining` in the envelope so the agent sees
-  throttle state. This prevents a self-inflicted throttle violation (which IP-bans ALL
-  SE tools) WITHOUT changing the strict no-429-retry policy. When `quota_remaining`
-  hits 0, surface the existing "set STACKEXCHANGE_KEY" guidance in the error.
+- **D-10:** **`backoff` handling: sleep-within + surface via the error/message path
+  (NOT a new envelope field).** Inside a multi-fetch tool call, sleep the `backoff`
+  seconds before any follow-up SE request. This prevents a self-inflicted throttle
+  violation (which IP-bans ALL SE tools) WITHOUT changing the strict no-429-retry
+  policy. When `quota_remaining` hits 0, surface the throttle state through the error
+  message with the existing "set STACKEXCHANGE_KEY" guidance.
+  **Resolved during research (OQ-1):** the original phrasing "surface in the envelope"
+  is RETRACTED — the list envelope `{ source, query, count, results }` is frozen and
+  SDK-validated against `listEnvelopeShape`, so a `backoff`/`quota_remaining` key is
+  not contract-legal. The contract stays frozen; throttle handling is behavioral
+  (sleep-within) + error-path only. Per OQ-2, prefer a single-page fetch
+  (`pagesize = min(limit*2, 100)`, no paging) so the common case never triggers a
+  follow-up and thus never needs to sleep.
 
 ### HN rising (TREND-03)
 - **D-11:** Approximate rising with **`search_by_date` + `numericFilters`** (Algolia
