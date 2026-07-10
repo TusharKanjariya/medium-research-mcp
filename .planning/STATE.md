@@ -6,7 +6,7 @@ current_phase: 05
 current_phase_name: Guarded JSON Path & Trending Signals
 status: verifying
 stopped_at: Phase 5 context gathered
-last_updated: "2026-07-10T11:16:46.969Z"
+last_updated: "2026-07-10T11:17:09.422Z"
 last_activity: 2026-07-10
 last_activity_desc: Phase 05 execution started
 progress:
@@ -111,6 +111,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Tuned fast-xml-parser processEntities to avoid false-positive entity-limit failures on legitimate code-heavy feeds while keeping billion-laughs output/depth bounds
 - [Phase 05]: getJson gains opt-in untrustedHost SSRF guard reusing assertSafeUrl + content-type gate (SEC-01)
 - [Phase 05]: hn_rising: velocity is an ordering-only signal; frozen contract preserved (type stays story), tunable hours/minPoints via Algolia numericFilters
+- [Phase ?]: devto_top forbidden rising+days combo enforced in exported pure devtoTopUrl (throws pre-fetch), not the raw-shape Zod schema (D-15, Pitfall 4)
 
 ### Pending Todos
 
