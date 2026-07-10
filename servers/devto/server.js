@@ -128,6 +128,34 @@ export function mapDevtoDetail(article, comments) {
   return { item, comments: flat };
 }
 
+/**
+ * Build the Dev.to /articles request URL for the devto_top tool (both modes).
+ * Pure and exported so the forbidden-combo guard is unit-testable offline
+ * WITHOUT the network (D-15, Pitfall 4): `registerTool` takes a RAW Zod shape,
+ * so cross-field constraints (reject `mode: "rising"` + `days`) cannot live in
+ * the schema and MUST be enforced here, BEFORE any fetch.
+ *
+ * - `mode: "top"`  -> `?top=<days ?? TOP_DAYS>&per_page=<limit>` (top-of-window;
+ *   `days` is an INTEGER number of days: 7 = top of week, 30 = top of month).
+ * - `mode: "rising"` -> `?state=rising&per_page=<limit>` (Forem rising feed;
+ *   `days` is meaningless here and is REJECTED).
+ * - `tag` (either mode) appends `&tag=<encodeURIComponent(tag)>`.
+ */
+export function devtoTopUrl({ mode = "top", days, tag, limit } = {}) {
+  if (mode === "rising" && days != null) {
+    throw new Error(
+      'devto_top: `days` is not valid with `mode: "rising"` — `days` selects a ' +
+        "top-of-window (mode: \"top\") only. Drop `days` or use `mode: \"top\"`.",
+    );
+  }
+  const params =
+    mode === "rising"
+      ? `state=rising&per_page=${limit}`
+      : `top=${days ?? TOP_DAYS}&per_page=${limit}`;
+  const tagPart = tag ? `&tag=${encodeURIComponent(tag)}` : "";
+  return `${DEVTO}/articles?${params}${tagPart}`;
+}
+
 // --- MCP wiring (identical shape to the HN template) ---------------------
 //
 // registerTool takes RAW Zod shapes for inputSchema/outputSchema (NOT
@@ -140,25 +168,31 @@ export const server = new McpServer({ name: "devto", version: "1.0.0" });
 server.registerTool(
   "devto_top",
   {
-    title: "Dev.to top articles",
+    title: "Dev.to top / rising articles",
     description:
-      "Most popular Dev.to articles over a recent window (default: the past " +
-      "7 days — Dev.to's native top-of-week trending). `days` overrides the " +
-      "window; `limit` bounds the results.",
+      "Dev.to trending articles in one of two explicit modes. `mode: \"top\"` " +
+      "(default) returns the most popular articles over the past `days` — where " +
+      "`days` is an INTEGER NUMBER OF DAYS (7 = top of week, 30 = top of month; " +
+      "default 7), NOT a word like \"week\". `mode: \"rising\"` returns Dev.to's " +
+      "rising feed (`days` does NOT apply in rising mode and is rejected). An " +
+      "optional `tag` (e.g. \"javascript\", \"rust\") filters EITHER mode; " +
+      "`limit` bounds the results.",
     inputSchema: {
+      mode: z.enum(["top", "rising"]).optional(),
       limit: z.number().int().min(1).max(50).optional(),
       days: z.number().int().min(1).max(365).optional(),
+      tag: z.string().optional(),
     },
     outputSchema: listEnvelopeShape,
   },
-  async ({ limit = 20, days = TOP_DAYS }) => {
-    const raw = await getJson(
-      `${DEVTO}/articles?top=${days}&per_page=${limit}`,
-      { headers: FOREM_HEADERS },
-    );
+  async ({ mode = "top", limit = 20, days, tag }) => {
+    // Build the URL first: devtoTopUrl throws deterministically on the D-15
+    // forbidden combo (mode: "rising" + days) BEFORE any network call.
+    const url = devtoTopUrl({ mode, days, tag, limit });
+    const raw = await getJson(url, { headers: FOREM_HEADERS });
     const env = buildListEnvelope({
       source: SOURCE,
-      query: null, // top list has no free-text query
+      query: tag ?? null, // free-text query is the tag filter, if any
       results: (raw ?? []).map(mapDevtoArticle),
     });
     return toolResult(env);
