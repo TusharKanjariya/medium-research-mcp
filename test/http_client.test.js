@@ -567,6 +567,52 @@ test("getJson untrustedHost rejects a 302 whose Location points at an internal I
   assert.deepEqual(sleep.waited, [], "an SSRF rejection is not retried");
 });
 
+// WR-03: a malformed redirect Location (`http://` — no host) throws a raw TypeError
+// from `new URL(loc, url)`. It must be classified as a TERMINAL, non-retryable
+// error (fail closed on the SSRF path), NOT a retryable network error — so no wasted
+// retries and NO stale served, even when a stale entry exists.
+test("getJson untrustedHost treats a malformed redirect Location as terminal — no retry, no stale (WR-03)", async () => {
+  cacheSet("gj:redir-malformed", { cached: "stale-should-not-serve" }, -1000); // expired seed
+  const fetchImpl = fetchStub([jsonRes(302, null, { location: "http://" })]);
+  const sleep = sleepSpy();
+  await assert.rejects(
+    () =>
+      getJson("http://forum.example.test/api", {
+        fetchImpl,
+        sleep,
+        lookup: publicLookup,
+        untrustedHost: true,
+        cacheKey: "gj:redir-malformed",
+      }),
+    (err) => {
+      assert.match(err.message, /invalid redirect Location/i, "terminal malformed-redirect error");
+      assert.ok(!(err instanceof TypeError), "not misclassified as a network TypeError");
+      return true;
+    },
+  );
+  assert.equal(fetchImpl.calls, 1, "the malformed redirect is not retried");
+  assert.deepEqual(sleep.waited, [], "a malformed-redirect rejection is not retried");
+});
+
+// WR-03 parity: getText (the RSS path) fails the same way on a malformed Location.
+test("getText treats a malformed redirect Location as terminal — no retry, no stale (WR-03)", async () => {
+  cacheSet("text:redir-malformed", "<rss>old</rss>", -1000);
+  const fetchImpl = fetchStub([textRes(302, "", { location: "http://" })]);
+  const sleep = sleepSpy();
+  await assert.rejects(
+    () =>
+      getText("https://feeds.example.test/redirect", {
+        fetchImpl,
+        sleep,
+        lookup: publicLookup,
+        cacheKey: "text:redir-malformed",
+      }),
+    /invalid redirect Location/i,
+  );
+  assert.equal(fetchImpl.calls, 1, "malformed redirect not retried");
+  assert.deepEqual(sleep.waited, [], "malformed-redirect rejection not retried");
+});
+
 // 7. Credentials-in-URL are rejected before any fetch (D-04).
 test("getJson untrustedHost rejects a user:pass@host URL before fetching (D-04)", async () => {
   const fetchImpl = fetchStub([jsonRes(200, { should: "never-read" })]);

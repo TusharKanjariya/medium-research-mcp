@@ -236,8 +236,22 @@ async function fetchTextManual(fetchImpl, startUrl, init, timeoutMs, lookup) {
     if (res.status >= 300 && res.status < 400) {
       const loc = res.headers.get("location");
       if (!loc) return res; // 3xx without Location — let the caller handle it
+      // WR-03: parse the redirect target INSIDE a try/catch. A malformed Location
+      // (e.g. `http://` with no host) throws a raw TypeError from `new URL`, which
+      // both getJson (untrustedHost) and getText would otherwise misclassify as a
+      // retryable network error (isNetwork = err instanceof TypeError) — wasting
+      // retries and possibly serving stale for what is a terminal malformed-response
+      // condition on the untrusted SSRF path. Fail closed: a plain Error is NOT a
+      // TypeError/RetryableError/AbortError, so it is terminal, not retried, and not
+      // served from stale — the same disposition as an assertSafeUrl rejection.
+      let next;
+      try {
+        next = new URL(loc, url).href;
+      } catch {
+        throw new Error(`rss: invalid redirect Location [${redactUrl(url)}]`);
+      }
       // RE-VALIDATE the redirect target before following (D-02 per-hop guard).
-      url = (await assertSafeUrl(new URL(loc, url).href, { lookup })).href;
+      url = (await assertSafeUrl(next, { lookup })).href;
       continue;
     }
     return res; // 2xx/4xx/5xx — getText's loop classifies it
