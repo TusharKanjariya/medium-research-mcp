@@ -1,0 +1,39 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-07-10T12:09:31.981Z",
+  "phase": "6",
+  "phase_name": "Author-Blog Awareness",
+  "phase_dir": ".planning/phases/ (06 not yet created)",
+  "milestone": "v1.1 Writer-Aware, Universal Research",
+  "plan": null,
+  "task": null,
+  "total_tasks": null,
+  "status": "paused",
+  "context_note": "Clean pause at a phase boundary. Phase 5 (Guarded JSON Path & Trending Signals) is FULLY complete — planned, executed, verified, code-reviewed, review-fixes applied, and threat-secured. Nothing is in progress. Phase 6 is the next unstarted phase.",
+  "completed_tasks": [
+    {"id": "05-discuss", "name": "Phase 5 CONTEXT.md (D-01..D-15; OQ-1 resolved — contract frozen)", "status": "done"},
+    {"id": "05-plan", "name": "4 plans, Wave 1, verified by plan-checker", "status": "done"},
+    {"id": "05-01", "name": "SEC-01 guarded getJson untrustedHost + Lemmy on guarded path", "status": "done", "commit": "e52a90e"},
+    {"id": "05-02", "name": "TREND-03 hn_rising (velocity re-sort)", "status": "done", "commit": "12fcb73"},
+    {"id": "05-03", "name": "TREND-02 SE so_unanswered + seThrottle", "status": "done", "commit": "ddd25df"},
+    {"id": "05-04", "name": "TREND-01 devto_top mode/days/tag", "status": "done", "commit": "225167f"},
+    {"id": "05-verify", "name": "VERIFICATION.md — passed 19/19 must-haves", "status": "done"},
+    {"id": "05-review", "name": "Code review (0 critical, 3 warn, 3 info) + fixes applied (WR-01/02/03)", "status": "done", "commit": "96e0521"},
+    {"id": "05-secure", "name": "SECURITY.md — threats_open: 0 (10 threats closed)", "status": "done", "commit": "76cb022"}
+  ],
+  "remaining_tasks": [
+    {"id": "06", "name": "Phase 6 Author-Blog Awareness (ABLOG-01..05) — not started", "status": "not_started"}
+  ],
+  "blockers": [],
+  "async_jobs": [],
+  "human_actions_pending": [],
+  "decisions": [
+    {"decision": "Output contract stays FROZEN; SE throttle rides sleep-within + error path (no backoff/quota_remaining envelope field)", "rationale": "OQ-1: list envelope is SDK-validated against listEnvelopeShape; a 5th key is not contract-legal and the contract is the project's core value", "phase": "5"},
+    {"decision": "SEC-01 guard is an opt-in getJson(url,{untrustedHost:true}) reusing the getText assertSafeUrl guard (no forked guard)", "rationale": "D-01/D-02 — fixed-host servers pay zero DNS cost; single retry/cache/stale path", "phase": "5"},
+    {"decision": "SEC-03 (DNS-rebinding TOCTOU) re-accepted, not implemented", "rationale": "D-06 — local single-user tool; IP-pinning stays v2+", "phase": "5"},
+    {"decision": "Overrode the false-positive ui.plan-gate (frontend:true) for this headless MCP server", "rationale": "no frontend exists; UI-SPEC nonsensical. Silence permanently via workflow.ui_safety_gate:false + ui_phase:false in .planning/config.json", "phase": "5"}
+  ],
+  "uncommitted_files": [],
+  "next_action": "Run /gsd-discuss-phase 6 to start Phase 6 (Author-Blog Awareness). Milestone research already covers it in .planning/research/SUMMARY.md and PITFALLS.md.",
+  "context_notes": "v1.1 is 5/8 phases done (Phase 5 of 8). Phase 6 (Author-Blog Awareness, ABLOG-01..05) is parallelizable with Phase 5 and shares the shared/http_client.js User-Agent change (Medium 403 mitigation) to coordinate. Author-blog tools live IN servers/rss (not a sibling server) per the v1.1 roadmap decision. Optional cleanup: 3 INFO code-review nits from 05-REVIEW.md remain (error-prefix wording rss:, null-safe raw.hits/raw.items, devto_top query:tag vs null) — run /gsd-code-review 5 --all to sweep them. Working tree clean; 298 tests pass."
+}
