@@ -19,6 +19,8 @@ import { fileURLToPath } from "node:url";
 import {
   mapSeQuestion,
   mapSeDetail,
+  mapSeUnanswered,
+  seThrottle,
   requireSeQuestion,
   seUrl,
   server,
@@ -41,9 +43,23 @@ const fixture = (name) =>
 const list = fixture("stackexchange-list");
 const detail = fixture("stackexchange-detail");
 const answers = fixture("stackexchange-answers");
+const noAnswers = fixture("stackexchange-noanswers");
+const noAnswersBackoff = fixture("stackexchange-noanswers-backoff");
+const noAnswersQuotaZero = fixture("stackexchange-noanswers-quota-zero");
 
 const listItem = list.items[0];
 const detailQuestion = detail.items[0];
+
+// Injectable sleep spy (mirrors test/http_client.test.js) — records each wait in ms
+// so the backoff-honoring path is observable without real time passing.
+function sleepSpy() {
+  const waited = [];
+  const sleep = async (ms) => {
+    waited.push(ms);
+  };
+  sleep.waited = waited;
+  return sleep;
+}
 
 // --- mapSeQuestion -------------------------------------------------------
 
@@ -254,6 +270,89 @@ test("so_search advertises only /search/advanced-valid sorts and rejects hot-que
   assert.throws(() => schema.parse({ query: "x", sort: "week" }), "search rejects week");
 });
 
+// --- TREND-02: so_unanswered (view-rank + throttle) ----------------------
+
+test("mapSeUnanswered overrides score with view_count, keeps the rest of the item map (D-08)", () => {
+  const item = noAnswers.items[0];
+  const m = mapSeUnanswered(item);
+  assert.equal(m.score, item.view_count); // score := view_count (the override)
+  assert.notEqual(m.score, item.score); // proves it is NOT the vote score
+  assert.equal(m.num_comments, item.answer_count); // answer_count (0), untouched
+  assert.equal(m.num_comments, 0);
+  assert.equal(m.type, "question");
+  assert.equal(m.id, String(item.question_id));
+  assert.equal(typeof m.id, "string");
+  assert.match(m.created_utc, /^\d{4}-\d{2}-\d{2}T/);
+  assert.ok(
+    new Date(m.created_utc).getUTCFullYear() > 2000,
+    "created_utc is a real, non-1970 date",
+  );
+});
+
+test("mapSeUnanswered yields score=null when view_count is missing", () => {
+  const m = mapSeUnanswered({ ...noAnswers.items[0], view_count: undefined });
+  assert.equal(m.score, null);
+});
+
+test("view_count re-rank reorders the fetched window strictly descending (Pitfall 2 — no server view sort)", () => {
+  // Replicate the handler's client-side re-rank exactly.
+  const ranked = [...noAnswers.items]
+    .sort((a, b) => (b.view_count ?? 0) - (a.view_count ?? 0))
+    .map(mapSeUnanswered);
+  const scores = ranked.map((r) => r.score);
+  // strictly descending by view_count
+  for (let i = 1; i < scores.length; i++) {
+    assert.ok(scores[i - 1] > scores[i], `score[${i - 1}] > score[${i}]`);
+  }
+  // top item is the max-view_count question, NOT the fetched-order first item
+  const maxView = Math.max(...noAnswers.items.map((i) => i.view_count));
+  assert.equal(ranked[0].score, maxView);
+  assert.notEqual(
+    ranked[0].id,
+    String(noAnswers.items[0].question_id),
+    "fetched order is not preserved — the re-rank changed the head",
+  );
+});
+
+test("seThrottle throws the set-STACKEXCHANGE_KEY guidance when quota_remaining is 0 (D-10)", async () => {
+  const sleep = sleepSpy();
+  await assert.rejects(
+    () => seThrottle(noAnswersQuotaZero, { sleep }),
+    /STACKEXCHANGE_KEY/,
+  );
+  assert.deepEqual(sleep.waited, [], "no sleep on the quota-exhaustion path");
+});
+
+test("seThrottle honors a present backoff by sleeping backoff*1000 ms via the injected sleep (D-10)", async () => {
+  const sleep = sleepSpy();
+  const out = await seThrottle(noAnswersBackoff, { sleep });
+  assert.equal(out, noAnswersBackoff, "resolves with the raw payload");
+  assert.deepEqual(
+    sleep.waited,
+    [3 * 1000],
+    "a single 3000ms wait honors the fixture's backoff:3",
+  );
+});
+
+test("seThrottle does NOT sleep for a normal response with no backoff", async () => {
+  const sleep = sleepSpy();
+  await seThrottle(noAnswers, { sleep });
+  assert.deepEqual(sleep.waited, [], "no backoff field -> no wait");
+});
+
+test("a list envelope built from mapSeUnanswered parses against the frozen contract (OQ-1 — no extra fields)", () => {
+  const env = buildListEnvelope({
+    source: "stackexchange",
+    query: "asyncio",
+    results: noAnswers.items.map(mapSeUnanswered),
+  });
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env));
+  assert.equal(env.count, noAnswers.items.length);
+  // the throttle signals never leak into the envelope
+  assert.ok(!("backoff" in env), "no backoff key on the envelope");
+  assert.ok(!("quota_remaining" in env), "no quota_remaining key on the envelope");
+});
+
 // --- registration smoke (FOUND-05) --------------------------------------
 
 test("stackexchange server registers so_get_question, so_hot_questions, so_search, so_unanswered", () => {
@@ -267,10 +366,25 @@ test("stackexchange server registers so_get_question, so_hot_questions, so_searc
 });
 
 test("each stackexchange tool declares an outputSchema (contract validation on return)", () => {
-  for (const name of ["so_hot_questions", "so_search", "so_get_question"]) {
+  for (const name of [
+    "so_hot_questions",
+    "so_search",
+    "so_get_question",
+    "so_unanswered",
+  ]) {
     assert.ok(
       server._registeredTools[name].outputSchema,
       `${name} has an outputSchema`,
     );
   }
+});
+
+test("so_unanswered is registered with an outputSchema and a REQUIRED tag input (D-09)", () => {
+  const tool = server._registeredTools["so_unanswered"];
+  assert.ok(tool, "so_unanswered is registered");
+  assert.ok(tool.outputSchema, "so_unanswered declares an outputSchema");
+  const schema = tool.inputSchema;
+  // tag is required — omitting it must fail schema parse
+  assert.throws(() => schema.parse({ site: "stackoverflow" }), "tag is required");
+  assert.doesNotThrow(() => schema.parse({ tag: "python" }), "tag alone is valid");
 });
