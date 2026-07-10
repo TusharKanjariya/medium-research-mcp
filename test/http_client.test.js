@@ -18,6 +18,28 @@ function res(status, data, { throwJson = false } = {}) {
   };
 }
 
+// A Response-like object for the guarded (untrustedHost) getJson path: unlike
+// res() it exposes headers.get() so the content-type gate can read content-type,
+// and a Location header for 3xx redirect re-validation cases. Mirrors textRes's
+// headers.get shim (below) plus a content-type key and an async json().
+function jsonRes(status, data, { ct = "application/json", location } = {}) {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    headers: {
+      get: (k) => {
+        const key = String(k).toLowerCase();
+        if (key === "content-type") return ct;
+        if (key === "location") return location ?? null;
+        return null;
+      },
+    },
+    async json() {
+      return data;
+    },
+  };
+}
+
 // Returns a fetch stub that yields queued responses in order; the last entry
 // repeats for any further calls. Each entry may be a Response-like object or a
 // function to invoke (e.g. to throw a network error).
@@ -427,6 +449,154 @@ const mappedMetadataLookup = async () => [
 const noLookup = async () => {
   throw new Error("DNS lookup must not be called for an IP-literal host");
 };
+
+// ========================================================================
+// Guarded getJson() — the opt-in untrustedHost SSRF path (SEC-01). Reuses the
+// SAME assertSafeUrl denylist + per-hop redirect re-validation as getText, plus
+// a content-type gate (D-03). All offline: fetchImpl/sleep/lookup injected,
+// resolvers reused from above, each case uses a distinct cacheKey.
+// ========================================================================
+
+// 1. IP-literal metadata host is blocked before any fetch (no DNS).
+test("getJson untrustedHost rejects the 169.254.169.254 metadata IP before fetching (D-02)", async () => {
+  const fetchImpl = fetchStub([jsonRes(200, { should: "never-read" })]);
+  await assert.rejects(
+    () =>
+      getJson("http://169.254.169.254/x", {
+        fetchImpl,
+        sleep: sleepSpy(),
+        lookup: noLookup,
+        untrustedHost: true,
+        cacheKey: "gj:meta-literal",
+      }),
+    /blocked address/,
+  );
+  assert.equal(fetchImpl.calls, 0, "no fetch for a blocked IP-literal host");
+});
+
+// 2. IP-literal loopback is blocked (no DNS).
+test("getJson untrustedHost rejects http://127.0.0.1 loopback (D-02)", async () => {
+  const fetchImpl = fetchStub([jsonRes(200, { should: "never-read" })]);
+  await assert.rejects(
+    () =>
+      getJson("http://127.0.0.1/x", {
+        fetchImpl,
+        sleep: sleepSpy(),
+        lookup: noLookup,
+        untrustedHost: true,
+        cacheKey: "gj:loopback-literal",
+      }),
+    /blocked address/,
+  );
+  assert.equal(fetchImpl.calls, 0);
+});
+
+// 3. Public hostname whose DNS resolves to a private IP is blocked before fetch.
+test("getJson untrustedHost rejects a public host resolving to a private IP (D-02)", async () => {
+  const fetchImpl = fetchStub([jsonRes(200, { should: "never-read" })]);
+  await assert.rejects(
+    () =>
+      getJson("http://intranet.example.test/x", {
+        fetchImpl,
+        sleep: sleepSpy(),
+        lookup: privateLookup,
+        untrustedHost: true,
+        cacheKey: "gj:private-resolve",
+      }),
+    /blocked address/,
+  );
+  assert.equal(fetchImpl.calls, 0, "no fetch when the resolved address is private");
+});
+
+// 4. Content-type gate: an HTML 200 is a terminal login-required error — NOT
+// retried and NOT served from stale.
+test("getJson untrustedHost gates an HTML 200 to a terminal non-JSON error, no retry, no stale (D-03)", async () => {
+  cacheSet("gj:html-gate", { cached: "stale-should-not-serve" }, -1000); // expired seed
+  const fetchImpl = fetchStub([jsonRes(200, { irrelevant: true }, { ct: "text/html" })]);
+  const sleep = sleepSpy();
+  await assert.rejects(
+    () =>
+      getJson("http://forum.example.test/api", {
+        fetchImpl,
+        sleep,
+        lookup: publicLookup,
+        untrustedHost: true,
+        cacheKey: "gj:html-gate",
+      }),
+    (err) => {
+      assert.match(err.message, /login required|non-JSON/i);
+      return true;
+    },
+  );
+  assert.deepEqual(sleep.waited, [], "an HTML-gate rejection is not retried");
+  assert.equal(fetchImpl.calls, 1, "gate fires on the first response");
+});
+
+// 5. Pass-through: a JSON 200 resolves normally (the gate does not over-reject).
+test("getJson untrustedHost passes through a valid application/json 200 (gate does not over-reject)", async () => {
+  const fetchImpl = fetchStub([jsonRes(200, { ok: true }, { ct: "application/json" })]);
+  const out = await getJson("http://forum.example.test/api", {
+    fetchImpl,
+    sleep: sleepSpy(),
+    lookup: publicLookup,
+    untrustedHost: true,
+    cacheKey: "gj:json-pass",
+  });
+  assert.deepEqual(out, { ok: true });
+  assert.equal(fetchImpl.calls, 1);
+});
+
+// 6. Redirect re-validation: a 302 → internal IP is rejected, target never fetched.
+test("getJson untrustedHost rejects a 302 whose Location points at an internal IP (per-hop re-validation)", async () => {
+  const fetchImpl = fetchStub([
+    jsonRes(302, null, { location: "http://169.254.169.254/meta" }),
+  ]);
+  const sleep = sleepSpy();
+  await assert.rejects(
+    () =>
+      getJson("http://forum.example.test/api", {
+        fetchImpl,
+        sleep,
+        lookup: publicLookup, // initial host passes; the literal redirect target is blocked
+        untrustedHost: true,
+        cacheKey: "gj:redir-internal",
+      }),
+    /blocked address/,
+  );
+  assert.equal(fetchImpl.calls, 1, "the internal redirect target is never fetched");
+  assert.deepEqual(sleep.waited, [], "an SSRF rejection is not retried");
+});
+
+// 7. Credentials-in-URL are rejected before any fetch (D-04).
+test("getJson untrustedHost rejects a user:pass@host URL before fetching (D-04)", async () => {
+  const fetchImpl = fetchStub([jsonRes(200, { should: "never-read" })]);
+  await assert.rejects(
+    () =>
+      getJson("http://user:pass@example.test/x", {
+        fetchImpl,
+        sleep: sleepSpy(),
+        lookup: publicLookup,
+        untrustedHost: true,
+        cacheKey: "gj:creds-in-url",
+      }),
+    /credentials in URL/i,
+  );
+  assert.equal(fetchImpl.calls, 0, "no fetch for a credentials-carrying URL");
+});
+
+// 8. Opt-in regression: WITHOUT the flag, the guard never runs — a private-
+// resolving host fetches normally (proves the guard is strictly opt-in, D-01).
+test("getJson WITHOUT untrustedHost does NOT run the SSRF guard (opt-in, D-01)", async () => {
+  const fetchImpl = fetchStub([res(200, { ok: true })]);
+  const out = await getJson("http://intranet.example.test/x", {
+    fetchImpl,
+    sleep: sleepSpy(),
+    lookup: privateLookup, // would block IF the guard ran — it must not
+    cacheKey: "gj:no-flag",
+  });
+  assert.deepEqual(out, { ok: true }, "no-flag path resolves without any SSRF check");
+  assert.equal(fetchImpl.calls, 1);
+});
 
 // Set/clear RSS_ALLOWED_HOSTS around a test body (restores prior value).
 async function withAllowedHosts(value, fn) {
