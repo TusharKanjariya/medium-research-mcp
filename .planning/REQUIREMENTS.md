@@ -17,14 +17,18 @@ agent at call time; env is for credentials and optional defaults only.**
 - [ ] **ABLOG-01**: User can fetch an author's recent posts by platform + author
       parameter (Medium `@user`, Substack publication, or raw feed URL) in the
       normalized contract, with HTML-stripped full text and tags
+
 - [ ] **ABLOG-02**: User (agent) can tell the coverage window is partial —
       `count` + per-item `created_utc` plus tool descriptions explicitly stating
       the feed caps (~10 posts Medium, ~20 Substack) and paywall truncation
+
 - [ ] **ABLOG-03**: User can list a Substack publication's full archive via the
       unofficial JSON API (fills `score`/`num_comments` from reactions/comments;
       degrades to the RSS window on failure, never hard-errors)
+
 - [ ] **ABLOG-04**: User can fetch posts by tag/keyword on platforms with tag
       feeds (e.g. Medium `feed/tag/<tag>`), tag as a tool parameter
+
 - [ ] **ABLOG-05**: User can follow documented recipes for posting-cadence
       tracking and series/follow-up detection from normal tool output (docs only)
 
@@ -32,9 +36,11 @@ agent at call time; env is for credentials and optional defaults only.**
 
 - [ ] **TREND-01**: User can get Dev.to's top articles for the last N days and
       rising articles, combinable with a tag parameter
+
 - [ ] **TREND-02**: User can mine high-view unanswered Stack Exchange questions
       per tag (server fetches a no-answer window, ranks by `view_count`;
       honors the API `backoff` field)
+
 - [ ] **TREND-03**: User can get rising Hacker News stories (Algolia
       `search_by_date` velocity ranking with tunable hours / min-points params)
 
@@ -42,16 +48,19 @@ agent at call time; env is for credentials and optional defaults only.**
 
 - [ ] **SRC-10**: User can research any public Discourse forum by instance URL
       parameter — latest topics, top by period, topic detail — in the contract
+
 - [ ] **SRC-11**: User can research any Mastodon instance's public and hashtag
       timelines by instance + hashtag parameters, keyless
+
 - [ ] **SRC-13**: User can get trending tags/links from a Mastodon instance
       (returns empty results gracefully where the instance disables trends)
 
 ### Security & Parameterization (SEC)
 
-- [ ] **SEC-01**: All user-supplied-host JSON requests route through the shared
+- [x] **SEC-01**: All user-supplied-host JSON requests route through the shared
       SSRF guard (extends the v1.0 `getText`-only guard to a guarded JSON path;
       Lemmy's instance-parameterized calls move onto the same path)
+
 - [ ] **SEC-02**: No hardcoded accounts/instances/feeds exist anywhere in the
       suite — verified by an explicit parameterization audit
 
@@ -61,8 +70,10 @@ agent at call time; env is for credentials and optional defaults only.**
       connector in Claude Desktop (staged build that bundles `shared/` +
       production deps so `../../shared` imports survive; credentials marked
       `sensitive` in `user_config`)
+
 - [ ] **PKG-02**: User can run any server from npm via `npx` on any MCP client
       (one scoped package, bin entry per server, Windows-safe shebangs)
+
 - [ ] **PKG-03**: User can follow per-client setup docs — Claude Desktop,
       OpenCode, Codex, Cursor — including Windows `cmd /c npx` spawn and
       env-passing quirks
@@ -116,7 +127,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SRC-10 | Phase 7 | Pending |
 | SRC-11 | Phase 7 | Pending |
 | SRC-13 | Phase 7 | Pending |
-| SEC-01 | Phase 5 | Pending |
+| SEC-01 | Phase 5 | Complete |
 | SEC-02 | Phase 7 | Pending |
 | PKG-01 | Phase 8 | Pending |
 | PKG-02 | Phase 8 | Pending |
@@ -124,6 +135,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DOC-01 | Phase 8 | Pending |
 
 **Coverage:**
+
 - v1.1 requirements: 17 total
 - Mapped to phases: 17 ✓ (Phase 5: 4 · Phase 6: 5 · Phase 7: 4 · Phase 8: 4)
 - Unmapped: 0

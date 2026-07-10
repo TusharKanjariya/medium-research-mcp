@@ -6,14 +6,14 @@ current_phase: 05
 current_phase_name: Guarded JSON Path & Trending Signals
 status: executing
 stopped_at: Phase 5 context gathered
-last_updated: "2026-07-10T10:52:36.094Z"
+last_updated: "2026-07-10T10:58:56.969Z"
 last_activity: 2026-07-10
 last_activity_desc: Phase 05 execution started
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 0
+  completed_plans: 1
   percent: 0
 ---
 
@@ -29,8 +29,8 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 ## Current Position
 
 Phase: 05 (Guarded JSON Path & Trending Signals) — EXECUTING
-Plan: 1 of 4
-Status: Executing Phase 05
+Plan: 2 of 4
+Status: Ready to execute
 Last activity: 2026-07-10 — Phase 05 execution started
 
 **v1.1 phase structure:**
@@ -72,6 +72,7 @@ Last activity: 2026-07-10 — Phase 05 execution started
 | Phase 04 P02 | 2min | 2 tasks | 2 files |
 | Phase 04 P03 | 8min | 3 tasks | 7 files |
 | Phase 04 P04 | 12min | 3 tasks | 3 files |
+| Phase 05 P01 | 15m | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,7 @@ Recent decisions affecting current work:
 - [Phase ?]: RSS server ships a single rss_fetch tool (D-04) — the feed URL is the query and items carry their own content, so no *_get/*_search
 - [Phase ?]: YouTube support is branch-free: mapAtomEntry prefers media:group>media:description, so YT-01 (D-15) needs zero host-specific code
 - [Phase ?]: Tuned fast-xml-parser processEntities to avoid false-positive entity-limit failures on legitimate code-heavy feeds while keeping billion-laughs output/depth bounds
+- [Phase 05]: getJson gains opt-in untrustedHost SSRF guard reusing assertSafeUrl + content-type gate (SEC-01)
 
 ### Pending Todos
 
@@ -134,7 +136,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-10T09:34:26.020Z
+Last session: 2026-07-10T10:58:11.042Z
 Stopped at: Phase 5 context gathered
 Resume file: .planning/phases/05-guarded-json-path-trending-signals/05-CONTEXT.md
 

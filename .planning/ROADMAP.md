@@ -29,53 +29,66 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
 ## Phase Details (v1.1)
 
 ### Phase 5: Guarded JSON Path & Trending Signals
+
 **Goal**: Every user-supplied-host JSON request is SSRF-guarded, and agents can pull trending and pain-point signals from HN, Stack Exchange, and Dev.to
 **Depends on**: Nothing (first phase of v1.1; v1.0 foundation shipped)
 **Requirements**: SEC-01, TREND-01, TREND-02, TREND-03
 **Success Criteria** (what must be TRUE):
+
   1. A JSON tool call whose user-supplied host resolves to a private/loopback/metadata address (e.g. `127.0.0.1`, `169.254.169.254`) is rejected with a clear error — the shared guard now covers JSON requests, not just `getText`, and Lemmy's instance-parameterized calls ride the same guarded path
   2. User can get Dev.to's top articles for the last N days and rising articles, combinable with a tag parameter, in the normalized contract
   3. User can mine high-view unanswered Stack Exchange questions per tag, ranked by `view_count`, and repeated calls honor the API `backoff` field instead of triggering throttling
   4. User can get rising Hacker News stories with tunable hours / min-points parameters, in the normalized contract
-**Plans**: 4 plans (all Wave 1 — parallel, disjoint file sets)
-- [ ] 05-01-PLAN.md — SEC-01 guarded getJson `untrustedHost` path (content-type gate + creds-in-URL reject) + move Lemmy onto the guarded path
+
+**Plans**: 1/4 plans executed
+
+- [x] 05-01-PLAN.md — SEC-01 guarded getJson `untrustedHost` path (content-type gate + creds-in-URL reject) + move Lemmy onto the guarded path
 - [ ] 05-02-PLAN.md — TREND-03 `hn_rising` (search_by_date + numericFilters, points/hour velocity re-sort)
 - [ ] 05-03-PLAN.md — TREND-02 SE `so_unanswered` (high-view no-answers mining, view_count re-rank, backoff/quota handling)
 - [ ] 05-04-PLAN.md — TREND-01 `devto_top` extended with `mode`/`days`/`tag` (top + rising, forbidden-combo guard)
 
 ### Phase 6: Author-Blog Awareness
+
 **Goal**: Any agent can read a chosen author's Medium/Substack/raw-feed posts in the normalized contract — author always a tool parameter — with honest coverage windows and documented dedup/cadence recipes
 **Depends on**: None hard — parallelizable with Phase 5 (`getText` is already guarded); coordinate the shared `http_client.js` User-Agent change both phases touch (Medium 403 mitigation)
 **Requirements**: ABLOG-01, ABLOG-02, ABLOG-03, ABLOG-04, ABLOG-05
 **Success Criteria** (what must be TRUE):
+
   1. User can fetch an author's recent posts by platform + author parameter (Medium `@user`, Substack publication, or raw feed URL) and get normalized items with HTML-stripped full text and tags
   2. The coverage window is honest and visible: `count` + per-item `created_utc` in output, and tool descriptions explicitly state the feed caps (~10 posts Medium, ~20 Substack) and paywall truncation, so the agent knows what it cannot see
   3. User can list a Substack publication's full archive with reactions/comments filling `score`/`num_comments`; when the unofficial JSON API fails, the tool degrades to the RSS window without hard-erroring
   4. User can fetch posts by tag/keyword on platforms with tag feeds (e.g. Medium `feed/tag/<tag>`), tag as a tool parameter
   5. User can follow documented recipes for posting-cadence tracking and series/follow-up detection using only normal tool output
+
 **Plans**: TBD
 
 ### Phase 7: Universal Sources & Parameterization Audit
+
 **Goal**: Agents can research any public Discourse forum or Mastodon instance chosen at call time, and no account/instance/feed is hardcoded anywhere in the suite
 **Depends on**: Phase 5 (SEC-01 guarded JSON path gates both new servers and the Lemmy parameterization move)
 **Requirements**: SRC-10, SRC-11, SRC-13, SEC-02
 **Success Criteria** (what must be TRUE):
+
   1. User can point the Discourse server at any public instance URL (tool parameter) and get latest topics, top-by-period, and topic detail in the normalized contract
   2. User can pull public and hashtag timelines from any Mastodon instance keylessly, instance + hashtag as tool parameters, in the normalized contract
   3. User can get trending tags/links from a Mastodon instance, and instances with trends disabled return empty results gracefully — never an error
   4. A login-required Discourse or locked-down (`AUTHORIZED_FETCH`) Mastodon instance yields a clear tool-level error, not a crash or a contract violation
   5. The parameterization audit passes: no hardcoded accounts/instances/feeds anywhere in the suite; Lemmy's instance is a tool parameter with env as optional default only
+
 **Plans**: TBD
 
 ### Phase 8: Universal Distribution
+
 **Goal**: Any MCP-capable client on any OS can install and run every server — one-click `.mcpb` in Claude Desktop or `npx` from npm elsewhere — with working per-client docs and the cross-source research recipe
 **Depends on**: Phases 5, 6, 7 (packaging ships the final v1.1 tool surface once; strictly last)
 **Requirements**: PKG-01, PKG-02, PKG-03, DOC-01
 **Success Criteria** (what must be TRUE):
+
   1. User can install any server as a one-click `.mcpb` custom connector in Claude Desktop and call its tools — the staged build bundles `shared/` + production deps so `../../shared` imports survive, and credentials are marked `sensitive` in `user_config`
   2. User can run any server from the published npm package via `npx` on a non-Claude MCP client — one scoped package, a bin entry per server, working on Windows (shebang-safe)
   3. User can follow per-client setup docs (Claude Desktop, OpenCode, Codex, Cursor) — including the Windows `cmd /c npx` spawn and explicit env-block quirks — and reach a working connection
   4. User can follow the cross-source pain-point sweep recipe (one tag through Stack Exchange + Discourse + Mastodon + Dev.to, merged via `mergeRank`) end to end
+
 **Plans**: TBD
 
 ## Future / Deferred (v2+)
@@ -97,7 +110,7 @@ Not part of the v1.1 milestone. Tracked for a later milestone (start via `/gsd-n
 | 2. Keyless Source Breadth | v1.0 | 3/3 | Complete | 2026-07-02 |
 | 3. Keyed Ecosystem & Launch Sources | v1.0 | 2/2 | Complete | 2026-07-02 |
 | 4. RSS Multiplier & Output Proof | v1.0 | 4/4 | Complete | 2026-07-03 |
-| 5. Guarded JSON Path & Trending Signals | v1.1 | 0/4 | Planned | - |
+| 5. Guarded JSON Path & Trending Signals | v1.1 | 1/4 | In Progress|  |
 | 6. Author-Blog Awareness | v1.1 | 0/? | Not started | - |
 | 7. Universal Sources & Parameterization Audit | v1.1 | 0/? | Not started | - |
 | 8. Universal Distribution | v1.1 | 0/? | Not started | - |
