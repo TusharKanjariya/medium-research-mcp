@@ -110,7 +110,7 @@ Not part of the v1.1 milestone. Tracked for a later milestone (start via `/gsd-n
 | 2. Keyless Source Breadth | v1.0 | 3/3 | Complete | 2026-07-02 |
 | 3. Keyed Ecosystem & Launch Sources | v1.0 | 2/2 | Complete | 2026-07-02 |
 | 4. RSS Multiplier & Output Proof | v1.0 | 4/4 | Complete | 2026-07-03 |
-| 5. Guarded JSON Path & Trending Signals | v1.1 | 4/4 | Complete   | 2026-07-10 |
+| 5. Guarded JSON Path & Trending Signals | v1.1 | 4/4 | Complete    | 2026-07-10 |
 | 6. Author-Blog Awareness | v1.1 | 0/? | Not started | - |
 | 7. Universal Sources & Parameterization Audit | v1.1 | 0/? | Not started | - |
 | 8. Universal Distribution | v1.1 | 0/? | Not started | - |
