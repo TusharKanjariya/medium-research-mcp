@@ -14,7 +14,13 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-import { mapHnHit, mapHnItem, server } from "../servers/hn/server.js";
+import {
+  mapHnHit,
+  mapHnItem,
+  risingNumericFilters,
+  rankByVelocity,
+  server,
+} from "../servers/hn/server.js";
 import {
   buildListEnvelope,
   buildDetailEnvelope,
@@ -168,17 +174,83 @@ test("mapHnItem builds a detail envelope that parses against the contract schema
   assert.doesNotThrow(() => DetailEnvelopeSchema.parse(env));
 });
 
+// --- hn_rising helpers (TREND-03): deterministic, clock injected ---------
+//
+// Both helpers are pure and take an injected `nowSeconds`, so ordering and the
+// numericFilters cutoff are exact and offline — no network, no Date.now().
+
+test("risingNumericFilters builds points>N,created_at_i>cutoff from the injected clock", () => {
+  const nowSeconds = 1_000_000;
+  assert.equal(
+    risingNumericFilters({ hours: 24, minPoints: 10, nowSeconds }),
+    `points>10,created_at_i>${1_000_000 - 24 * 3600}`,
+  );
+  // A different window/floor recomputes the cutoff exactly.
+  assert.equal(
+    risingNumericFilters({ hours: 6, minPoints: 50, nowSeconds }),
+    `points>50,created_at_i>${1_000_000 - 6 * 3600}`,
+  );
+});
+
+test("rankByVelocity orders by points/hour desc — a fresh climber outranks an older high-points hit", () => {
+  const nowSeconds = 1_000_000;
+  const at = (ageHours) => nowSeconds - ageHours * 3600;
+  const oldHigh = { objectID: "old", points: 200, created_at_i: at(20) }; // 10 pts/h
+  const climber = { objectID: "climber", points: 60, created_at_i: at(1) }; // 60 pts/h
+  const staleLow = { objectID: "stale", points: 12, created_at_i: at(23) }; // ~0.5 pts/h
+  const input = [oldHigh, staleLow, climber];
+  const ranked = rankByVelocity(input, nowSeconds);
+  assert.deepEqual(
+    ranked.map((h) => h.objectID),
+    ["climber", "old", "stale"],
+  );
+  // input is not mutated (a NEW array is returned)
+  assert.deepEqual(
+    input.map((h) => h.objectID),
+    ["old", "stale", "climber"],
+  );
+});
+
+test("rankByVelocity guards divide-by-zero on an age-0 hit (1/60h floor) — finite velocity, no throw", () => {
+  const nowSeconds = 1_000_000;
+  const fresh = { objectID: "fresh", points: 5, created_at_i: nowSeconds }; // age 0
+  const other = { objectID: "other", points: 5, created_at_i: nowSeconds - 3600 };
+  let ranked;
+  assert.doesNotThrow(() => {
+    ranked = rankByVelocity([other, fresh], nowSeconds);
+  });
+  // 5 / (1/60h) = 300 pts/h for the age-0 hit, finite and highest here
+  assert.equal(ranked[0].objectID, "fresh");
+  assert.ok(Number.isFinite(5 / Math.max(0 / 3600, 1 / 60)));
+});
+
 // --- registration smoke (Task 2, FOUND-05) ------------------------------
 
-test("hn server registers exactly hn_front_page, hn_search, hn_get_item", () => {
+test("hn server registers exactly hn_front_page, hn_search, hn_rising, hn_get_item", () => {
   // Tools register at import time; importing does NOT connect a transport
   // (connect is guarded to direct execution), so this stays offline.
   const names = Object.keys(server._registeredTools ?? {}).sort();
-  assert.deepEqual(names, ["hn_front_page", "hn_get_item", "hn_search"]);
+  assert.deepEqual(names, [
+    "hn_front_page",
+    "hn_get_item",
+    "hn_rising",
+    "hn_search",
+  ]);
+});
+
+test("hn_rising is registered with an outputSchema (contract validation on return)", () => {
+  assert.ok(
+    server._registeredTools["hn_rising"],
+    "hn_rising is registered",
+  );
+  assert.ok(
+    server._registeredTools["hn_rising"].outputSchema,
+    "hn_rising declares an outputSchema",
+  );
 });
 
 test("each hn tool declares an outputSchema (contract validation on return)", () => {
-  for (const name of ["hn_front_page", "hn_search", "hn_get_item"]) {
+  for (const name of ["hn_front_page", "hn_search", "hn_rising", "hn_get_item"]) {
     assert.ok(
       server._registeredTools[name].outputSchema,
       `${name} has an outputSchema`,
