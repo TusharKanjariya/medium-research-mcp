@@ -41,7 +41,7 @@ agent at call time; env is for credentials and optional defaults only.**
       per tag (server fetches a no-answer window, ranks by `view_count`;
       honors the API `backoff` field)
 
-- [ ] **TREND-03**: User can get rising Hacker News stories (Algolia
+- [x] **TREND-03**: User can get rising Hacker News stories (Algolia
       `search_by_date` velocity ranking with tunable hours / min-points params)
 
 ### New Sources (SRC)
@@ -123,7 +123,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ABLOG-05 | Phase 6 | Pending |
 | TREND-01 | Phase 5 | Pending |
 | TREND-02 | Phase 5 | Pending |
-| TREND-03 | Phase 5 | Pending |
+| TREND-03 | Phase 5 | Complete |
 | SRC-10 | Phase 7 | Pending |
 | SRC-11 | Phase 7 | Pending |
 | SRC-13 | Phase 7 | Pending |

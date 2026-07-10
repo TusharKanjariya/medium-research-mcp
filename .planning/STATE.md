@@ -6,14 +6,14 @@ current_phase: 05
 current_phase_name: Guarded JSON Path & Trending Signals
 status: executing
 stopped_at: Phase 5 context gathered
-last_updated: "2026-07-10T10:58:56.969Z"
+last_updated: "2026-07-10T11:04:26.181Z"
 last_activity: 2026-07-10
 last_activity_desc: Phase 05 execution started
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 ## Current Position
 
 Phase: 05 (Guarded JSON Path & Trending Signals) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-07-10 — Phase 05 execution started
 
@@ -73,6 +73,7 @@ Last activity: 2026-07-10 — Phase 05 execution started
 | Phase 04 P03 | 8min | 3 tasks | 7 files |
 | Phase 04 P04 | 12min | 3 tasks | 3 files |
 | Phase 05 P01 | 15m | 3 tasks | 4 files |
+| Phase 05 P02 | 12min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -107,6 +108,7 @@ Recent decisions affecting current work:
 - [Phase ?]: YouTube support is branch-free: mapAtomEntry prefers media:group>media:description, so YT-01 (D-15) needs zero host-specific code
 - [Phase ?]: Tuned fast-xml-parser processEntities to avoid false-positive entity-limit failures on legitimate code-heavy feeds while keeping billion-laughs output/depth bounds
 - [Phase 05]: getJson gains opt-in untrustedHost SSRF guard reusing assertSafeUrl + content-type gate (SEC-01)
+- [Phase 05]: hn_rising: velocity is an ordering-only signal; frozen contract preserved (type stays story), tunable hours/minPoints via Algolia numericFilters
 
 ### Pending Todos
 
@@ -136,7 +138,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-10T10:58:11.042Z
+Last session: 2026-07-10T11:03:28.977Z
 Stopped at: Phase 5 context gathered
 Resume file: .planning/phases/05-guarded-json-path-trending-signals/05-CONTEXT.md
 
