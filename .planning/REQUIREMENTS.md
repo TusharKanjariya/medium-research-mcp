@@ -34,7 +34,7 @@ agent at call time; env is for credentials and optional defaults only.**
 
 ### Trending & Pain-Point Mining (TREND)
 
-- [ ] **TREND-01**: User can get Dev.to's top articles for the last N days and
+- [x] **TREND-01**: User can get Dev.to's top articles for the last N days and
       rising articles, combinable with a tag parameter
 
 - [x] **TREND-02**: User can mine high-view unanswered Stack Exchange questions
@@ -121,7 +121,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ABLOG-03 | Phase 6 | Pending |
 | ABLOG-04 | Phase 6 | Pending |
 | ABLOG-05 | Phase 6 | Pending |
-| TREND-01 | Phase 5 | Pending |
+| TREND-01 | Phase 5 | Complete |
 | TREND-02 | Phase 5 | Complete |
 | TREND-03 | Phase 5 | Complete |
 | SRC-10 | Phase 7 | Pending |

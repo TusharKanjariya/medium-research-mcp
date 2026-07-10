@@ -21,7 +21,7 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
 
 ### v1.1 Writer-Aware, Universal Research (Phases 5–8)
 
-- [ ] **Phase 5: Guarded JSON Path & Trending Signals** - Extend the SSRF guard to a guarded JSON path (the milestone's single gating dependency) and add HN rising, Stack Exchange high-view-unanswered, and Dev.to top-window trending tools
+- [x] **Phase 5: Guarded JSON Path & Trending Signals** - Extend the SSRF guard to a guarded JSON path (the milestone's single gating dependency) and add HN rising, Stack Exchange high-view-unanswered, and Dev.to top-window trending tools (completed 2026-07-10)
 - [ ] **Phase 6: Author-Blog Awareness** - Medium/Substack/raw-feed author tools in the normalized contract with honest coverage windows, Substack archive enrichment, tag feeds, and documented dedup/cadence recipes
 - [ ] **Phase 7: Universal Sources & Parameterization Audit** - Discourse and Mastodon servers with instance-as-tool-parameter (incl. Mastodon trends), Lemmy parameterized, and the no-hardcoded-targets audit across the suite
 - [ ] **Phase 8: Universal Distribution** - `.mcpb` one-click bundles, npm/`npx` packages, per-client setup docs (Claude Desktop, OpenCode, Codex, Cursor), and the cross-source pain-point sweep recipe
@@ -40,12 +40,12 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
   3. User can mine high-view unanswered Stack Exchange questions per tag, ranked by `view_count`, and repeated calls honor the API `backoff` field instead of triggering throttling
   4. User can get rising Hacker News stories with tunable hours / min-points parameters, in the normalized contract
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans complete
 
 - [x] 05-01-PLAN.md — SEC-01 guarded getJson `untrustedHost` path (content-type gate + creds-in-URL reject) + move Lemmy onto the guarded path
 - [x] 05-02-PLAN.md — TREND-03 `hn_rising` (search_by_date + numericFilters, points/hour velocity re-sort)
 - [x] 05-03-PLAN.md — TREND-02 SE `so_unanswered` (high-view no-answers mining, view_count re-rank, backoff/quota handling)
-- [ ] 05-04-PLAN.md — TREND-01 `devto_top` extended with `mode`/`days`/`tag` (top + rising, forbidden-combo guard)
+- [x] 05-04-PLAN.md — TREND-01 `devto_top` extended with `mode`/`days`/`tag` (top + rising, forbidden-combo guard)
 
 ### Phase 6: Author-Blog Awareness
 
@@ -110,7 +110,7 @@ Not part of the v1.1 milestone. Tracked for a later milestone (start via `/gsd-n
 | 2. Keyless Source Breadth | v1.0 | 3/3 | Complete | 2026-07-02 |
 | 3. Keyed Ecosystem & Launch Sources | v1.0 | 2/2 | Complete | 2026-07-02 |
 | 4. RSS Multiplier & Output Proof | v1.0 | 4/4 | Complete | 2026-07-03 |
-| 5. Guarded JSON Path & Trending Signals | v1.1 | 3/4 | In Progress|  |
+| 5. Guarded JSON Path & Trending Signals | v1.1 | 4/4 | Complete   | 2026-07-10 |
 | 6. Author-Blog Awareness | v1.1 | 0/? | Not started | - |
 | 7. Universal Sources & Parameterization Audit | v1.1 | 0/? | Not started | - |
 | 8. Universal Distribution | v1.1 | 0/? | Not started | - |
