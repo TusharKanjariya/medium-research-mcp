@@ -61,6 +61,13 @@ never hardcoded.
       and YouTube channel/playlist recipes — v1.0 Phase 4 (SRC-09, YT-01)
 - ✓ Branch-free 5+-source uniform-run merge (`shared/rank.js` `mergeRank`),
       proven offline + demoed live across 6 sources — v1.0 Phase 4 (OUT-02)
+- ✓ Guarded JSON path — opt-in `getJson(url, { untrustedHost: true })` reuses the
+      `getText` SSRF guard (no forked guard); Lemmy's instance calls ride it; the
+      single gating dependency for v1.1's tool-param-host servers — v1.1 Phase 5 (SEC-01)
+- ✓ Trending & pain-point mining — `hn_rising` (points/hour velocity), Stack Exchange
+      `so_unanswered` (high-view no-answers, view_count rank, backoff sleep-within),
+      Dev.to `devto_top` extended with `mode`/`days`/`tag`; output contract kept frozen
+      — v1.1 Phase 5 (TREND-01..03)
 
 ### Active
 
@@ -70,8 +77,8 @@ never hardcoded.
 
 - [ ] Author-blog tools: Medium/Substack feed reading in the normalized contract,
       author as tool parameter (dedup, follow-up, cadence)
-- [ ] Trending & pain-point mining on existing servers (Dev.to top window,
-      Stack Exchange high-view unanswered, HN rising)
+- [x] Trending & pain-point mining on existing servers (Dev.to top window,
+      Stack Exchange high-view unanswered, HN rising) — ✓ shipped v1.1 Phase 5
 - [ ] Discourse generic fetcher (SRC-10), instance as tool parameter
 - [ ] Mastodon public/hashtag timelines (SRC-11), instance as tool parameter
 - [ ] Universal distribution: `.mcpb` bundles + npm packages + client config docs
@@ -171,4 +178,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-08 after starting milestone v1.1 Writer-Aware, Universal Research*
+*Last updated: 2026-07-10 after completing v1.1 Phase 5 (Guarded JSON Path & Trending Signals — SEC-01, TREND-01..03; 291 tests, 0 fail; output contract frozen)*
