@@ -178,6 +178,14 @@ export async function assertSafeUrl(rawUrl, { lookup = dnsLookup } = {}) {
     throw new Error(`rss: invalid URL`);
   }
 
+  // D-04: reject credentials embedded in the URL (user:pass@host). A
+  // userinfo-carrying URL can smuggle a target past naive host checks and can
+  // leak a secret in logs — the redacted origin+path form is used so no secret
+  // is echoed back through a tool result. Tightens getText/RSS callers too (A3).
+  if (u.username || u.password) {
+    throw new Error(`rss: credentials in URL are not allowed [${redactUrl(u.href)}]`);
+  }
+
   if (!ALLOWED_SCHEMES.has(u.protocol)) {
     throw new Error(
       `rss: scheme ${u.protocol} not allowed (http/https only) [${redactUrl(u.href)}]`,
@@ -240,6 +248,17 @@ async function fetchTextManual(fetchImpl, startUrl, init, timeoutMs, lookup) {
 /**
  * GET url and parse JSON, with caching + resilient retry.
  *
+ * OPT-IN SSRF guard (SEC-01, D-01/D-02): pass `untrustedHost: true` when the
+ * host comes from untrusted tool/LLM input (e.g. a user-supplied instance host).
+ * That routes the fetch through the SAME `fetchTextManual` → `assertSafeUrl`
+ * denylist + per-hop redirect re-validation that `getText`/RSS use (no forked
+ * guard, D-02), and adds a content-type gate (D-03): a 200 whose content-type is
+ * HTML is treated as a terminal "login required / not JSON" response — NOT
+ * retried and NOT served from stale — instead of crashing on `JSON.parse`.
+ * Fixed-host callers pass no flag and behave byte-for-byte unchanged, paying
+ * ZERO DNS cost (D-01). Non-default ports are allowed — only the resolved IP
+ * decides rejection (D-05).
+ *
  * @param {string} url
  * @param {object} [opts]
  * @param {Record<string,string>} [opts.headers]
@@ -248,6 +267,9 @@ async function fetchTextManual(fetchImpl, startUrl, init, timeoutMs, lookup) {
  * @param {string} [opts.cacheKey=url]      logical cache key — NEVER a secret
  * @param {Function} [opts.fetchImpl=fetch] injectable fetch (tests)
  * @param {Function} [opts.sleep]           injectable delay (tests)
+ * @param {boolean} [opts.untrustedHost=false] route through the SSRF guard +
+ *                                          content-type gate (untrusted host)
+ * @param {Function} [opts.lookup=dnsLookup] injectable dns.lookup (SSRF tests)
  * @returns {Promise<any>} parsed JSON value (fresh, refreshed, or stale)
  */
 export async function getJson(url, opts = {}) {
@@ -258,6 +280,8 @@ export async function getJson(url, opts = {}) {
     cacheKey = url,
     fetchImpl = fetch,
     sleep = realSleep,
+    untrustedHost = false,
+    lookup = dnsLookup,
   } = opts;
 
   const fresh = getFresh(cacheKey);
@@ -273,14 +297,29 @@ export async function getJson(url, opts = {}) {
 
   for (let attempt = 0; attempt <= BACKOFF_MS.length; attempt++) {
     try {
-      const response = await fetchWithTimeout(
-        fetchImpl,
-        url,
-        { headers },
-        timeoutMs,
-      );
+      // When the host is untrusted, validate-then-fetch through the shared SSRF
+      // guard (re-validating every redirect hop, D-02); otherwise the fixed-host
+      // path stays byte-for-byte identical and never resolves DNS (D-01).
+      const response = untrustedHost
+        ? await fetchTextManual(fetchImpl, url, { headers }, timeoutMs, lookup)
+        : await fetchWithTimeout(fetchImpl, url, { headers }, timeoutMs);
 
       if (response.ok) {
+        // D-03 content-type gate (untrustedHost only): a 200 carrying an HTML
+        // content-type is a login/interstitial page, not JSON. Gate on a POSITIVE
+        // HTML signal (Pitfall 6 — do NOT reject merely-non-json types; text/plain
+        // carrying valid JSON must still parse) and fail closed: terminal error,
+        // NOT retryable, NOT served from stale — mirroring the 4xx path below.
+        if (untrustedHost) {
+          const ct = response.headers.get("content-type") ?? "";
+          if (/html/i.test(ct)) {
+            lastError = new Error(
+              `getJson: non-JSON response (login required?) from ${redactUrl(url)}`,
+            );
+            transientFailure = false;
+            break;
+          }
+        }
         let value;
         try {
           value = await response.json();
