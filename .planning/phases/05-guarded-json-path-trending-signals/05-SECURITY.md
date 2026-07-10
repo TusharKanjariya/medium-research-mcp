@@ -69,7 +69,7 @@ created: 2026-07-10
 
 **Notes:**
 - Both high-severity threats (T-05-01 SSRF-to-internal, T-05-02 redirect-to-internal) are mitigated by reused, battle-tested v1.0 controls (`assertSafeUrl` + per-hop redirect re-validation) and verified present in code + covered by tests. Nothing blocks at ASVS L1 / block-on high.
-- **Non-blocking robustness note (from 05-REVIEW.md, WR-03):** a malformed redirect `Location` at `shared/http_client.js:240` (`new URL(loc, url)` outside the guard's try/catch) throws a raw `TypeError` currently misclassified as a retryable network error. This is a robustness/wasted-retry issue, NOT an SSRF bypass — a malformed `Location` cannot resolve to and reach an internal host; `assertSafeUrl` still gates every valid redirect target. Tracked as an advisory code-review fix (`/gsd-code-review 5 --fix`), not an open threat.
+- **Robustness note (from 05-REVIEW.md, WR-03) — RESOLVED 2026-07-10 (commit `96e0521`):** a malformed redirect `Location` at `shared/http_client.js:240` (`new URL(loc, url)` outside the guard's try/catch) previously threw a raw `TypeError` misclassified as a retryable network error. This was a robustness/wasted-retry issue, NOT an SSRF bypass — a malformed `Location` cannot resolve to and reach an internal host; `assertSafeUrl` still gates every valid redirect target. The `new URL(loc, url)` construction is now wrapped to fail closed (terminal, non-retryable, not-served-stale — same disposition as an `assertSafeUrl` rejection). Also strengthened this pass: WR-01 (throttle sleep bounded at 30s) and WR-02 (`seThrottle` wired into `so_get_question`'s genuine question→answers double-fetch). See `05-REVIEW-FIX.md`.
 
 ---
 
