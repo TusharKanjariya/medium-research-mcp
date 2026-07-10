@@ -1,0 +1,99 @@
+{
+  "items": [
+    {
+      "tags": ["python", "asyncio"],
+      "owner": {
+        "account_id": 100001,
+        "reputation": 1520,
+        "user_id": 2000001,
+        "user_type": "registered",
+        "profile_image": "https://www.gravatar.com/avatar/aaa?s=256",
+        "display_name": "async_seeker",
+        "link": "https://stackoverflow.com/users/2000001/async-seeker"
+      },
+      "is_answered": false,
+      "view_count": 900,
+      "answer_count": 0,
+      "score": 2,
+      "last_activity_date": 1751000000,
+      "creation_date": 1751000000,
+      "question_id": 88000001,
+      "content_license": "CC BY-SA 4.0",
+      "link": "https://stackoverflow.com/questions/88000001/why-does-my-asyncio-gather-swallow-a-cancellederror",
+      "title": "Why does my asyncio.gather swallow a CancelledError?",
+      "body": "<p>I have a coroutine that raises <code>CancelledError</code> but <code>asyncio.gather</code> seems to hide it. How do I propagate the cancellation correctly?</p>"
+    },
+    {
+      "tags": ["python", "asyncio", "typing"],
+      "owner": {
+        "account_id": 100002,
+        "reputation": 44210,
+        "user_id": 2000002,
+        "user_type": "registered",
+        "profile_image": "https://www.gravatar.com/avatar/bbb?s=256",
+        "display_name": "type_wrangler",
+        "link": "https://stackoverflow.com/users/2000002/type-wrangler"
+      },
+      "is_answered": false,
+      "view_count": 12000,
+      "answer_count": 0,
+      "score": 9,
+      "last_activity_date": 1751100000,
+      "creation_date": 1751050000,
+      "question_id": 88000002,
+      "content_license": "CC BY-SA 4.0",
+      "link": "https://stackoverflow.com/questions/88000002/how-to-type-an-async-generator-that-yields-and-returns",
+      "title": "How to type an async generator that both yields and returns a value?",
+      "body": "<p>I want a precise type for an <code>AsyncGenerator</code> that <em>yields</em> chunks and also <em>returns</em> a summary. What is the correct <code>typing</code> annotation?</p>"
+    },
+    {
+      "tags": ["python", "asyncio"],
+      "owner": {
+        "account_id": 100003,
+        "reputation": 87,
+        "user_id": 2000003,
+        "user_type": "registered",
+        "profile_image": "https://www.gravatar.com/avatar/ccc?s=256",
+        "display_name": "loop_novice",
+        "link": "https://stackoverflow.com/users/2000003/loop-novice"
+      },
+      "is_answered": false,
+      "view_count": 300,
+      "answer_count": 0,
+      "score": 0,
+      "last_activity_date": 1751200000,
+      "creation_date": 1751200000,
+      "question_id": 88000003,
+      "content_license": "CC BY-SA 4.0",
+      "link": "https://stackoverflow.com/questions/88000003/asyncio-run-vs-manual-event-loop-management",
+      "title": "asyncio.run vs manual event loop management: which is safe in a library?",
+      "body": "<p>Should a library ever call <code>asyncio.run</code>, or must it always accept an existing loop? I keep getting <code>RuntimeError: event loop is closed</code>.</p>"
+    },
+    {
+      "tags": ["python", "asyncio", "aiohttp"],
+      "owner": {
+        "account_id": 100004,
+        "reputation": 6032,
+        "user_id": 2000004,
+        "user_type": "registered",
+        "profile_image": "https://www.gravatar.com/avatar/ddd?s=256",
+        "display_name": "session_pooler",
+        "link": "https://stackoverflow.com/users/2000004/session-pooler"
+      },
+      "is_answered": false,
+      "view_count": 5400,
+      "answer_count": 0,
+      "score": 4,
+      "last_activity_date": 1751300000,
+      "creation_date": 1751260000,
+      "question_id": 88000004,
+      "content_license": "CC BY-SA 4.0",
+      "link": "https://stackoverflow.com/questions/88000004/aiohttp-clientsession-reuse-across-tasks-leaks-connections",
+      "title": "aiohttp ClientSession reuse across tasks leaks connections",
+      "body": "<p>Reusing a single <code>ClientSession</code> across many concurrent tasks slowly leaks sockets until I hit the ulimit. What is the correct pooling pattern?</p>"
+    }
+  ],
+  "has_more": false,
+  "quota_max": 300,
+  "quota_remaining": 299
+}

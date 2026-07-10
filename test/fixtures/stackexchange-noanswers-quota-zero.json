@@ -1,0 +1,30 @@
+{
+  "items": [
+    {
+      "tags": ["python", "asyncio"],
+      "owner": {
+        "account_id": 100001,
+        "reputation": 1520,
+        "user_id": 2000001,
+        "user_type": "registered",
+        "profile_image": "https://www.gravatar.com/avatar/aaa?s=256",
+        "display_name": "async_seeker",
+        "link": "https://stackoverflow.com/users/2000001/async-seeker"
+      },
+      "is_answered": false,
+      "view_count": 900,
+      "answer_count": 0,
+      "score": 2,
+      "last_activity_date": 1751000000,
+      "creation_date": 1751000000,
+      "question_id": 88000001,
+      "content_license": "CC BY-SA 4.0",
+      "link": "https://stackoverflow.com/questions/88000001/why-does-my-asyncio-gather-swallow-a-cancellederror",
+      "title": "Why does my asyncio.gather swallow a CancelledError?",
+      "body": "<p>I have a coroutine that raises <code>CancelledError</code> but <code>asyncio.gather</code> seems to hide it. How do I propagate the cancellation correctly?</p>"
+    }
+  ],
+  "has_more": false,
+  "quota_max": 300,
+  "quota_remaining": 0
+}
