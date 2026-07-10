@@ -154,7 +154,10 @@ server.registerTool(
       limit: String(limit),
     });
     const headers = await lemmyAuthHeaders();
-    const raw = await getJson(`${base}/api/v3/post/list?${qs}`, { headers });
+    const raw = await getJson(`${base}/api/v3/post/list?${qs}`, {
+      headers,
+      untrustedHost: true, // SEC-01: instance host rides the shared SSRF guard
+    });
     const env = buildListEnvelope({
       source: SOURCE,
       query: null, // hot list has no free-text query
@@ -188,7 +191,10 @@ server.registerTool(
       sort,
     });
     const headers = await lemmyAuthHeaders();
-    const raw = await getJson(`${base}/api/v3/search?${qs}`, { headers });
+    const raw = await getJson(`${base}/api/v3/search?${qs}`, {
+      headers,
+      untrustedHost: true, // SEC-01: instance host rides the shared SSRF guard
+    });
     const env = buildListEnvelope({
       source: SOURCE,
       query,
@@ -216,10 +222,13 @@ server.registerTool(
     const pid = encodeURIComponent(id);
     const headers = await lemmyAuthHeaders();
     const [postRes, commentRes] = await Promise.all([
-      getJson(`${base}/api/v3/post?id=${pid}`, { headers }),
+      getJson(`${base}/api/v3/post?id=${pid}`, {
+        headers,
+        untrustedHost: true, // SEC-01: instance host rides the shared SSRF guard
+      }),
       getJson(
         `${base}/api/v3/comment/list?post_id=${pid}&max_depth=1&sort=Hot`,
-        { headers },
+        { headers, untrustedHost: true }, // SEC-01: shared SSRF guard
       ),
     ]);
     const { item, comments } = mapLemmyDetail(

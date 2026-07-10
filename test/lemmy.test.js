@@ -33,6 +33,7 @@ import {
   ListEnvelopeSchema,
   DetailEnvelopeSchema,
 } from "../shared/contract.js";
+import { getJson } from "../shared/http_client.js";
 
 const fixture = (name) =>
   JSON.parse(
@@ -185,6 +186,61 @@ test("each lemmy tool description documents the LEMMY_INSTANCE-for-auth note", (
       `${name} description mentions LEMMY_INSTANCE`,
     );
   }
+});
+
+// --- SEC-01 guarded path (untrustedHost) --------------------------------
+//
+// The three lemmy getJson calls now pass untrustedHost:true so the instance-
+// parameterized host rides the shared assertSafeUrl SSRF guard. The registered
+// tool wrapper builds its getJson opts internally, so there is no seam to inject
+// fetchImpl/lookup through the handler (Pitfall 5, 05-RESEARCH); we therefore
+// drive the guard behavior at the getJson layer with a lemmy instance URL,
+// exactly as the handler does. The map/registration tests above are unaffected —
+// they never drive getJson.
+
+// A JSON response shim exposing headers.get() for the content-type gate.
+const jsonRes = (status, data, ct = "application/json") => ({
+  ok: status >= 200 && status < 300,
+  status,
+  headers: { get: (k) => (String(k).toLowerCase() === "content-type" ? ct : null) },
+  async json() {
+    return data;
+  },
+});
+const publicLookup = async () => [{ address: "93.184.216.34", family: 4 }];
+const privateLookup = async () => [{ address: "10.0.0.5", family: 4 }];
+
+test("SEC-01: a lemmy instance getJson (untrustedHost) builds a valid list envelope on the guarded path", async () => {
+  const fetchImpl = async () => jsonRes(200, list); // lemmy list-shaped payload
+  const raw = await getJson("https://programming.dev/api/v3/post/list?type_=All", {
+    fetchImpl,
+    sleep: async () => {},
+    lookup: publicLookup,
+    untrustedHost: true,
+    cacheKey: "lemmy:guarded-public",
+  });
+  const env = buildListEnvelope({
+    source: "lemmy",
+    query: null,
+    results: (raw?.posts ?? []).map(mapLemmyPost),
+  });
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env));
+  assert.equal(env.count, list.posts.length);
+});
+
+test("SEC-01: a lemmy instance resolving to a private IP is blocked on the guarded path", async () => {
+  const fetchImpl = async () => jsonRes(200, list); // must never be read
+  await assert.rejects(
+    () =>
+      getJson("https://internal.lemmy.test/api/v3/post/list?type_=All", {
+        fetchImpl,
+        sleep: async () => {},
+        lookup: privateLookup,
+        untrustedHost: true,
+        cacheKey: "lemmy:guarded-private",
+      }),
+    /blocked address/,
+  );
 });
 
 // --- manifest documents the auth precondition ---------------------------
