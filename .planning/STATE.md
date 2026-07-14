@@ -5,15 +5,15 @@ milestone_name: Writer-Aware, Universal Research
 current_phase: 7
 current_phase_name: Universal Sources & Parameterization Audit
 status: executing
-stopped_at: Phase 7 context gathered
-last_updated: "2026-07-14T10:20:55.367Z"
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-07-14T10:30:02.291Z"
 last_activity: 2026-07-14
 last_activity_desc: Phase 7 execution started
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 11
-  completed_plans: 8
+  completed_plans: 9
   percent: 50
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 ## Current Position
 
 Phase: 7 (Universal Sources & Parameterization Audit) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-07-14 — Phase 7 execution started
 
@@ -82,6 +82,7 @@ Last activity: 2026-07-14 — Phase 7 execution started
 | Phase 6 P02 | 7min | 3 tasks | 6 files |
 | Phase 06 P03 | 16min | 3 tasks | 6 files |
 | Phase 07 P01 | 1h | 3 tasks | 4 files |
+| Phase 07 P02 | 5m | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -125,6 +126,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 06 P03]: archive-with-fallback logic factored into exported fetchSubstackArchive (injectable getJson/getText) so success + HTML-200 fallback + SSRF-reject drive offline; SSRF re-thrown on both paths, never swallowed into a fake envelope
 - [Phase ?]: D-15: Lemmy sends anonymous (drops env Bearer) when tool-param instance host differs from lemmyCreds().instance host — env token never replayed to a caller-chosen host
 - [Phase ?]: D-05/D-09: appended append-only TYPE values topic and status; Mastodon trending links reuse the existing article type
+- [Phase ?]: 07-02 Discourse category is the combined slug/id token
+- [Phase ?]: 07-02 exported mapDiscourseError for offline D-11 unit testing (no handler inject seam)
 
 ### Pending Todos
 
@@ -154,9 +157,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-14T10:20:06.212Z
-Stopped at: Phase 7 context gathered
-Resume file: .planning/phases/07-universal-sources-parameterization-audit/07-CONTEXT.md
+Last session: 2026-07-14T10:30:02.274Z
+Stopped at: Completed 07-02-PLAN.md
+Resume file: None
 
 ## Operator Next Steps
 
