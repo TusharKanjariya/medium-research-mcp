@@ -23,7 +23,7 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
 
 - [x] **Phase 5: Guarded JSON Path & Trending Signals** - Extend the SSRF guard to a guarded JSON path (the milestone's single gating dependency) and add HN rising, Stack Exchange high-view-unanswered, and Dev.to top-window trending tools (completed 2026-07-10)
 - [x] **Phase 6: Author-Blog Awareness** - Medium/Substack/raw-feed author tools in the normalized contract with honest coverage windows, Substack archive enrichment, tag feeds, and documented dedup/cadence recipes (completed 2026-07-14)
-- [ ] **Phase 7: Universal Sources & Parameterization Audit** - Discourse and Mastodon servers with instance-as-tool-parameter (incl. Mastodon trends), Lemmy parameterized, and the no-hardcoded-targets audit across the suite
+- [x] **Phase 7: Universal Sources & Parameterization Audit** - Discourse and Mastodon servers with instance-as-tool-parameter (incl. Mastodon trends), Lemmy parameterized, and the no-hardcoded-targets audit across the suite (completed 2026-07-14)
 - [ ] **Phase 8: Universal Distribution** - `.mcpb` one-click bundles, npm/`npx` packages, per-client setup docs (Claude Desktop, OpenCode, Codex, Cursor), and the cross-source pain-point sweep recipe
 
 ## Phase Details (v1.1)
@@ -83,7 +83,7 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
   4. A login-required Discourse or locked-down (`AUTHORIZED_FETCH`) Mastodon instance yields a clear tool-level error, not a crash or a contract violation
   5. The parameterization audit passes: no hardcoded accounts/instances/feeds anywhere in the suite; Lemmy's instance is a tool parameter with env as optional default only
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans complete
 
 **Wave 1**
 
@@ -96,7 +96,7 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
 
 **Wave 3** *(blocked on Waves 1–2)*
 
-- [ ] 07-04-PLAN.md — Wave 3 — SEC-02 parameterization audit test: allowlist scan of servers/*/server.js + rss resolve* helpers, negative control (SEC-02, D-16)
+- [x] 07-04-PLAN.md — Wave 3 — SEC-02 parameterization audit test: allowlist scan of servers/*/server.js + rss resolve* helpers, negative control (SEC-02, D-16)
 
 ### Phase 8: Universal Distribution
 
@@ -133,7 +133,7 @@ Not part of the v1.1 milestone. Tracked for a later milestone (start via `/gsd-n
 | 4. RSS Multiplier & Output Proof | v1.0 | 4/4 | Complete | 2026-07-03 |
 | 5. Guarded JSON Path & Trending Signals | v1.1 | 4/4 | Complete    | 2026-07-10 |
 | 6. Author-Blog Awareness | v1.1 | 3/3 | Complete    | 2026-07-14 |
-| 7. Universal Sources & Parameterization Audit | v1.1 | 3/4 | In Progress|  |
+| 7. Universal Sources & Parameterization Audit | v1.1 | 4/4 | Complete   | 2026-07-14 |
 | 8. Universal Distribution | v1.1 | 0/? | Not started | - |
 
 ---
