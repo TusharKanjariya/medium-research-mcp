@@ -47,6 +47,19 @@ function redactUrl(url) {
   }
 }
 
+// D-14 / Pitfall 1: only medium.com feed hosts get the clearer 403 message. A
+// boundary-safe suffix match (exact host or a `.medium.com` subdomain) so a
+// look-alike host like `notmedium.com` is NOT treated as Medium. A malformed URL
+// cannot throw here — it simply is not a Medium host.
+function isMediumHost(url) {
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    return host === "medium.com" || host.endsWith(".medium.com");
+  } catch {
+    return false;
+  }
+}
+
 // `init` carries the fetch RequestInit (headers, and for POST also method/body);
 // the abort `signal` is merged in so every verb shares one timeout path.
 async function fetchWithTimeout(fetchImpl, url, init, timeoutMs) {
@@ -565,7 +578,20 @@ export async function getText(url, opts = {}) {
 
       // Any 4xx (incl. 429/408) or other non-retryable status: do NOT retry, and
       // do NOT serve stale — this is a definitive client-error terminal state.
-      lastError = new Error(`getText: HTTP ${status} from ${redactUrl(url)}`);
+      if (status === 403 && isMediumHost(url)) {
+        // Pitfall 1 / D-14: medium.com/feed/@user sits behind CDN bot protection
+        // that 403s non-browser agents. Surface an honest, actionable error rather
+        // than a misleading bare "HTTP 403". Still terminal — no retry, no stale
+        // (T-06-02): wrapping the identified UA in a retry loop would behave like
+        // the bot it identifies as and risk an IP ban. redactUrl keeps the query
+        // string out of the message (T-06-01).
+        lastError = new Error(
+          `getText: Medium is blocking automated fetches from this network ` +
+            `(HTTP 403 from ${redactUrl(url)}); the feed may still work from another network`,
+        );
+      } else {
+        lastError = new Error(`getText: HTTP ${status} from ${redactUrl(url)}`);
+      }
       transientFailure = false;
       break;
     } catch (err) {

@@ -206,6 +206,18 @@ test("userAgent returns the configured value when MCP_USER_AGENT is set", () => 
   });
 });
 
+// --- D-14: identified feed-reader UA is at version 1.1 -----------------------
+test("userAgent default is medium-research-mcp/1.1 and carries the repo URL (D-14)", () => {
+  withEnv({}, () => {
+    const ua = userAgent();
+    assert.ok(ua.includes("medium-research-mcp/1.1"), "default UA version is bumped to 1.1");
+    assert.ok(
+      ua.includes("https://github.com/TusharRedlioDesigns/medium-research-mcp"),
+      "default UA identifies the project repo URL",
+    );
+  });
+});
+
 // --- rssAllowedHosts: optional operator allowlist (D-03) ----------------------
 // unset/blank => null (default public-internet-minus-denylist mode); set => a
 // lowercased, trimmed Set (lock-down mode). Never throws (optional hardening knob).

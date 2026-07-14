@@ -78,7 +78,7 @@ export const productHuntHeaders = () => ({
  */
 export const userAgent = () =>
   get("userAgent") ||
-  "medium-research-mcp/1.0 (+https://github.com/TusharRedlioDesigns/medium-research-mcp)";
+  "medium-research-mcp/1.1 (+https://github.com/TusharRedlioDesigns/medium-research-mcp)";
 
 /**
  * OPTIONAL Lemmy instance base URL for anonymous reads (D-05). Returns the
