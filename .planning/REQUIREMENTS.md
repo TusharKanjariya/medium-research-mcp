@@ -14,7 +14,7 @@ agent at call time; env is for credentials and optional defaults only.**
 
 ### Author-Blog Awareness (ABLOG)
 
-- [ ] **ABLOG-01**: User can fetch an author's recent posts by platform + author
+- [x] **ABLOG-01**: User can fetch an author's recent posts by platform + author
       parameter (Medium `@user`, Substack publication, or raw feed URL) in the
       normalized contract, with HTML-stripped full text and tags
 
@@ -116,7 +116,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ABLOG-01 | Phase 6 | Pending |
+| ABLOG-01 | Phase 6 | Complete |
 | ABLOG-02 | Phase 6 | Pending |
 | ABLOG-03 | Phase 6 | Pending |
 | ABLOG-04 | Phase 6 | Pending |

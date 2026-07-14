@@ -5,15 +5,15 @@ milestone_name: Writer-Aware, Universal Research
 current_phase: 6
 current_phase_name: Author-Blog Awareness
 status: executing
-stopped_at: Phase 6 context gathered
-last_updated: "2026-07-14T06:27:49.939Z"
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-07-14T06:33:57.872Z"
 last_activity: 2026-07-14
 last_activity_desc: Phase 6 execution started
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 7
-  completed_plans: 4
+  completed_plans: 5
   percent: 25
 ---
 
@@ -29,8 +29,8 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 ## Current Position
 
 Phase: 6 (Author-Blog Awareness) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 6
+Plan: 2 of 3
+Status: Ready to execute
 Last activity: 2026-07-14 — Phase 6 execution started
 
 **v1.1 phase structure:**
@@ -77,6 +77,7 @@ Last activity: 2026-07-14 — Phase 6 execution started
 | Phase 05 P02 | 12min | 2 tasks | 2 files |
 | Phase 05 P03 | 259 | 3 tasks | 5 files |
 | Phase 05 P04 | 12min | 2 tasks | 2 files |
+| Phase 06 P01 | 15m | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -113,6 +114,7 @@ Recent decisions affecting current work:
 - [Phase 05]: getJson gains opt-in untrustedHost SSRF guard reusing assertSafeUrl + content-type gate (SEC-01)
 - [Phase 05]: hn_rising: velocity is an ordering-only signal; frozen contract preserved (type stays story), tunable hours/minPoints via Algolia numericFilters
 - [Phase ?]: devto_top forbidden rising+days combo enforced in exported pure devtoTopUrl (throws pre-fetch), not the raw-shape Zod schema (D-15, Pitfall 4)
+- [Phase 06]: Medium 403 is host-gated + terminal (no retry/stale) to avoid IP-ban behavior (T-06-02)
 
 ### Pending Todos
 
@@ -142,8 +144,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-14T06:02:59.519Z
-Stopped at: Phase 6 context gathered
+Last session: 2026-07-14T06:33:57.856Z
+Stopped at: Completed 06-01-PLAN.md
 Resume file: .planning/phases/06-author-blog-awareness/06-CONTEXT.md
 
 ## Operator Next Steps

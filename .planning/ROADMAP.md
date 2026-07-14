@@ -60,10 +60,10 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
   4. User can fetch posts by tag/keyword on platforms with tag feeds (e.g. Medium `feed/tag/<tag>`), tag as a tool parameter
   5. User can follow documented recipes for posting-cadence tracking and series/follow-up detection using only normal tool output
 
-**Plans**: 3 plans
+**Plans**: 1/3 plans executed
 **Wave 1**
 
-- [ ] 06-01-PLAN.md — Wave 1 — shared Medium-403 → clear tool-level error mapping + UA 1.0→1.1 bump (D-14)
+- [x] 06-01-PLAN.md — Wave 1 — shared Medium-403 → clear tool-level error mapping + UA 1.0→1.1 bump (D-14)
 - [ ] 06-02-PLAN.md — Wave 1 — rss_author_posts + rss_tag_posts: author-shape platform inference, query/published_before selection, preview-only markers, honest-window descriptions (ABLOG-01/02/04)
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -119,7 +119,7 @@ Not part of the v1.1 milestone. Tracked for a later milestone (start via `/gsd-n
 | 3. Keyed Ecosystem & Launch Sources | v1.0 | 2/2 | Complete | 2026-07-02 |
 | 4. RSS Multiplier & Output Proof | v1.0 | 4/4 | Complete | 2026-07-03 |
 | 5. Guarded JSON Path & Trending Signals | v1.1 | 4/4 | Complete    | 2026-07-10 |
-| 6. Author-Blog Awareness | v1.1 | 0/3 | Planned | - |
+| 6. Author-Blog Awareness | v1.1 | 1/3 | In Progress|  |
 | 7. Universal Sources & Parameterization Audit | v1.1 | 0/? | Not started | - |
 | 8. Universal Distribution | v1.1 | 0/? | Not started | - |
 
