@@ -351,6 +351,54 @@ export function resolveTagFeed(tag) {
   return `https://medium.com/feed/tag/${encodeURIComponent(String(tag ?? "").trim())}`;
 }
 
+// --- Substack archive enrichment (Phase 6, ABLOG-03) ----------------------
+
+/**
+ * Map ONE post from a Substack publication archive (the unofficial
+ * https://<pub>.substack.com/api/v1/archive JSON) onto a raw contract item
+ * (pre-normalize). This is the ONE enrichment the RSS window cannot do (D-09):
+ * the archive carries per-post reaction + comment counts, which fill the EXISTING
+ * `score` / `num_comments` fields — no new item key, the contract stays frozen.
+ *
+ * CONFIRMED archive JSON keys (per a live probe of a public Substack archive; the
+ * contract mapping reactions->score, comments->num_comments is LOCKED, the key
+ * names are confirmed here):
+ *   id            -> id (String; falls back to slug/canonical_url)
+ *   title         -> title
+ *   subtitle      -> text (else description)
+ *   post_date     -> created_utc (ISO-8601, via toIso)
+ *   canonical_url -> url + permalink
+ *   reaction_count-> score        (numeric; ?? so a legitimate 0 survives, absence -> null)
+ *   comment_count -> num_comments (numeric; same ?? rule)
+ *   publishedBylines[0].name -> author
+ *   postTags[].name          -> tags[]
+ *
+ * PURE — no fetch, no mutation of the input.
+ */
+export function mapSubstackArchiveItem(post) {
+  const p = post ?? {};
+  const bylines = Array.isArray(p.publishedBylines) ? p.publishedBylines : [];
+  const tags = (Array.isArray(p.postTags) ? p.postTags : [])
+    .map((t) => (t && typeof t === "object" ? t.name : t))
+    .filter((t) => t != null && t !== "")
+    .map(String);
+  const url = p.canonical_url ?? null;
+  return {
+    id: String(p.id ?? p.slug ?? p.canonical_url ?? ""),
+    type: "article",
+    title: p.title ?? "",
+    author: bylines[0]?.name ?? null,
+    // `??` (NOT ||) so a real 0-count survives and only true absence -> null (D-09).
+    score: p.reaction_count ?? null,
+    num_comments: p.comment_count ?? null,
+    created_utc: toIso(p.post_date),
+    url,
+    permalink: url,
+    tags,
+    text: p.subtitle ?? p.description ?? null,
+  };
+}
+
 // --- MCP wiring (identical shape to the Dev.to template) -----------------
 //
 // registerTool takes RAW Zod shapes (Pitfall 7). The handler fetches ONLY via
