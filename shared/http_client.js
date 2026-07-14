@@ -232,6 +232,36 @@ export async function assertSafeUrl(rawUrl, { lookup = dnsLookup } = {}) {
 
 const MAX_REDIRECTS = 5;
 
+// WR-03: request headers that carry a credential bound to the ORIGINAL host and
+// so must never be replayed to a different origin on a redirect (mirrors browser
+// fetch, which drops Authorization on a cross-origin redirect). Matched
+// case-insensitively against the caller's header keys.
+const SENSITIVE_CROSS_ORIGIN_HEADERS = new Set(["authorization", "cookie"]);
+
+// True when two absolute URLs share scheme + host + port (same origin). Both
+// arguments are already-parsed hrefs here, so the parse cannot realistically
+// throw; fail closed (treat as cross-origin) if it ever does.
+function sameOrigin(a, b) {
+  try {
+    return new URL(a).origin === new URL(b).origin;
+  } catch {
+    return false;
+  }
+}
+
+// Return a copy of `init` whose headers have every sensitive cross-origin header
+// removed (case-insensitive), leaving the original `init` untouched. Non-sensitive
+// headers (e.g. User-Agent) and all other init fields pass through unchanged.
+function stripSensitiveHeaders(init) {
+  const headers = init?.headers;
+  if (!headers) return init;
+  const filtered = {};
+  for (const [k, v] of Object.entries(headers)) {
+    if (!SENSITIVE_CROSS_ORIGIN_HEADERS.has(k.toLowerCase())) filtered[k] = v;
+  }
+  return { ...init, headers: filtered };
+}
+
 // Fetch `startUrl` with SSRF validation on the initial host AND on every redirect
 // Location, following manually (native fetch auto-follows up to 20 hops WITHOUT
 // re-checking the SSRF policy per hop — that is the redirect-to-internal /
@@ -239,11 +269,14 @@ const MAX_REDIRECTS = 5;
 // status/body is handled by getText's attempt loop); throws past the hop cap.
 async function fetchTextManual(fetchImpl, startUrl, init, timeoutMs, lookup) {
   let url = (await assertSafeUrl(startUrl, { lookup })).href;
+  // WR-03: track the effective request init across hops so credentialed headers
+  // can be dropped once a redirect crosses to a different origin (see below).
+  let currentInit = init;
   for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
     const res = await fetchWithTimeout(
       fetchImpl,
       url,
-      { ...init, redirect: "manual" },
+      { ...currentInit, redirect: "manual" },
       timeoutMs,
     );
     if (res.status >= 300 && res.status < 400) {
@@ -262,6 +295,16 @@ async function fetchTextManual(fetchImpl, startUrl, init, timeoutMs, lookup) {
         next = new URL(loc, url).href;
       } catch {
         throw new Error(`rss: invalid redirect Location [${redactUrl(url)}]`);
+      }
+      // WR-03: a redirect that changes the ORIGIN (scheme/host/port) must not
+      // replay credentialed request headers to the new host — strip Authorization
+      // and Cookie on a cross-origin hop so e.g. Lemmy's env Bearer is never
+      // delivered to a redirected third-party host (mirrors browser fetch
+      // semantics). Same-origin redirects keep all headers. This is
+      // defense-in-depth complementing each server's per-host token gating; once
+      // stripped the headers stay stripped for any subsequent hop.
+      if (!sameOrigin(url, next)) {
+        currentInit = stripSensitiveHeaders(currentInit);
       }
       // RE-VALIDATE the redirect target before following (D-02 per-hop guard).
       url = (await assertSafeUrl(next, { lookup })).href;

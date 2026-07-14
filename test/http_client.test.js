@@ -613,6 +613,54 @@ test("getText treats a malformed redirect Location as terminal — no retry, no 
   assert.deepEqual(sleep.waited, [], "malformed-redirect rejection not retried");
 });
 
+// WR-03: a credentialed request (Authorization / Cookie) that 302s to a DIFFERENT
+// origin must NOT replay those headers to the redirected host (mirrors browser
+// fetch: drop auth on a cross-origin redirect). A same-origin redirect keeps them.
+// capturingStub records each hop's init so we can inspect the second-hop headers.
+test("getJson untrustedHost strips Authorization/Cookie on a cross-origin redirect (WR-03)", async () => {
+  const fetchImpl = capturingStub([
+    jsonRes(302, null, { location: "https://other.example.test/api" }), // hop 1: cross-origin
+    jsonRes(200, { ok: true }, { ct: "application/json" }), // hop 2: on the new host
+  ]);
+  const out = await getJson("https://forum.example.test/api", {
+    fetchImpl,
+    sleep: sleepSpy(),
+    lookup: publicLookup,
+    untrustedHost: true,
+    headers: { Authorization: "Bearer SECRET", Cookie: "sid=abc", "X-Keep": "1" },
+    cacheKey: "gj:redir-strip-auth",
+  });
+  assert.deepEqual(out, { ok: true });
+  // hop 1 (original host) carried the credential…
+  assert.equal(fetchImpl.inits[0].headers.Authorization, "Bearer SECRET");
+  assert.equal(fetchImpl.inits[0].headers.Cookie, "sid=abc");
+  // …hop 2 (cross-origin) must NOT — but keeps non-sensitive headers.
+  assert.equal(fetchImpl.inits[1].headers.Authorization, undefined, "Authorization stripped cross-origin");
+  assert.equal(fetchImpl.inits[1].headers.Cookie, undefined, "Cookie stripped cross-origin");
+  assert.equal(fetchImpl.inits[1].headers["X-Keep"], "1", "non-sensitive header retained");
+});
+
+test("getJson untrustedHost RETAINS Authorization on a same-origin redirect (WR-03)", async () => {
+  const fetchImpl = capturingStub([
+    jsonRes(302, null, { location: "https://forum.example.test/api/v2" }), // same origin
+    jsonRes(200, { ok: true }, { ct: "application/json" }),
+  ]);
+  const out = await getJson("https://forum.example.test/api", {
+    fetchImpl,
+    sleep: sleepSpy(),
+    lookup: publicLookup,
+    untrustedHost: true,
+    headers: { Authorization: "Bearer SECRET" },
+    cacheKey: "gj:redir-keep-auth",
+  });
+  assert.deepEqual(out, { ok: true });
+  assert.equal(
+    fetchImpl.inits[1].headers.Authorization,
+    "Bearer SECRET",
+    "same-origin redirect keeps Authorization",
+  );
+});
+
 // 7. Credentials-in-URL are rejected before any fetch (D-04).
 test("getJson untrustedHost rejects a user:pass@host URL before fetching (D-04)", async () => {
   const fetchImpl = fetchStub([jsonRes(200, { should: "never-read" })]);
