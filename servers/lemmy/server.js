@@ -31,7 +31,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { pathToFileURL } from "node:url";
 import { z } from "zod";
 import { getJson } from "../../shared/http_client.js";
-import { lemmyInstance } from "../../shared/credentials.js";
+import { lemmyInstance, lemmyCreds } from "../../shared/credentials.js";
 import { lemmyJwt } from "../../shared/auth.js";
 import {
   buildListEnvelope,
@@ -88,12 +88,41 @@ export function mapLemmyDetail(postView, comments) {
   return { item, comments: mapped };
 }
 
-// --- Conditional Bearer auth wire (D-06) ----------------------------------
+// --- Instance parameterization (D-13/D-15, SEC-02) ------------------------
+//
+// The instance is now an optional per-call TOOL PARAMETER that overrides the
+// LEMMY_INSTANCE env default (lemmyInstance()); the env value is only the
+// default when no `instance` arg is supplied. normalizeInstance() defaults a
+// missing scheme to https:// and strips trailing slashes so `${base}/api/v3/...`
+// interpolates cleanly. It does NOT guess a bare name into a host (D-13). The
+// SSRF guard still lives in getJson({ untrustedHost: true }) — this helper only
+// shapes the string; it never decides whether the host is safe to reach.
+
+/**
+ * Normalize a Lemmy instance base URL: trim, default a missing scheme to https,
+ * strip trailing slashes. Throws a readable (host-literal-free, SEC-02) error on
+ * empty input.
+ * @param {string} instance
+ * @returns {string} base URL incl. scheme, no trailing slash
+ */
+export function normalizeInstance(instance) {
+  const raw = String(instance ?? "").trim();
+  if (!raw) throw new Error("instance is required (e.g. https://your.lemmy.instance)");
+  const withScheme = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  return withScheme.replace(/\/+$/, "");
+}
+
+// --- Conditional Bearer auth wire (D-06) + host gate (D-15) ----------------
 //
 // bearerHeaders() is a pure header-builder so the auth decision is unit-testable
-// offline; lemmyAuthHeaders() is the async seam every read calls — it resolves
-// lemmyJwt() (a Bearer token when LEMMY_* creds are present, else null) and turns
-// it into the getJson `headers` fragment. `null` => {} => anonymous, no error.
+// offline; lemmyAuthHeaders() is the async seam that resolves lemmyJwt() (a Bearer
+// token when LEMMY_* creds are present, else null) into the getJson `headers`
+// fragment. `null` => {} => anonymous, no error.
+//
+// SECURITY (D-15, Open Q3): the env JWT is minted for lemmyCreds().instance
+// (= LEMMY_INSTANCE). It must NEVER be replayed to a caller-chosen instance. The
+// effective base is host-gated BEFORE the token is resolved: when the tool-param
+// instance host differs from the auth-instance host, the request is anonymous.
 
 /** Pure: jwt -> the Authorization header fragment (or {} when there is no jwt). */
 export function bearerHeaders(jwt) {
@@ -110,6 +139,42 @@ export async function lemmyAuthHeaders({ jwtImpl = lemmyJwt } = {}) {
   return bearerHeaders(jwt);
 }
 
+/**
+ * Pure host-match decision (D-15): does the effective request base target the
+ * SAME host the env JWT was minted for (lemmyCreds().instance)? Only then may the
+ * Bearer be attached. Returns false when auth creds are absent or the hosts
+ * differ. `credsImpl` is injectable for offline tests. A malformed base host
+ * fails closed (false => anonymous).
+ * @param {string} base effective (already-normalized) instance base URL
+ * @param {{ credsImpl?: () => ({instance:string}|undefined) }} [opts]
+ * @returns {boolean}
+ */
+export function authInstanceMatches(base, { credsImpl = lemmyCreds } = {}) {
+  const creds = credsImpl();
+  if (!creds?.instance) return false;
+  try {
+    return (
+      new URL(normalizeInstance(base)).host ===
+      new URL(normalizeInstance(creds.instance)).host
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Host-gated read headers for an effective base: attach the Bearer ONLY when the
+ * base targets the env auth host (authInstanceMatches); otherwise anonymous ({}).
+ * This is the seam every handler calls — it wraps lemmyAuthHeaders() behind the
+ * D-15 host gate so the env token never crosses to a caller-chosen instance.
+ * @param {string} base effective (already-normalized) instance base URL
+ * @param {{ jwtImpl?: () => Promise<string|null>, credsImpl?: () => ({instance:string}|undefined) }} [opts]
+ */
+export async function resolveLemmyHeaders(base, opts = {}) {
+  if (!authInstanceMatches(base, opts)) return {};
+  return lemmyAuthHeaders(opts);
+}
+
 // --- MCP wiring (identical shape to the HN template) ----------------------
 //
 // registerTool takes RAW Zod shapes (NOT z.object(...) — Pitfall 7). Every
@@ -118,17 +183,25 @@ export async function lemmyAuthHeaders({ jwtImpl = lemmyJwt } = {}) {
 // above, assembles the envelope with the shared factories, and returns
 // toolResult() so both structuredContent and JSON-text content are emitted.
 //
-// The base URL comes ONLY from lemmyInstance() (operator-set env, SSRF mitigation
-// T-02-02-SSRF); user input only ever populates query params via URLSearchParams
-// or encodeURIComponent'd path segments (T-02-02-URL, Pitfall 8).
+// The base URL is the optional per-call `instance` tool parameter (D-13/D-15)
+// falling back to lemmyInstance() (operator-set env default). Whichever host is
+// effective, the request rides getJson({ untrustedHost: true }) so the shared
+// assertSafeUrl SSRF guard vets it (T-02-02-SSRF); user input only ever populates
+// query params via URLSearchParams or encodeURIComponent'd path segments
+// (T-02-02-URL, Pitfall 8). Authenticated reads (Bearer) apply ONLY when the
+// effective instance host matches the env-configured LEMMY_INSTANCE host — the
+// env token is never replayed to a caller-chosen instance (D-15).
 
 export const server = new McpServer({ name: "lemmy", version: "1.0.0" });
 
 const AUTH_NOTE =
-  "Authenticated reads require LEMMY_INSTANCE to be set explicitly (even to the " +
-  "default https://programming.dev) ALONGSIDE LEMMY_USERNAME/LEMMY_PASSWORD; with " +
-  "username/password set but LEMMY_INSTANCE unset, reads stay anonymous by design " +
-  "(no error).";
+  "`instance` is an optional per-call override of the LEMMY_INSTANCE default " +
+  "(scheme defaults to https). Authenticated reads require LEMMY_INSTANCE to be " +
+  "set explicitly (even to the default https://programming.dev) ALONGSIDE " +
+  "LEMMY_USERNAME/LEMMY_PASSWORD, and apply ONLY when the effective instance " +
+  "matches the env-configured LEMMY_INSTANCE; a differing `instance` is read " +
+  "anonymously. With username/password set but LEMMY_INSTANCE unset, reads stay " +
+  "anonymous by design (no error).";
 
 server.registerTool(
   "lemmy_hot",
@@ -143,17 +216,18 @@ server.registerTool(
     inputSchema: {
       limit: z.number().int().min(1).max(50).optional(),
       sort: z.enum(SORT).optional(),
+      instance: z.string().optional(),
     },
     outputSchema: listEnvelopeShape,
   },
-  async ({ limit = 20, sort = "Hot" }) => {
-    const base = lemmyInstance();
+  async ({ limit = 20, sort = "Hot", instance }) => {
+    const base = normalizeInstance(instance ?? lemmyInstance());
     const qs = new URLSearchParams({
       type_: "All",
       sort,
       limit: String(limit),
     });
-    const headers = await lemmyAuthHeaders();
+    const headers = await resolveLemmyHeaders(base);
     const raw = await getJson(`${base}/api/v3/post/list?${qs}`, {
       headers,
       untrustedHost: true, // SEC-01: instance host rides the shared SSRF guard
@@ -179,18 +253,19 @@ server.registerTool(
     inputSchema: {
       query: z.string(),
       sort: z.enum(SORT).optional(),
+      instance: z.string().optional(),
     },
     outputSchema: listEnvelopeShape,
   },
-  async ({ query, sort = "TopWeek" }) => {
-    const base = lemmyInstance();
+  async ({ query, sort = "TopWeek", instance }) => {
+    const base = normalizeInstance(instance ?? lemmyInstance());
     const qs = new URLSearchParams({
       q: query,
       type_: "Posts",
       listing_type: "All",
       sort,
     });
-    const headers = await lemmyAuthHeaders();
+    const headers = await resolveLemmyHeaders(base);
     const raw = await getJson(`${base}/api/v3/search?${qs}`, {
       headers,
       untrustedHost: true, // SEC-01: instance host rides the shared SSRF guard
@@ -214,13 +289,14 @@ server.registerTool(
       AUTH_NOTE,
     inputSchema: {
       id: z.union([z.string(), z.number()]),
+      instance: z.string().optional(),
     },
     outputSchema: detailEnvelopeShape,
   },
-  async ({ id }) => {
-    const base = lemmyInstance();
+  async ({ id, instance }) => {
+    const base = normalizeInstance(instance ?? lemmyInstance());
     const pid = encodeURIComponent(id);
-    const headers = await lemmyAuthHeaders();
+    const headers = await resolveLemmyHeaders(base);
     const [postRes, commentRes] = await Promise.all([
       getJson(`${base}/api/v3/post?id=${pid}`, {
         headers,
