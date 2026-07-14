@@ -32,6 +32,7 @@ import {
   markPreviewOnly,
   filterAuthorPosts,
   resolveTagFeed,
+  mapSubstackArchiveItem,
   server,
 } from "../servers/rss/server.js";
 import { buildListEnvelope, ListEnvelopeSchema } from "../shared/contract.js";
@@ -41,6 +42,14 @@ const fixture = (name) =>
     fileURLToPath(new URL(`./fixtures/${name}.xml`, import.meta.url)),
     "utf8",
   );
+
+// JSON / raw-body fixture loader (Substack archive success body + login-HTML body).
+const rawFixture = (name) =>
+  readFileSync(
+    fileURLToPath(new URL(`./fixtures/${name}`, import.meta.url)),
+    "utf8",
+  );
+const jsonFixture = (name) => JSON.parse(rawFixture(name));
 
 const rss2Parsed = parseFeed(fixture("rss-rss2"));
 const atomParsed = parseFeed(fixture("rss-atom"));
@@ -531,3 +540,65 @@ test("rss_author_posts description states the ~10/~20 window caps and paywall tr
   assert.match(desc, /~?\s*20/);
   assert.match(desc, /paywall|teaser|preview/i);
 });
+
+// --- (n) mapSubstackArchiveItem: reactions -> score, comments -> num_comments --
+//
+// The one enrichment the RSS window cannot do (D-09): the Substack archive JSON
+// carries per-post reaction + comment counts, which fill the EXISTING score /
+// num_comments fields on the frozen contract. Absence -> null (never 0).
+
+const archivePosts = jsonFixture("substack-archive.json");
+
+test("mapSubstackArchiveItem fills score from reactions and num_comments from comments (D-09)", () => {
+  const withEngagement = archivePosts[0]; // reaction_count 128, comment_count 17
+  const m = mapSubstackArchiveItem(withEngagement);
+  assert.equal(m.type, "article");
+  assert.equal(typeof m.id, "string");
+  assert.equal(m.title, withEngagement.title);
+  assert.equal(m.author, "Ada Lovelace"); // publishedBylines[0].name
+  assert.equal(m.score, 128); // reaction_count -> score (numeric)
+  assert.equal(m.num_comments, 17); // comment_count -> num_comments (numeric)
+  assert.equal(m.created_utc, new Date(withEngagement.post_date).toISOString());
+  assert.equal(m.url, withEngagement.canonical_url);
+  assert.equal(m.permalink, withEngagement.canonical_url);
+  assert.deepEqual(m.tags, ["rust", "cli"]); // postTags[].name -> tags[]
+  assert.equal(m.text, withEngagement.subtitle);
+});
+
+test("mapSubstackArchiveItem yields null (not 0) score/num_comments when absent", () => {
+  const noEngagement = archivePosts[1]; // no reaction_count, no comment_count
+  const m = mapSubstackArchiveItem(noEngagement);
+  assert.strictEqual(m.score, null, "absent reactions -> null, never 0");
+  assert.strictEqual(m.num_comments, null, "absent comments -> null, never 0");
+  assert.deepEqual(m.tags, []); // empty postTags -> []
+  assert.equal(m.type, "article");
+  assert.equal(typeof m.id, "string");
+});
+
+test("mapSubstackArchiveItem preserves a legitimate 0 count (?? not truthiness)", () => {
+  const m = mapSubstackArchiveItem({
+    id: 9,
+    title: "Zero",
+    post_date: "2026-05-01T00:00:00.000Z",
+    canonical_url: "https://pub.substack.com/p/zero",
+    reaction_count: 0,
+    comment_count: 0,
+  });
+  assert.strictEqual(m.score, 0, "0 reactions survives as 0");
+  assert.strictEqual(m.num_comments, 0, "0 comments survives as 0");
+});
+
+test("a ListEnvelope over the mapped archive parses against the contract and preserves count", () => {
+  const results = archivePosts.map(mapSubstackArchiveItem);
+  const env = buildListEnvelope({ source: "rss", query: "pub", results });
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env));
+  assert.equal(env.count, results.length);
+  assert.equal(env.count, 2);
+  // Enrichment rides EXISTING fields — no new item key.
+  for (const it of env.results) {
+    assert.equal(it.type, "article");
+    assert.ok("score" in it && "num_comments" in it);
+  }
+});
+
+// NOTE: rss_substack_archive tests (Task 2) are appended in the next commit.

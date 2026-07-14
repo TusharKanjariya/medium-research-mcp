@@ -1,0 +1,29 @@
+[
+  {
+    "id": 145678901,
+    "title": "Building a Rust CLI in a Weekend",
+    "subtitle": "A hands-on walkthrough of clap, anyhow, and shipping a binary.",
+    "slug": "building-a-rust-cli",
+    "post_date": "2026-06-30T13:00:00.000Z",
+    "canonical_url": "https://pub.substack.com/p/building-a-rust-cli",
+    "type": "newsletter",
+    "reactions": { "❤": 128 },
+    "reaction_count": 128,
+    "comment_count": 17,
+    "description": "A hands-on walkthrough of clap, anyhow, and shipping a binary.",
+    "publishedBylines": [{ "id": 42, "name": "Ada Lovelace" }],
+    "postTags": [{ "id": 1, "name": "rust" }, { "id": 2, "name": "cli" }]
+  },
+  {
+    "id": 145600002,
+    "title": "A Quiet Note on Slow Software",
+    "subtitle": "Why the fastest tools are the ones that get out of the way.",
+    "slug": "quiet-note-on-slow-software",
+    "post_date": "2026-06-01T09:30:00.000Z",
+    "canonical_url": "https://pub.substack.com/p/quiet-note-on-slow-software",
+    "type": "newsletter",
+    "description": "Why the fastest tools are the ones that get out of the way.",
+    "publishedBylines": [{ "id": 42, "name": "Ada Lovelace" }],
+    "postTags": []
+  }
+]
