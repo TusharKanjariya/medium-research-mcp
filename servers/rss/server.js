@@ -40,7 +40,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { pathToFileURL } from "node:url";
 import { z } from "zod";
 import { XMLParser } from "fast-xml-parser";
-import { getText } from "../../shared/http_client.js";
+import { getText, getJson } from "../../shared/http_client.js";
 import {
   buildListEnvelope,
   listEnvelopeShape,
@@ -399,6 +399,87 @@ export function mapSubstackArchiveItem(post) {
   };
 }
 
+/**
+ * Resolve a user-supplied `publication` to its `<pub>.substack.com` HOST (D-08).
+ * Accepts a bare publication slug (`pub` -> `pub.substack.com`), a bare host
+ * (`pub.substack.com`), or a full Substack URL (`https://pub.substack.com/...`).
+ * Returns ONLY the host — the caller builds the archive/feed URLs from it. The
+ * host is untrusted tool input, so downstream getJson/getText run it through the
+ * shared assertSafeUrl SSRF guard (a private/loopback host is rejected there, NOT
+ * fabricated-away here). PURE.
+ */
+export function resolveSubstackPublication(publication) {
+  const raw = typeof publication === "string" ? publication.trim() : "";
+  if (!raw) {
+    throw new Error(
+      "rss_substack_archive: publication is required — supply a Substack " +
+        "publication slug (e.g. pub), a pub.substack.com host, or a full " +
+        "https://pub.substack.com URL.",
+    );
+  }
+  let host;
+  if (/^https?:\/\//i.test(raw)) {
+    try {
+      host = new URL(raw).hostname.toLowerCase();
+    } catch {
+      throw new Error(`rss_substack_archive: invalid publication URL "${raw}".`);
+    }
+  } else {
+    // bare slug or bare host — take the authority segment before any path.
+    host = raw.split("/")[0].toLowerCase();
+  }
+  // A bare slug (no dot) is a Substack publication name -> <slug>.substack.com.
+  if (!host.includes(".")) host = `${host}.substack.com`;
+  return host;
+}
+
+/**
+ * List a Substack publication's archive with graceful degrade (ABLOG-03, D-08/09/10).
+ *
+ * Primary: the unofficial `https://<pub>.substack.com/api/v1/archive` JSON on the
+ * Phase-5 guarded path `getJson(url, { untrustedHost: true })` — the publication
+ * host is user-supplied, so untrustedHost is MANDATORY (rides assertSafeUrl +
+ * the content-type gate, D-08). Each archive post maps through
+ * mapSubstackArchiveItem (reactions -> score, comments -> num_comments, D-09).
+ *
+ * Degrade (D-10 — the EXPECTED path, undocumented endpoint): on ANY archive
+ * failure (endpoint gone, a login-HTML-200 caught by the content-type gate,
+ * throttle, parse error) fall back to the `<pub>.substack.com/feed` RSS window
+ * via getText and return THAT envelope. NEVER re-throw archive breakage.
+ *
+ * SSRF is NOT swallowed: the getText fallback ALSO rides assertSafeUrl, so a
+ * blocked (private/loopback/metadata) publication host is rejected on BOTH paths
+ * — the fallback re-throws it, ending in a thrown SSRF error, not a fake envelope.
+ *
+ * The impls/opts are injectable so the success + fallback + SSRF paths are driven
+ * offline (the registered handler builds opts internally, mirroring lemmy SEC-01).
+ */
+export async function fetchSubstackArchive(
+  publication,
+  { getJsonImpl = getJson, getTextImpl = getText, jsonOpts = {}, textOpts = {} } = {},
+) {
+  const host = resolveSubstackPublication(publication);
+  const archiveUrl = `https://${host}/api/v1/archive`;
+  try {
+    // untrustedHost is MANDATORY (D-08) — spread jsonOpts AFTER so a test may add
+    // fetchImpl/lookup/cacheKey but cannot silently drop the SSRF guard.
+    const posts = await getJsonImpl(archiveUrl, {
+      untrustedHost: true,
+      ...jsonOpts,
+    });
+    const results = (Array.isArray(posts) ? posts : []).map(mapSubstackArchiveItem);
+    return buildListEnvelope({ source: SOURCE, query: publication, results });
+  } catch {
+    // D-10 graceful degrade: the archive is undocumented — breakage is expected.
+    // Fall back to the RSS window. getText re-runs assertSafeUrl, so a blocked
+    // host still throws here (SSRF is never degraded into a fake envelope).
+    const feedUrl = `https://${host}/feed`;
+    const xml = await getTextImpl(feedUrl, { ...textOpts });
+    const results = normalizeFeed(parseFeed(xml), feedUrl).map(markPreviewOnly);
+    return buildListEnvelope({ source: SOURCE, query: publication, results });
+  }
+}
+
 // --- MCP wiring (identical shape to the Dev.to template) -----------------
 //
 // registerTool takes RAW Zod shapes (Pitfall 7). The handler fetches ONLY via
@@ -523,6 +604,40 @@ server.registerTool(
     const xml = await getText(url);
     const results = normalizeFeed(parseFeed(xml), url).map(markPreviewOnly);
     const env = buildListEnvelope({ source: SOURCE, query: tag, results });
+    return toolResult(env);
+  },
+);
+
+server.registerTool(
+  "rss_substack_archive",
+  {
+    title: "List a Substack publication's full archive (with reaction + comment counts)",
+    description:
+      "List a Substack publication's FULL post archive as normalized contract " +
+      'items (type "article"), enriched with per-post engagement the RSS window ' +
+      "cannot provide: reaction counts fill `score` and comment counts fill " +
+      "`num_comments`. The `publication` argument accepts a bare slug (e.g. " +
+      "`platformer`), a `<pub>.substack.com` host, or a full Substack URL.\n\n" +
+      "ARCHIVE vs WINDOW: unlike rss_author_posts (which returns only the ~20 most " +
+      "recent Substack posts via the RSS feed), this reads the publication's full " +
+      "archive endpoint, so it can surface older history with engagement metrics.\n\n" +
+      "UNOFFICIAL + GRACEFUL FALLBACK: the archive endpoint is UNOFFICIAL and may " +
+      "change or require sign-in. On ANY archive failure this tool automatically " +
+      "falls back to the ~20-item RSS window (`<pub>.substack.com/feed`) and returns " +
+      "that instead — it never hard-errors, but in the fallback case `score` and " +
+      "`num_comments` are null (the RSS window carries no engagement). Paywalled / " +
+      'member-only items carry the literal tag "preview-only" and teaser-quality text.\n\n' +
+      "RECIPE — posting cadence & series/follow-up detection: see " +
+      "docs/AUTHOR-BLOG-RECIPES.md. Prefer this tool over rss_author_posts when you " +
+      "need a Substack author's fuller history or engagement signal — but read the " +
+      "honesty caveat there (a feed/archive is still not guaranteed lifetime history).",
+    inputSchema: {
+      publication: z.string(),
+    },
+    outputSchema: listEnvelopeShape,
+  },
+  async ({ publication }) => {
+    const env = await fetchSubstackArchive(publication);
     return toolResult(env);
   },
 );
