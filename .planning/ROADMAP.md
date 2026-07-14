@@ -61,9 +61,13 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
   5. User can follow documented recipes for posting-cadence tracking and series/follow-up detection using only normal tool output
 
 **Plans**: 3 plans
+**Wave 1**
 
 - [ ] 06-01-PLAN.md — Wave 1 — shared Medium-403 → clear tool-level error mapping + UA 1.0→1.1 bump (D-14)
 - [ ] 06-02-PLAN.md — Wave 1 — rss_author_posts + rss_tag_posts: author-shape platform inference, query/published_before selection, preview-only markers, honest-window descriptions (ABLOG-01/02/04)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 06-03-PLAN.md — Wave 2 — rss_substack_archive (guarded JSON archive enrichment + graceful RSS fallback) + docs/AUTHOR-BLOG-RECIPES.md (ABLOG-03/05)
 
 ### Phase 7: Universal Sources & Parameterization Audit
