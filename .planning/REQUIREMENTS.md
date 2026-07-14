@@ -22,14 +22,14 @@ agent at call time; env is for credentials and optional defaults only.**
       `count` + per-item `created_utc` plus tool descriptions explicitly stating
       the feed caps (~10 posts Medium, ~20 Substack) and paywall truncation
 
-- [ ] **ABLOG-03**: User can list a Substack publication's full archive via the
+- [x] **ABLOG-03**: User can list a Substack publication's full archive via the
       unofficial JSON API (fills `score`/`num_comments` from reactions/comments;
       degrades to the RSS window on failure, never hard-errors)
 
 - [x] **ABLOG-04**: User can fetch posts by tag/keyword on platforms with tag
       feeds (e.g. Medium `feed/tag/<tag>`), tag as a tool parameter
 
-- [ ] **ABLOG-05**: User can follow documented recipes for posting-cadence
+- [x] **ABLOG-05**: User can follow documented recipes for posting-cadence
       tracking and series/follow-up detection from normal tool output (docs only)
 
 ### Trending & Pain-Point Mining (TREND)
@@ -118,9 +118,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | ABLOG-01 | Phase 6 | Complete |
 | ABLOG-02 | Phase 6 | Complete |
-| ABLOG-03 | Phase 6 | Pending |
+| ABLOG-03 | Phase 6 | Complete |
 | ABLOG-04 | Phase 6 | Complete |
-| ABLOG-05 | Phase 6 | Pending |
+| ABLOG-05 | Phase 6 | Complete |
 | TREND-01 | Phase 5 | Complete |
 | TREND-02 | Phase 5 | Complete |
 | TREND-03 | Phase 5 | Complete |

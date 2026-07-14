@@ -5,8 +5,8 @@ milestone_name: Writer-Aware, Universal Research
 current_phase: 6
 current_phase_name: Author-Blog Awareness
 status: verifying
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-07-14T06:48:03.159Z"
+stopped_at: Completed 06-03-PLAN.md
+last_updated: "2026-07-14T07:00:45.578Z"
 last_activity: 2026-07-14
 last_activity_desc: Phase 6 execution started
 progress:
@@ -79,6 +79,7 @@ Last activity: 2026-07-14 — Phase 6 execution started
 | Phase 05 P04 | 12min | 2 tasks | 2 files |
 | Phase 06 P01 | 15m | 2 tasks | 4 files |
 | Phase 6 P02 | 7min | 3 tasks | 6 files |
+| Phase 06 P03 | 16min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -118,6 +119,8 @@ Recent decisions affecting current work:
 - [Phase 06]: Medium 403 is host-gated + terminal (no retry/stale) to avoid IP-ban behavior (T-06-02)
 - [Phase ?]: [Phase 06 P02]: rss author/tag tools live in servers/rss reusing getText->parseFeed->normalizeFeed; resolveAuthorFeed infers platform by author shape and THROWS on an ambiguous bare token (never guesses a host, T-06-03)
 - [Phase ?]: [Phase 06 P02]: preview/paywall state rides tags[] as the literal 'preview-only' (markPreviewOnly, D-06/D-07) — never a new field, text left clean; contract frozen
+- [Phase ?]: [Phase 06 P03]: rss_substack_archive enriches score/num_comments from the unofficial <pub>.substack.com/api/v1/archive JSON on getJson(untrustedHost:true); ANY failure degrades to the RSS feed window and never hard-errors (D-08/09/10)
+- [Phase ?]: [Phase 06 P03]: archive-with-fallback logic factored into exported fetchSubstackArchive (injectable getJson/getText) so success + HTML-200 fallback + SSRF-reject drive offline; SSRF re-thrown on both paths, never swallowed into a fake envelope
 
 ### Pending Todos
 
@@ -147,9 +150,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-14T06:46:40.040Z
-Stopped at: Completed 06-02-PLAN.md
-Resume file: .planning/phases/06-author-blog-awareness/06-03-PLAN.md
+Last session: 2026-07-14T07:00:45.564Z
+Stopped at: Completed 06-03-PLAN.md
+Resume file: None
 
 ## Operator Next Steps
 
