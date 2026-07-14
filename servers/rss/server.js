@@ -474,7 +474,17 @@ export async function fetchSubstackArchive(
       ...jsonOpts,
       untrustedHost: true,
     });
-    const results = (Array.isArray(posts) ? posts : []).map(mapSubstackArchiveItem);
+    // WR-03 (D-10): an unexpected archive shape — a non-array 200 body, or an
+    // empty array — is an ARCHIVE FAILURE, not a valid "0 posts" answer for an
+    // active publication. Throw so it lands in the catch below and degrades to
+    // the RSS-window fallback (the same path as any other archive breakage),
+    // rather than returning a silent, misleading count:0 envelope.
+    if (!Array.isArray(posts) || posts.length === 0) {
+      throw new Error(
+        "rss_substack_archive: unexpected archive shape (non-array or empty body)",
+      );
+    }
+    const results = posts.map(mapSubstackArchiveItem);
     return buildListEnvelope({ source: SOURCE, query: publication, results });
   } catch {
     // D-10 graceful degrade: the archive is undocumented — breakage is expected.

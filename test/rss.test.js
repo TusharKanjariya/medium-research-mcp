@@ -720,6 +720,54 @@ test("rss_substack_archive fallback: an HTML-200 archive degrades to the RSS win
   }
 });
 
+test("rss_substack_archive: a non-array archive 200 degrades to the RSS window, not an empty envelope (WR-03)", async () => {
+  // The undocumented archive returns a 200 with an UNEXPECTED (non-array) JSON
+  // shape — e.g. { posts: [...] } or an error stub. This is an archive failure
+  // per D-10 and must route to the RSS-window fallback, NOT yield count:0.
+  const feedXml = fixture("rss-substack-feed");
+  const env = await fetchSubstackArchive("pub", {
+    jsonOpts: {
+      fetchImpl: async () => jsonRes(200, { posts: [], error: "shape changed" }),
+      sleep: async () => {},
+      lookup: publicLookup,
+      cacheKey: "rss:archive-nonarray-200",
+    },
+    textOpts: {
+      fetchImpl: async () => textRes(200, feedXml),
+      sleep: async () => {},
+      lookup: publicLookup,
+      cacheKey: "rss:archive-nonarray-fallback",
+    },
+  });
+  // Degraded to the feed window — a contract-valid, NON-empty envelope, never a throw.
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env));
+  assert.ok(env.results.length >= 1, "non-array archive falls back to the RSS window");
+  for (const it of env.results) {
+    assert.strictEqual(it.score, null, "RSS-window items carry null engagement");
+    assert.strictEqual(it.num_comments, null);
+  }
+});
+
+test("rss_substack_archive: an empty archive array degrades to the RSS window (WR-03)", async () => {
+  const feedXml = fixture("rss-substack-feed");
+  const env = await fetchSubstackArchive("pub", {
+    jsonOpts: {
+      fetchImpl: async () => jsonRes(200, []), // empty archive == failure per D-10
+      sleep: async () => {},
+      lookup: publicLookup,
+      cacheKey: "rss:archive-empty-200",
+    },
+    textOpts: {
+      fetchImpl: async () => textRes(200, feedXml),
+      sleep: async () => {},
+      lookup: publicLookup,
+      cacheKey: "rss:archive-empty-fallback",
+    },
+  });
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env));
+  assert.ok(env.results.length >= 1, "empty archive falls back to the RSS window");
+});
+
 test("rss_substack_archive SSRF: a private/loopback/metadata publication host is rejected on the guarded path (D-08)", async () => {
   // (i) a host that RESOLVES to a private IP (injected privateLookup).
   await assert.rejects(
