@@ -133,7 +133,7 @@ Not part of the v1.1 milestone. Tracked for a later milestone (start via `/gsd-n
 | 4. RSS Multiplier & Output Proof | v1.0 | 4/4 | Complete | 2026-07-03 |
 | 5. Guarded JSON Path & Trending Signals | v1.1 | 4/4 | Complete    | 2026-07-10 |
 | 6. Author-Blog Awareness | v1.1 | 3/3 | Complete    | 2026-07-14 |
-| 7. Universal Sources & Parameterization Audit | v1.1 | 4/4 | Complete   | 2026-07-14 |
+| 7. Universal Sources & Parameterization Audit | v1.1 | 4/4 | Complete    | 2026-07-14 |
 | 8. Universal Distribution | v1.1 | 0/? | Not started | - |
 
 ---
