@@ -1,8 +1,9 @@
 ---
 phase: 06-author-blog-awareness
 verified: 2026-07-14T00:00:00Z
-status: human_needed
+status: passed
 score: 5/5 must-haves verified
+human_verification_resolved: 2026-07-14T08:00:00Z (both items passed live — see 06-UAT.md)
 behavior_unverified: 0
 overrides_applied: 0
 human_verification:
