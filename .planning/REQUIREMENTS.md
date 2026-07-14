@@ -18,7 +18,7 @@ agent at call time; env is for credentials and optional defaults only.**
       parameter (Medium `@user`, Substack publication, or raw feed URL) in the
       normalized contract, with HTML-stripped full text and tags
 
-- [ ] **ABLOG-02**: User (agent) can tell the coverage window is partial —
+- [x] **ABLOG-02**: User (agent) can tell the coverage window is partial —
       `count` + per-item `created_utc` plus tool descriptions explicitly stating
       the feed caps (~10 posts Medium, ~20 Substack) and paywall truncation
 
@@ -26,7 +26,7 @@ agent at call time; env is for credentials and optional defaults only.**
       unofficial JSON API (fills `score`/`num_comments` from reactions/comments;
       degrades to the RSS window on failure, never hard-errors)
 
-- [ ] **ABLOG-04**: User can fetch posts by tag/keyword on platforms with tag
+- [x] **ABLOG-04**: User can fetch posts by tag/keyword on platforms with tag
       feeds (e.g. Medium `feed/tag/<tag>`), tag as a tool parameter
 
 - [ ] **ABLOG-05**: User can follow documented recipes for posting-cadence
@@ -117,9 +117,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | ABLOG-01 | Phase 6 | Complete |
-| ABLOG-02 | Phase 6 | Pending |
+| ABLOG-02 | Phase 6 | Complete |
 | ABLOG-03 | Phase 6 | Pending |
-| ABLOG-04 | Phase 6 | Pending |
+| ABLOG-04 | Phase 6 | Complete |
 | ABLOG-05 | Phase 6 | Pending |
 | TREND-01 | Phase 5 | Complete |
 | TREND-02 | Phase 5 | Complete |

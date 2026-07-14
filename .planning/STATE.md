@@ -4,16 +4,16 @@ milestone: v1.1
 milestone_name: Writer-Aware, Universal Research
 current_phase: 6
 current_phase_name: Author-Blog Awareness
-status: executing
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-07-14T06:33:57.872Z"
+status: verifying
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-07-14T06:48:03.159Z"
 last_activity: 2026-07-14
 last_activity_desc: Phase 6 execution started
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 6
   percent: 25
 ---
 
@@ -29,8 +29,8 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 ## Current Position
 
 Phase: 6 (Author-Blog Awareness) — EXECUTING
-Plan: 2 of 3
-Status: Ready to execute
+Plan: 3 of 3
+Status: Phase complete — ready for verification
 Last activity: 2026-07-14 — Phase 6 execution started
 
 **v1.1 phase structure:**
@@ -78,6 +78,7 @@ Last activity: 2026-07-14 — Phase 6 execution started
 | Phase 05 P03 | 259 | 3 tasks | 5 files |
 | Phase 05 P04 | 12min | 2 tasks | 2 files |
 | Phase 06 P01 | 15m | 2 tasks | 4 files |
+| Phase 6 P02 | 7min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -115,6 +116,8 @@ Recent decisions affecting current work:
 - [Phase 05]: hn_rising: velocity is an ordering-only signal; frozen contract preserved (type stays story), tunable hours/minPoints via Algolia numericFilters
 - [Phase ?]: devto_top forbidden rising+days combo enforced in exported pure devtoTopUrl (throws pre-fetch), not the raw-shape Zod schema (D-15, Pitfall 4)
 - [Phase 06]: Medium 403 is host-gated + terminal (no retry/stale) to avoid IP-ban behavior (T-06-02)
+- [Phase ?]: [Phase 06 P02]: rss author/tag tools live in servers/rss reusing getText->parseFeed->normalizeFeed; resolveAuthorFeed infers platform by author shape and THROWS on an ambiguous bare token (never guesses a host, T-06-03)
+- [Phase ?]: [Phase 06 P02]: preview/paywall state rides tags[] as the literal 'preview-only' (markPreviewOnly, D-06/D-07) — never a new field, text left clean; contract frozen
 
 ### Pending Todos
 
@@ -144,9 +147,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-14T06:33:57.856Z
-Stopped at: Completed 06-01-PLAN.md
-Resume file: .planning/phases/06-author-blog-awareness/06-CONTEXT.md
+Last session: 2026-07-14T06:46:40.040Z
+Stopped at: Completed 06-02-PLAN.md
+Resume file: .planning/phases/06-author-blog-awareness/06-03-PLAN.md
 
 ## Operator Next Steps
 
