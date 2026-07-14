@@ -45,6 +45,7 @@ import {
   buildListEnvelope,
   listEnvelopeShape,
   toolResult,
+  stripHtml,
 } from "../../shared/contract.js";
 
 const SOURCE = "rss";
@@ -329,11 +330,16 @@ export function filterAuthorPosts(results, { query, published_before } = {}) {
   let out = Array.isArray(results) ? results : [];
   if (query) {
     const q = String(query).toLowerCase();
-    out = out.filter(
-      (it) =>
-        (it.title && String(it.title).toLowerCase().includes(q)) ||
-        (it.text && String(it.text).toLowerCase().includes(q)),
-    );
+    out = out.filter((it) => {
+      const title = it.title ? String(it.title).toLowerCase() : "";
+      // WR-04: match against the HTML-STRIPPED text the caller actually receives
+      // (normalizeItem strips downstream in buildListEnvelope). Matching raw
+      // markup would let a query like `img`, `span`, `href`, or `https` hit tags/
+      // attributes/URLs that never appear in the visible `text`, producing
+      // "matches" the user cannot see or reproduce. Case-insensitive per D-04.
+      const text = it.text != null ? (stripHtml(it.text) ?? "").toLowerCase() : "";
+      return title.includes(q) || text.includes(q);
+    });
   }
   if (published_before) {
     const cutoff = Date.parse(published_before);

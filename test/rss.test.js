@@ -522,6 +522,32 @@ test("rss_author_posts query narrows by title/teaser substring (case-insensitive
   assert.match(results[0].title, /Rust/);
 });
 
+test("rss_author_posts query matches the HTML-stripped text, not raw markup (WR-04)", () => {
+  // The query test must run over the STRIPPED text the caller receives. A query
+  // that only appears inside markup (tag names, attributes, hrefs) must NOT match;
+  // a query in the visible prose MUST match.
+  const items = [
+    {
+      id: "1",
+      type: "article",
+      title: "Post about gardening",
+      text: '<p class="span-wide"><a href="https://example.com/img">Tulips are lovely</a></p>',
+      tags: [],
+    },
+  ];
+  // markup-only tokens that never appear in stripped text -> no match.
+  for (const q of ["span", "href", "https", "img", "class", "<p>"]) {
+    assert.equal(
+      filterAuthorPosts(items, { query: q }).length,
+      0,
+      `query "${q}" must not match HTML markup`,
+    );
+  }
+  // visible prose -> matches (case-insensitive).
+  assert.equal(filterAuthorPosts(items, { query: "tulips" }).length, 1);
+  assert.equal(filterAuthorPosts(items, { query: "GARDENING" }).length, 1); // title still matches
+});
+
 test("rss_author_posts published_before drops items at/after the cutoff", () => {
   // Jul 02 and Jun 01 items; a Jun 15 cutoff keeps only the Jun 01 (Go) post.
   const results = authorPipeline(mediumAuthorParsed, "u", { published_before: "2026-06-15" });
