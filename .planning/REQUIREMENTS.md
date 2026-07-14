@@ -49,10 +49,10 @@ agent at call time; env is for credentials and optional defaults only.**
 - [x] **SRC-10**: User can research any public Discourse forum by instance URL
       parameter — latest topics, top by period, topic detail — in the contract
 
-- [ ] **SRC-11**: User can research any Mastodon instance's public and hashtag
+- [x] **SRC-11**: User can research any Mastodon instance's public and hashtag
       timelines by instance + hashtag parameters, keyless
 
-- [ ] **SRC-13**: User can get trending tags/links from a Mastodon instance
+- [x] **SRC-13**: User can get trending tags/links from a Mastodon instance
       (returns empty results gracefully where the instance disables trends)
 
 ### Security & Parameterization (SEC)
@@ -125,8 +125,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TREND-02 | Phase 5 | Complete |
 | TREND-03 | Phase 5 | Complete |
 | SRC-10 | Phase 7 | Complete |
-| SRC-11 | Phase 7 | Pending |
-| SRC-13 | Phase 7 | Pending |
+| SRC-11 | Phase 7 | Complete |
+| SRC-13 | Phase 7 | Complete |
 | SEC-01 | Phase 5 | Complete |
 | SEC-02 | Phase 7 | Complete |
 | PKG-01 | Phase 8 | Pending |
