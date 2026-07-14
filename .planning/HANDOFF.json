@@ -1,39 +1,40 @@
 {
   "version": "1.0",
-  "timestamp": "2026-07-10T12:09:31.981Z",
-  "phase": "6",
-  "phase_name": "Author-Blog Awareness",
-  "phase_dir": ".planning/phases/ (06 not yet created)",
+  "timestamp": "2026-07-14T11:23:42.015Z",
+  "phase": "8",
+  "phase_name": "Universal Distribution",
+  "phase_dir": ".planning/phases/ (08 not yet created)",
   "milestone": "v1.1 Writer-Aware, Universal Research",
   "plan": null,
   "task": null,
   "total_tasks": null,
   "status": "paused",
-  "context_note": "Clean pause at a phase boundary. Phase 5 (Guarded JSON Path & Trending Signals) is FULLY complete — planned, executed, verified, code-reviewed, review-fixes applied, and threat-secured. Nothing is in progress. Phase 6 is the next unstarted phase.",
+  "context_note": "Clean pause at a phase boundary. Phase 7 (Universal Sources & Parameterization Audit) is FULLY complete — discussed, researched, planned (4 plans), executed, code-reviewed (3 warnings fixed), verified (5/5 must-haves), live-UAT'd (both multi-instance smokes passed), and phase.complete. Nothing is in progress. Phase 8 (Universal Distribution, the LAST v1.1 phase) is the next unstarted phase and has no CONTEXT.md yet.",
   "completed_tasks": [
-    {"id": "05-discuss", "name": "Phase 5 CONTEXT.md (D-01..D-15; OQ-1 resolved — contract frozen)", "status": "done"},
-    {"id": "05-plan", "name": "4 plans, Wave 1, verified by plan-checker", "status": "done"},
-    {"id": "05-01", "name": "SEC-01 guarded getJson untrustedHost + Lemmy on guarded path", "status": "done", "commit": "e52a90e"},
-    {"id": "05-02", "name": "TREND-03 hn_rising (velocity re-sort)", "status": "done", "commit": "12fcb73"},
-    {"id": "05-03", "name": "TREND-02 SE so_unanswered + seThrottle", "status": "done", "commit": "ddd25df"},
-    {"id": "05-04", "name": "TREND-01 devto_top mode/days/tag", "status": "done", "commit": "225167f"},
-    {"id": "05-verify", "name": "VERIFICATION.md — passed 19/19 must-haves", "status": "done"},
-    {"id": "05-review", "name": "Code review (0 critical, 3 warn, 3 info) + fixes applied (WR-01/02/03)", "status": "done", "commit": "96e0521"},
-    {"id": "05-secure", "name": "SECURITY.md — threats_open: 0 (10 threats closed)", "status": "done", "commit": "76cb022"}
+    {"id": "05", "name": "Phase 5 Guarded JSON Path & Trending Signals", "status": "done"},
+    {"id": "06", "name": "Phase 6 Author-Blog Awareness (ABLOG-01..05)", "status": "done"},
+    {"id": "07-discuss", "name": "Phase 7 CONTEXT.md (D-01..D-16)", "status": "done"},
+    {"id": "07-research", "name": "Phase 7 RESEARCH.md (live-probed field maps; corrected 3 CONTEXT assumptions)", "status": "done"},
+    {"id": "07-plan", "name": "4 plans (07-01..04), 3 waves, plan-checker PASSED", "status": "done", "commit": "98eb508"},
+    {"id": "07-01", "name": "TYPE append topic/status + Lemmy instance param (host-gated Bearer)", "status": "done"},
+    {"id": "07-02", "name": "Discourse server (latest/top/topic)", "status": "done"},
+    {"id": "07-03", "name": "Mastodon server (public/hashtag/trending tags+links)", "status": "done"},
+    {"id": "07-04", "name": "SEC-02 parameterization-audit test", "status": "done"},
+    {"id": "07-review", "name": "Code review (0 crit, 3 warn) + fixes WR-01/02/03 (incl. cross-origin auth-header stripping)", "status": "done"},
+    {"id": "07-verify", "name": "VERIFICATION.md passed 5/5 + live UAT (07-UAT.md) both smokes passed", "status": "done"}
   ],
   "remaining_tasks": [
-    {"id": "06", "name": "Phase 6 Author-Blog Awareness (ABLOG-01..05) — not started", "status": "not_started"}
+    {"id": "08", "name": "Phase 8 Universal Distribution (PKG-01, PKG-02, PKG-03, DOC-01) — not started", "status": "not_started"}
   ],
   "blockers": [],
   "async_jobs": [],
   "human_actions_pending": [],
   "decisions": [
-    {"decision": "Output contract stays FROZEN; SE throttle rides sleep-within + error path (no backoff/quota_remaining envelope field)", "rationale": "OQ-1: list envelope is SDK-validated against listEnvelopeShape; a 5th key is not contract-legal and the contract is the project's core value", "phase": "5"},
-    {"decision": "SEC-01 guard is an opt-in getJson(url,{untrustedHost:true}) reusing the getText assertSafeUrl guard (no forked guard)", "rationale": "D-01/D-02 — fixed-host servers pay zero DNS cost; single retry/cache/stale path", "phase": "5"},
-    {"decision": "SEC-03 (DNS-rebinding TOCTOU) re-accepted, not implemented", "rationale": "D-06 — local single-user tool; IP-pinning stays v2+", "phase": "5"},
-    {"decision": "Overrode the false-positive ui.plan-gate (frontend:true) for this headless MCP server", "rationale": "no frontend exists; UI-SPEC nonsensical. Silence permanently via workflow.ui_safety_gate:false + ui_phase:false in .planning/config.json", "phase": "5"}
+    {"decision": "Phase 7 Discourse = 3 tools (latest/top/topic), Mastodon = 4 tools (public/hashtag/trending_tags/trending_links); explicit instance URL param; Lemmy keeps LEMMY_INSTANCE as optional default; SEC-02 delivered as an automated audit test", "rationale": "matches SRC-10/11/13 ACs; explicit self-documenting tools; regression-proof no-hardcoded-targets enforcement", "phase": "7"},
+    {"decision": "RESEARCH corrected 3 CONTEXT assumptions, all confirmed live during UAT", "rationale": "mastodon.social public timeline is now 422 auth-required (per-endpoint lockdown; trends still anon); Discourse category route needs slug AND numeric id; Lemmy already passes untrustedHost:true (only param+host-gated-Bearer remained)", "phase": "7"},
+    {"decision": "WR-03 cross-origin Authorization/Cookie stripping added to shared/http_client.js fetchTextManual", "rationale": "defense-in-depth complementing the Lemmy token host-gate; a redirect must not carry credentials to a different origin", "phase": "7"}
   ],
   "uncommitted_files": [],
-  "next_action": "Run /gsd-discuss-phase 6 to start Phase 6 (Author-Blog Awareness). Milestone research already covers it in .planning/research/SUMMARY.md and PITFALLS.md.",
-  "context_notes": "v1.1 is 5/8 phases done (Phase 5 of 8). Phase 6 (Author-Blog Awareness, ABLOG-01..05) is parallelizable with Phase 5 and shares the shared/http_client.js User-Agent change (Medium 403 mitigation) to coordinate. Author-blog tools live IN servers/rss (not a sibling server) per the v1.1 roadmap decision. Optional cleanup: 3 INFO code-review nits from 05-REVIEW.md remain (error-prefix wording rss:, null-safe raw.hits/raw.items, devto_top query:tag vs null) — run /gsd-code-review 5 --all to sweep them. Working tree clean; 298 tests pass."
+  "next_action": "Run /gsd-discuss-phase 8 to start Phase 8 (Universal Distribution). Packaging has real gray areas: one scoped npm package name + bin-per-server, the .mcpb staging strategy (stage repo layout + vendored prod node_modules so ../../shared survives), which clients to document (Claude Desktop/OpenCode/Codex/Cursor), and whether .mcpb bundles ship in v1.1 or defer. Milestone research already covers Phase 8 as SUMMARY.md 'Phase 4: Universal distribution' + PITFALLS.md 7/8/9/10.",
+  "context_notes": "v1.1 is 3/4 phases done (5,6,7 complete; only Phase 8 remains — 75%). 418 tests pass, tree clean, HEAD b55f14c. Local master is 57 commits ahead of origin (UNPUSHED) — this is why executors auto-degrade to sequential-on-master (worktree base-check #683); expected, not a bug. Pushing before Phase 8 is recommended: it restores parallel worktrees AND packaging docs reference the repo URL. auto_advance:true/mode:yolo is set but the user drives each phase manually and pauses at boundaries (saved as the manual-gsd-pacing memory) — do NOT auto-chain into the next phase. The live-UAT harness pattern (a scratchpad .mjs importing the server's exported functions + getJson/getText, run against real instances) worked well for Phase 6 & 7 human-verification and is reusable. Phase 8 adds only dev-time packaging tooling (@anthropic-ai/mcpb devDependency) — no new RUNTIME deps; the 11 manifests are scaffold-only today and Phase 8 activates packing (PKG-01)."
 }
