@@ -38,6 +38,8 @@ export const TYPE = [
   "issue", // GitHub issues (Phase 3, SRC-06)
   "package", // Libraries.io packages (Phase 3, SRC-07)
   "launch", // Product Hunt launches (Phase 3, SRC-08)
+  "topic", // Discourse topics + Mastodon trending tags (Phase 7, SRC-10/SRC-11, D-05/D-09)
+  "status", // Mastodon timeline statuses (Phase 7, SRC-11, D-09)
 ];
 
 // --- item ----------------------------------------------------------------

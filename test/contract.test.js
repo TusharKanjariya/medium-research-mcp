@@ -94,6 +94,51 @@ test("TYPE keeps every pre-existing value (additive change, no removals/reorder)
   assert.deepEqual(TYPE.slice(0, priorNine.length), priorNine);
 });
 
+// --- TYPE enum: Phase 7 additive extension (D-05, D-09) ------------------
+// Discourse topics + Mastodon trending tags -> "topic"; Mastodon timeline
+// statuses -> "status". Appended at the END after the Phase 3 values so the
+// new Discourse/Mastodon servers' structuredContent validates. Append-only:
+// the prior twelve values keep their value and order (Mastodon trending links
+// reuse the existing "article" type — no value added for links, D-09).
+
+test("TYPE includes the Phase 7 additive values topic and status", () => {
+  for (const t of ["topic", "status"]) {
+    assert.ok(TYPE.includes(t), `TYPE must include "${t}"`);
+  }
+});
+
+test("TYPE appends topic then status after launch (append-only tail)", () => {
+  const priorTwelve = [
+    "story",
+    "ask",
+    "show",
+    "question",
+    "article",
+    "repo",
+    "comment",
+    "post",
+    "job",
+    "issue",
+    "package",
+    "launch",
+  ];
+  // the prior twelve remain the leading prefix, in order (appended, not reordered)
+  assert.deepEqual(TYPE.slice(0, priorTwelve.length), priorTwelve);
+  // the two new values are the tail, in order, immediately after "launch"
+  assert.deepEqual(TYPE.slice(priorTwelve.length), ["topic", "status"]);
+});
+
+test("ItemSchema parses items typed topic and status", () => {
+  for (const t of ["topic", "status"]) {
+    const item = normalizeItem({ id: 1, type: t, title: "x" });
+    assert.doesNotThrow(
+      () => ItemSchema.parse(item),
+      `an item typed "${t}" must parse`,
+    );
+    assert.equal(item.type, t);
+  }
+});
+
 test("ItemSchema parses items typed issue, package, and launch", () => {
   for (const t of ["issue", "package", "launch"]) {
     const item = normalizeItem({ id: 1, type: t, title: "x" });
