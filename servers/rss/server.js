@@ -7,11 +7,17 @@
 // the dual content/structuredContent return, caching/retry/stale, AND the SSRF
 // guard — lives in the shared modules and is imported here.
 //
-// D-04: a SINGLE `rss_fetch(url, limit?)` list tool — a DELIBERATE deviation from
-// the `*_hot`/`*_search`/`*_get` trio every other server ships. RSS has exactly
-// ONE operation (fetch a feed): items carry their own content so there is no
-// per-item detail endpoint (no `*_get`), and the feed URL IS the query so there
-// is no corpus to search (no `*_search`).
+// D-04/D-01: `rss_fetch(url, limit?)` is the GENERIC single-feed list tool — a
+// DELIBERATE deviation from the `*_hot`/`*_search`/`*_get` trio every other server
+// ships. Generic RSS has exactly ONE operation (fetch a feed): items carry their
+// own content so there is no per-item detail endpoint (no `*_get`), and the feed
+// URL IS the query so there is no corpus to search (no `*_search`).
+//
+// Phase 6 (D-01) adds FOCUSED writer-aware tools alongside rss_fetch —
+// rss_author_posts (a writer's Medium/Substack/raw-feed window) and rss_tag_posts
+// (Medium tag feed) — so the server is no longer single-tool. They reuse the SAME
+// getText -> parseFeed -> normalizeFeed pipeline; rss_fetch stays the generic
+// single-feed fetcher.
 //
 // Fetch path (CLAUDE.md / D-07): this server calls ONLY getText — never fetch()
 // directly, never getJson/postJson. getText carries the SSRF validation
@@ -335,6 +341,16 @@ export function filterAuthorPosts(results, { query, published_before } = {}) {
   return out;
 }
 
+/**
+ * Build the Medium tag feed URL for a tag (D-11, ABLOG-04). Medium's
+ * https://medium.com/feed/tag/<tag> is the only keyless public tag feed among the
+ * supported platforms, so rss_tag_posts is Medium-only. The tag is URL-encoded in
+ * the path segment so a multi-word/special-char tag never breaks the path. PURE.
+ */
+export function resolveTagFeed(tag) {
+  return `https://medium.com/feed/tag/${encodeURIComponent(String(tag ?? "").trim())}`;
+}
+
 // --- MCP wiring (identical shape to the Dev.to template) -----------------
 //
 // registerTool takes RAW Zod shapes (Pitfall 7). The handler fetches ONLY via
@@ -353,10 +369,12 @@ server.registerTool(
       'contract item with type "article" and BOTH score and num_comments null ' +
       "(RSS carries no engagement metric). `limit` caps the number of items " +
       "(default 20).\n\n" +
-      "SINGLE-TOOL DESIGN (deliberate): unlike the other sources this server " +
-      "exposes ONLY rss_fetch — no *_get (feed items already carry their content; " +
-      "there is no per-item detail endpoint) and no *_search (the feed URL itself " +
-      "is the query; there is no server-side corpus to search).\n\n" +
+      "GENERIC-FEED TOOL: rss_fetch is the generic single-feed fetcher — no *_get " +
+      "(feed items already carry their content; there is no per-item detail " +
+      "endpoint) and no *_search (the feed URL itself is the query; there is no " +
+      "server-side corpus to search). For a specific writer's posts use " +
+      "rss_author_posts, and for a Medium tag feed use rss_tag_posts (this server " +
+      "exposes those focused tools alongside rss_fetch).\n\n" +
       "RECIPE — subreddit (read-only Reddit): " +
       'rss_fetch("https://www.reddit.com/r/<sub>/.rss") ' +
       '(or ".../.rss?sort=top") returns a subreddit\'s posts as normalized items.\n\n' +
@@ -426,6 +444,37 @@ server.registerTool(
     const mapped = normalizeFeed(parseFeed(xml), url).map(markPreviewOnly);
     const results = filterAuthorPosts(mapped, { query, published_before });
     const env = buildListEnvelope({ source: SOURCE, query: author, results });
+    return toolResult(env);
+  },
+);
+
+server.registerTool(
+  "rss_tag_posts",
+  {
+    title: "Fetch recent Medium posts for a tag",
+    description:
+      "Fetch recent Medium articles tagged `tag` as normalized contract items " +
+      '(type "article", HTML-stripped text, tags[], created_utc), from ' +
+      "https://medium.com/feed/tag/<tag>.\n\n" +
+      "MEDIUM-ONLY (D-11): tag feeds are Medium-only in v1.1 — Substack and raw " +
+      "feeds have no keyless public tag/keyword endpoint, so there is deliberately " +
+      "no `platform` parameter. For a specific writer's posts use rss_author_posts; " +
+      "for an arbitrary feed URL use rss_fetch.\n\n" +
+      "HONEST WINDOW: a Medium tag feed returns at most the ~10 most recent tagged " +
+      "posts — it is a recency sample, NOT the full corpus for that tag. Paywalled / " +
+      'member-only items carry the literal tag "preview-only" in tags[] and their ' +
+      "text is teaser-quality (see docs/AUTHOR-BLOG-RECIPES.md for cadence and " +
+      "series/follow-up recipes).",
+    inputSchema: {
+      tag: z.string(),
+    },
+    outputSchema: listEnvelopeShape,
+  },
+  async ({ tag }) => {
+    const url = resolveTagFeed(tag);
+    const xml = await getText(url);
+    const results = normalizeFeed(parseFeed(xml), url).map(markPreviewOnly);
+    const env = buildListEnvelope({ source: SOURCE, query: tag, results });
     return toolResult(env);
   },
 );
