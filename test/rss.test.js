@@ -31,6 +31,7 @@ import {
   resolveAuthorFeed,
   markPreviewOnly,
   filterAuthorPosts,
+  resolveTagFeed,
   server,
 } from "../servers/rss/server.js";
 import { buildListEnvelope, ListEnvelopeSchema } from "../shared/contract.js";
@@ -314,12 +315,52 @@ test("every fixture builds a ListEnvelope that parses against the contract schem
 
 // --- (i) registration smoke ----------------------------------------------
 
+// --- (m) rss_tag_posts (Medium-only, D-11) --------------------------------
+
+const mediumTagParsed = parseFeed(fixture("rss-medium-tag"));
+
+test("resolveTagFeed builds the Medium tag feed URL and URL-encodes the tag segment", () => {
+  assert.equal(resolveTagFeed("rust"), "https://medium.com/feed/tag/rust");
+  // a multi-word / special-char tag is encoded so the path never breaks.
+  assert.equal(
+    resolveTagFeed("machine learning"),
+    "https://medium.com/feed/tag/machine%20learning",
+  );
+  assert.equal(resolveTagFeed("c#"), "https://medium.com/feed/tag/c%23");
+});
+
+test("rss_tag_posts pipeline over a Medium tag feed yields a contract-valid envelope", () => {
+  const results = normalizeFeed(mediumTagParsed, resolveTagFeed("rust")).map(markPreviewOnly);
+  const env = buildListEnvelope({ source: "rss", query: "rust", results });
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env));
+  assert.ok(env.results.length >= 2);
+  for (const it of env.results) {
+    assert.equal(it.type, "article");
+    assert.ok(it.url && it.url.includes("medium.com"));
+  }
+});
+
+test("rss_tag_posts is registered { tag } + outputSchema and states Medium-only", () => {
+  const tool = server._registeredTools.rss_tag_posts;
+  assert.ok(tool, "rss_tag_posts is registered");
+  assert.ok(tool.outputSchema, "has an outputSchema");
+  assert.deepEqual(Object.keys(tool.inputSchema.shape).sort(), ["tag"]);
+  assert.match(tool.description, /Medium-only|Medium only/i);
+});
+
+// The SINGLE-TOOL note must no longer claim the server exposes ONLY rss_fetch (D-01).
+test("rss_fetch description no longer claims the server exposes only rss_fetch (D-01)", () => {
+  const desc = server._registeredTools.rss_fetch.description;
+  assert.doesNotMatch(desc, /exposes ONLY rss_fetch/i);
+  assert.match(desc, /rss_author_posts|rss_tag_posts/);
+});
+
 // Non-brittle registration smoke: assert each expected tool is present WITH an
 // outputSchema, rather than a deepEqual over the exact set — 06-03 later adds
 // rss_substack_archive and finalizes the exact-four assertion without a rewrite.
 test("rss server registers the writer-aware tools, each with an outputSchema", () => {
   const tools = server._registeredTools ?? {};
-  for (const name of ["rss_fetch", "rss_author_posts"]) {
+  for (const name of ["rss_fetch", "rss_author_posts", "rss_tag_posts"]) {
     assert.ok(tools[name], `${name} is registered`);
     assert.ok(tools[name].outputSchema, `${name} declares an outputSchema`);
   }
