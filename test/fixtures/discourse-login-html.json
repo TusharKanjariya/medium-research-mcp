@@ -1,0 +1,4 @@
+{
+  "_note": "Represents a login-required / interstitial Discourse response served as HTTP 200 with content-type text/html (e.g. community.monday.com's app-shell 'Not Found' page). The Phase 5 content-type gate in getJson rejects it BEFORE JSON.parse, so this body is never parsed — it exists only as the D-11 HTML-200 fixture. The gate keys on the content-type header, not this content.",
+  "html": "<!DOCTYPE html><html><head><title>Log in</title></head><body><h1>Log in required</h1><form action=\"/login\" method=\"post\"><button>Sign in</button></form></body></html>"
+}

@@ -161,7 +161,9 @@ export function mapDiscourseDetail(raw, base) {
 // clear tool-level error naming the instance; propagate everything else. Wording
 // says "requires login or is not publicly accessible" because a Cloudflare-fronted
 // instance (403 HTML) is indistinguishable from login_required at the HTTP layer.
-function mapDiscourseError(err, base) {
+// Exported so the D-11 mapping is unit-testable offline (the handler wraps its own
+// getJson opts, so there is no injection seam at the tool boundary).
+export function mapDiscourseError(err, base) {
   if (
     /HTTP 40[13]/.test(err?.message ?? "") ||
     /non-JSON response \(login required/.test(err?.message ?? "")

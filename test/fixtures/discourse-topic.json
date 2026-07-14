@@ -1,0 +1,40 @@
+{
+  "id": 1234,
+  "title": "How do I structure a plugin?",
+  "slug": "how-do-i-structure-a-plugin",
+  "posts_count": 3,
+  "reply_count": 2,
+  "like_count": 12,
+  "views": 340,
+  "created_at": "2026-07-01T10:00:00.000Z",
+  "tags": ["plugins", "howto"],
+  "category_id": 6,
+  "word_count": 210,
+  "participant_count": 3,
+  "details": {
+    "created_by": { "id": 100, "username": "alice", "name": "Alice" }
+  },
+  "post_stream": {
+    "stream": [9001, 9002, 9003],
+    "posts": [
+      {
+        "id": 9001,
+        "username": "alice",
+        "cooked": "<p>Here is my question &amp; <a href=\"x\">details</a></p>",
+        "score": 45547.4
+      },
+      {
+        "id": 9002,
+        "username": "bob",
+        "cooked": "<p>Try the docs</p>",
+        "score": 12.0
+      },
+      {
+        "id": 9003,
+        "username": "carol",
+        "cooked": "Also check <a href=\"y\">this</a>",
+        "score": 3.0
+      }
+    ]
+  }
+}

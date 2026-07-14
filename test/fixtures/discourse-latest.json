@@ -1,0 +1,55 @@
+{
+  "users": [
+    { "id": 100, "username": "alice" },
+    { "id": 200, "username": "bob" }
+  ],
+  "primary_groups": [],
+  "topic_list": {
+    "more_topics_url": "/latest.json?page=1",
+    "topics": [
+      {
+        "id": 1234,
+        "title": "How do I structure a plugin?",
+        "slug": "how-do-i-structure-a-plugin",
+        "posts_count": 1,
+        "reply_count": 5,
+        "highest_post_number": 6,
+        "created_at": "2026-07-01T10:00:00.000Z",
+        "last_posted_at": "2026-07-03T08:00:00.000Z",
+        "bumped_at": "2026-07-03T08:00:00.000Z",
+        "excerpt": "I'm building a plugin and &hellip; <a href=\"x\">need help</a>",
+        "tags": ["plugins", "howto"],
+        "views": 340,
+        "like_count": 12,
+        "op_like_count": 4,
+        "last_poster_username": "bob",
+        "category_id": 6,
+        "posters": [
+          { "user_id": 100, "description": "Original Poster" },
+          { "user_id": 200, "description": "Most Recent Poster" }
+        ]
+      },
+      {
+        "id": 5678,
+        "title": "Announcement thread",
+        "slug": "announcement-thread",
+        "posts_count": 3,
+        "reply_count": 2,
+        "highest_post_number": 3,
+        "created_at": "2026-07-02T12:00:00.000Z",
+        "last_posted_at": "2026-07-02T14:00:00.000Z",
+        "bumped_at": "2026-07-02T14:00:00.000Z",
+        "excerpt": "Read this first",
+        "tags": [],
+        "views": 88,
+        "like_count": 3,
+        "op_like_count": 1,
+        "last_poster_username": "charlie",
+        "category_id": 6,
+        "posters": [
+          { "user_id": 999, "description": "Original Poster" }
+        ]
+      }
+    ]
+  }
+}
