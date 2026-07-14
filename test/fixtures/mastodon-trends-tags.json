@@ -1,0 +1,21 @@
+[
+  {
+    "id": "1",
+    "name": "mcp",
+    "url": "https://mastodon.social/tags/mcp",
+    "history": [
+      { "day": "1752451200", "accounts": "120", "uses": "200" },
+      { "day": "1752364800", "accounts": "80", "uses": "150" },
+      { "day": "1752278400", "accounts": "40", "uses": "60" }
+    ]
+  },
+  {
+    "id": "2",
+    "name": "fediverse",
+    "url": "https://mastodon.social/tags/fediverse",
+    "history": [
+      { "day": "1752451200", "accounts": "500", "uses": "900" },
+      { "day": "1752364800", "accounts": "450", "uses": "800" }
+    ]
+  }
+]

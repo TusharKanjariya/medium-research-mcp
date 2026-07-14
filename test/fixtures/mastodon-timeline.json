@@ -1,0 +1,49 @@
+[
+  {
+    "id": "111000000000000001",
+    "created_at": "2026-07-14T09:38:21.000Z",
+    "language": "en",
+    "uri": "https://fosstodon.org/users/alice/statuses/111000000000000001",
+    "url": "https://fosstodon.org/@alice/111000000000000001",
+    "replies_count": 3,
+    "reblogs_count": 5,
+    "favourites_count": 12,
+    "content": "<p>Shipping a new <a href=\"https://example.test/x\">MCP server</a> today &amp; loving it</p>",
+    "reblog": null,
+    "account": { "acct": "alice", "username": "alice" },
+    "tags": [
+      { "name": "mcp", "url": "https://fosstodon.org/tags/mcp" },
+      { "name": "opensource", "url": "https://fosstodon.org/tags/opensource" }
+    ],
+    "card": null
+  },
+  {
+    "id": "111000000000000002",
+    "created_at": "2026-07-14T10:00:00.000Z",
+    "language": "en",
+    "uri": "https://fosstodon.org/users/carol/statuses/111000000000000002",
+    "url": "https://fosstodon.org/@carol/111000000000000002",
+    "replies_count": 0,
+    "reblogs_count": 0,
+    "favourites_count": 0,
+    "content": "",
+    "account": { "acct": "carol", "username": "carol" },
+    "tags": [],
+    "card": null,
+    "reblog": {
+      "id": "111999999999999999",
+      "created_at": "2026-07-13T08:00:00.000Z",
+      "language": "en",
+      "uri": "https://mastodon.social/users/bob/statuses/111999999999999999",
+      "url": "https://mastodon.social/@bob/111999999999999999",
+      "replies_count": 8,
+      "reblogs_count": 20,
+      "favourites_count": 50,
+      "content": "<p>Original boosted post about &lt;federation&gt; &amp; the fediverse</p>",
+      "reblog": null,
+      "account": { "acct": "bob@mastodon.social", "username": "bob" },
+      "tags": [{ "name": "fediverse", "url": "https://mastodon.social/tags/fediverse" }],
+      "card": null
+    }
+  }
+]

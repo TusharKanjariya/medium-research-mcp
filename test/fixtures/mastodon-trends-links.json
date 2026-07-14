@@ -1,0 +1,29 @@
+[
+  {
+    "url": "https://news.example.test/mcp-servers-explained",
+    "title": "MCP servers, explained",
+    "description": "A deep dive into the Model Context Protocol and why uniform output matters.",
+    "type": "link",
+    "author_name": "TechExample",
+    "provider_name": "Example News",
+    "image": "https://news.example.test/img/mcp.png",
+    "blurhash": "U00000",
+    "published_at": "2026-07-13T00:00:00.000Z",
+    "history": [
+      { "day": "1752451200", "accounts": "10", "uses": "30" },
+      { "day": "1752364800", "accounts": "5", "uses": "20" }
+    ]
+  },
+  {
+    "url": "https://blog.example.test/federation",
+    "title": "Federation is hard",
+    "description": "",
+    "type": "link",
+    "author_name": "",
+    "provider_name": "Example Blog",
+    "published_at": null,
+    "history": [
+      { "day": "1752451200", "accounts": "3", "uses": "7" }
+    ]
+  }
+]
