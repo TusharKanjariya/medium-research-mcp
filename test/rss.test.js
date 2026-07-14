@@ -33,8 +33,11 @@ import {
   filterAuthorPosts,
   resolveTagFeed,
   mapSubstackArchiveItem,
+  resolveSubstackPublication,
+  fetchSubstackArchive,
   server,
 } from "../servers/rss/server.js";
+import { getJson } from "../shared/http_client.js";
 import { buildListEnvelope, ListEnvelopeSchema } from "../shared/contract.js";
 
 const fixture = (name) =>
@@ -364,16 +367,8 @@ test("rss_fetch description no longer claims the server exposes only rss_fetch (
   assert.match(desc, /rss_author_posts|rss_tag_posts/);
 });
 
-// Non-brittle registration smoke: assert each expected tool is present WITH an
-// outputSchema, rather than a deepEqual over the exact set — 06-03 later adds
-// rss_substack_archive and finalizes the exact-four assertion without a rewrite.
-test("rss server registers the writer-aware tools, each with an outputSchema", () => {
-  const tools = server._registeredTools ?? {};
-  for (const name of ["rss_fetch", "rss_author_posts", "rss_tag_posts"]) {
-    assert.ok(tools[name], `${name} is registered`);
-    assert.ok(tools[name].outputSchema, `${name} declares an outputSchema`);
-  }
-});
+// Registration smoke: FINALIZED to the exact four tools in the (o) block below
+// (rss server registers EXACTLY the four writer-aware tools).
 
 test("rss_fetch declares an outputSchema (contract validation on return)", () => {
   assert.ok(server._registeredTools.rss_fetch.outputSchema, "rss_fetch has an outputSchema");
@@ -601,4 +596,171 @@ test("a ListEnvelope over the mapped archive parses against the contract and pre
   }
 });
 
-// NOTE: rss_substack_archive tests (Task 2) are appended in the next commit.
+// --- (o) rss_substack_archive: guarded getJson + graceful RSS fallback ------
+//
+// Mirror the lemmy SEC-01 pattern: the registered handler builds its getJson/
+// getText opts internally, so the archive-with-fallback logic is factored into
+// the exported, injectable `fetchSubstackArchive`. Success, HTML-200 ->
+// content-type gate -> RSS-window fallback (the EXPECTED path, D-10), and SSRF
+// reject on the user-supplied publication host are all driven offline.
+
+// A JSON response shim exposing headers.get() for getJson's content-type gate.
+const jsonRes = (status, data, ct = "application/json") => ({
+  ok: status >= 200 && status < 300,
+  status,
+  headers: {
+    get: (k) => (String(k).toLowerCase() === "content-type" ? ct : null),
+  },
+  async json() {
+    return data;
+  },
+});
+// A raw-text response shim for getText (feed fallback window). No redirects.
+const textRes = (status, body, ct = "application/xml") => ({
+  ok: status >= 200 && status < 300,
+  status,
+  headers: {
+    get: (k) => {
+      const key = String(k).toLowerCase();
+      if (key === "content-type") return ct;
+      return null; // no Location -> not a redirect
+    },
+  },
+  async text() {
+    return body;
+  },
+});
+const publicLookup = async () => [{ address: "93.184.216.34", family: 4 }];
+const privateLookup = async () => [{ address: "10.0.0.5", family: 4 }];
+
+test("resolveSubstackPublication accepts a bare slug, a bare host, and a full URL", () => {
+  assert.equal(resolveSubstackPublication("pub"), "pub.substack.com");
+  assert.equal(resolveSubstackPublication("pub.substack.com"), "pub.substack.com");
+  assert.equal(
+    resolveSubstackPublication("https://pub.substack.com/archive"),
+    "pub.substack.com",
+  );
+  assert.equal(resolveSubstackPublication("  PUB  "), "pub.substack.com"); // trimmed + lowercased
+  assert.throws(() => resolveSubstackPublication(""), /publication/i);
+});
+
+test("rss_substack_archive success: archive JSON-200 fills score/num_comments (D-09)", async () => {
+  const env = await fetchSubstackArchive("pub", {
+    jsonOpts: {
+      fetchImpl: async () => jsonRes(200, archivePosts),
+      sleep: async () => {},
+      lookup: publicLookup,
+      cacheKey: "rss:archive-success",
+    },
+  });
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env));
+  assert.equal(env.source, "rss");
+  assert.equal(env.query, "pub");
+  assert.equal(env.count, archivePosts.length);
+  assert.equal(env.results[0].score, 128);
+  assert.equal(env.results[0].num_comments, 17);
+});
+
+test("rss_substack_archive fallback: an HTML-200 archive degrades to the RSS window, no hard-error (D-10)", async () => {
+  const loginHtml = rawFixture("substack-archive-loginhtml.html");
+  const feedXml = fixture("rss-substack-feed");
+  const env = await fetchSubstackArchive("pub", {
+    // archive returns a text/html login page -> content-type gate rejects it.
+    jsonOpts: {
+      fetchImpl: async () => jsonRes(200, loginHtml, "text/html; charset=utf-8"),
+      sleep: async () => {},
+      lookup: publicLookup,
+      cacheKey: "rss:archive-html200",
+    },
+    // fallback getText serves the RSS window.
+    textOpts: {
+      fetchImpl: async () => textRes(200, feedXml),
+      sleep: async () => {},
+      lookup: publicLookup,
+      cacheKey: "rss:archive-fallback-feed",
+    },
+  });
+  // The EXPECTED path: a contract-valid envelope from the feed window, never a throw.
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env));
+  assert.ok(env.results.length >= 1, "fallback feed yields items");
+  for (const it of env.results) {
+    assert.equal(it.type, "article");
+    // RSS-window items carry null engagement (the enrichment is archive-only).
+    assert.strictEqual(it.score, null);
+    assert.strictEqual(it.num_comments, null);
+  }
+});
+
+test("rss_substack_archive SSRF: a private/loopback/metadata publication host is rejected on the guarded path (D-08)", async () => {
+  // (i) a host that RESOLVES to a private IP (injected privateLookup).
+  await assert.rejects(
+    () =>
+      getJson("https://internal.substack.test/api/v1/archive", {
+        fetchImpl: async () => jsonRes(200, archivePosts), // must never be read
+        sleep: async () => {},
+        lookup: privateLookup,
+        untrustedHost: true,
+        cacheKey: "rss:archive-ssrf-private",
+      }),
+    /blocked address/,
+  );
+  // (ii) literal loopback + link-local metadata IPs reject with no DNS.
+  for (const host of ["http://127.0.0.1", "http://169.254.169.254"]) {
+    await assert.rejects(
+      () =>
+        getJson(`${host}/api/v1/archive`, {
+          fetchImpl: async () => jsonRes(200, archivePosts),
+          sleep: async () => {},
+          lookup: publicLookup, // ignored — IP-literal is classified directly
+          untrustedHost: true,
+          cacheKey: `rss:archive-ssrf-${host}`,
+        }),
+      /blocked address/,
+    );
+  }
+});
+
+test("rss_substack_archive: a private-host publication throws on BOTH paths (never a fake envelope)", async () => {
+  // Both the archive getJson AND the getText fallback ride assertSafeUrl, so a
+  // blocked host ends in a thrown SSRF error, not a silently-degraded envelope.
+  await assert.rejects(
+    () =>
+      fetchSubstackArchive("internal.substack.test", {
+        jsonOpts: {
+          fetchImpl: async () => jsonRes(200, archivePosts),
+          sleep: async () => {},
+          lookup: privateLookup,
+          cacheKey: "rss:archive-both-private-json",
+        },
+        textOpts: {
+          fetchImpl: async () => textRes(200, "<rss/>"),
+          sleep: async () => {},
+          lookup: privateLookup,
+          cacheKey: "rss:archive-both-private-text",
+        },
+      }),
+    /blocked address/,
+  );
+});
+
+test("rss_substack_archive is registered { publication } + outputSchema and documents the archive-vs-window tradeoff", () => {
+  const tool = server._registeredTools.rss_substack_archive;
+  assert.ok(tool, "rss_substack_archive is registered");
+  assert.ok(tool.outputSchema, "has an outputSchema");
+  assert.deepEqual(Object.keys(tool.inputSchema.shape).sort(), ["publication"]);
+  // Description names the enrichment vs the RSS-window fallback + the recipes doc.
+  assert.match(tool.description, /archive/i);
+  assert.match(tool.description, /AUTHOR-BLOG-RECIPES\.md/);
+});
+
+// Finalized registration smoke: EXACTLY the four rss tools, each with an outputSchema.
+test("rss server registers EXACTLY the four writer-aware tools, each with an outputSchema", () => {
+  const tools = server._registeredTools ?? {};
+  assert.deepEqual(
+    Object.keys(tools).sort(),
+    ["rss_author_posts", "rss_fetch", "rss_substack_archive", "rss_tag_posts"],
+  );
+  for (const name of Object.keys(tools)) {
+    assert.ok(tools[name].outputSchema, `${name} declares an outputSchema`);
+  }
+});
