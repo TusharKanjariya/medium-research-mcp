@@ -172,8 +172,13 @@ export function mapRssItem(item) {
  */
 export function mapAtomEntry(entry) {
   const href = pickAlternate(entry.link);
+  // WR-01 parity: coerce through textOf like the summary/content siblings — a
+  // <media:description type="…"> carrying any XML attribute parses to an object
+  // ({ "#text": "…", "@_…": "…" }); un-coerced it lands in `text` and stringifies
+  // to "[object Object]" downstream. textOf collapses it to its #text string (or
+  // null, letting <summary>/<content> take over).
   const text =
-    entry["media:group"]?.["media:description"] ??
+    textOf(entry["media:group"]?.["media:description"]) ??
     textOf(entry.summary) ??
     textOf(entry.content) ??
     null;

@@ -234,6 +234,35 @@ test("mapAtomEntry prefers media:group>media:description then summary then conte
   assert.equal(mapAtomEntry({ title: "t", content: { "#text": "CONTENT" } }).text, "CONTENT");
 });
 
+// WR-01 parity: a <media:description> carrying an attribute parses to an object;
+// un-coerced it lands in text and stringifies to "[object Object]" downstream.
+// It must collapse to its #text string (or fall back), and the envelope must
+// still validate against the contract schema.
+test("mapAtomEntry coerces an object-valued media:description (attribute present) to its #text string (WR-01)", () => {
+  const m = mapAtomEntry({
+    title: "t",
+    link: { "@_rel": "alternate", "@_href": "http://x/1" },
+    "media:group": {
+      "media:description": { "#text": "Real video description", "@_type": "plain" },
+    },
+    summary: "fallback summary",
+  });
+  assert.equal(typeof m.text, "string");
+  assert.equal(m.text, "Real video description");
+  const env = buildListEnvelope({ source: "rss", query: "q", results: [m] });
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env));
+  assert.ok(!env.results[0].text.includes("[object Object]"));
+});
+
+test("mapAtomEntry falls back to summary when media:description is an attribute-only object (WR-01)", () => {
+  const m = mapAtomEntry({
+    title: "t",
+    "media:group": { "media:description": { "@_type": "plain" } },
+    summary: "fallback summary",
+  });
+  assert.equal(m.text, "fallback summary");
+});
+
 // --- (d) reddit subreddit recipe (D-06) ----------------------------------
 
 test("reddit .rss parses via the subreddit recipe to schema-valid items (D-06)", () => {
