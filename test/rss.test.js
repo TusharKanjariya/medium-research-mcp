@@ -28,6 +28,8 @@ import {
   mapRssItem,
   mapAtomEntry,
   pickAlternate,
+  resolveAuthorFeed,
+  markPreviewOnly,
   server,
 } from "../servers/rss/server.js";
 import { buildListEnvelope, ListEnvelopeSchema } from "../shared/contract.js";
@@ -318,4 +320,87 @@ test("rss server registers exactly ['rss_fetch']", () => {
 
 test("rss_fetch declares an outputSchema (contract validation on return)", () => {
   assert.ok(server._registeredTools.rss_fetch.outputSchema, "rss_fetch has an outputSchema");
+});
+
+// --- (j) resolveAuthorFeed platform inference (D-02/D-03) -----------------
+//
+// The `author` string's SHAPE selects the platform. Ambiguous bare tokens MUST
+// throw — the server never synthesizes/guesses a host (T-06-03 SSRF/typo footgun).
+
+test("resolveAuthorFeed: @handle -> Medium profile feed (trimmed)", () => {
+  assert.equal(resolveAuthorFeed("@ev"), "https://medium.com/feed/@ev");
+  assert.equal(resolveAuthorFeed("  @ev  "), "https://medium.com/feed/@ev");
+});
+
+test("resolveAuthorFeed: bare *.substack.com host -> the publication feed", () => {
+  assert.equal(resolveAuthorFeed("pub.substack.com"), "https://pub.substack.com/feed");
+});
+
+test("resolveAuthorFeed: a full Substack URL -> the same publication feed", () => {
+  assert.equal(
+    resolveAuthorFeed("https://pub.substack.com/p/some-slug"),
+    "https://pub.substack.com/feed",
+  );
+});
+
+test("resolveAuthorFeed: any other http(s):// URL -> the raw feed URL, unchanged", () => {
+  assert.equal(
+    resolveAuthorFeed("https://example.com/feed.xml"),
+    "https://example.com/feed.xml",
+  );
+});
+
+test("resolveAuthorFeed: an ambiguous bare token throws and never guesses a host (D-03/T-06-03)", () => {
+  // Error names the three accepted forms.
+  assert.throws(() => resolveAuthorFeed("someuser"), /@handle|substack\.com|feed URL/i);
+  assert.throws(() => resolveAuthorFeed(""), /author/i);
+  // A bare host that is NOT a substack host (even though it mentions substack.com
+  // in a path) must not resolve to a fabricated host.
+  assert.throws(() => resolveAuthorFeed("evil.com/substack.com"), /@handle|substack\.com|feed URL/i);
+  // Prove no return value leaks from the ambiguous path.
+  let resolved = null;
+  try {
+    resolved = resolveAuthorFeed("someuser");
+  } catch {
+    /* expected */
+  }
+  assert.equal(resolved, null, "must not fabricate a host from a bare token");
+});
+
+// --- (k) preview-only marker detection (D-06/D-07) ------------------------
+//
+// Truncated/paywalled feed bodies get the literal `preview-only` appended to
+// tags[] (never a new field, never a text edit); a full item is untouched.
+
+test("markPreviewOnly: a Substack 'Read more' teaser gets preview-only in tags[]; text untouched", () => {
+  const item = {
+    title: "Paid",
+    tags: ["essay"],
+    text: "<p>Intro paragraph…</p><p><a href='https://x/p'>Read more</a></p>",
+  };
+  const out = markPreviewOnly(item);
+  assert.ok(out.tags.includes("preview-only"));
+  assert.equal(out.text, item.text, "text is never modified");
+});
+
+test("markPreviewOnly: a Medium member-only / abstract-only item gets preview-only", () => {
+  const item = {
+    title: "Members",
+    tags: [],
+    text: "<p>A short abstract…</p><p>Continue reading on Medium »</p>",
+  };
+  const out = markPreviewOnly(item);
+  assert.ok(out.tags.includes("preview-only"));
+});
+
+test("markPreviewOnly: a normal full item is untouched (no preview-only)", () => {
+  const item = { title: "Free", tags: ["news"], text: "<p>A complete public post body.</p>" };
+  const out = markPreviewOnly(item);
+  assert.deepEqual(out.tags, ["news"]);
+});
+
+test("markPreviewOnly: never appends preview-only twice", () => {
+  const item = { title: "P", tags: ["preview-only"], text: "Read more" };
+  const out = markPreviewOnly(item);
+  assert.equal(out.tags.filter((t) => t === "preview-only").length, 1);
 });
