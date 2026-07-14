@@ -83,7 +83,20 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
   4. A login-required Discourse or locked-down (`AUTHORIZED_FETCH`) Mastodon instance yields a clear tool-level error, not a crash or a contract violation
   5. The parameterization audit passes: no hardcoded accounts/instances/feeds anywhere in the suite; Lemmy's instance is a tool parameter with env as optional default only
 
-**Plans**: TBD
+**Plans**: 4 plans
+
+**Wave 1**
+
+- [ ] 07-01-PLAN.md — Wave 1 — contract TYPE append (`topic`/`status`) + Lemmy instance parameterization with host-gated Bearer (SEC-02, D-05/D-09/D-13/D-15)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 07-02-PLAN.md — Wave 2 — Discourse server: discourse_latest/top/topic over the guarded path, category `slug/id` route, D-11 login-failure UX (SRC-10)
+- [ ] 07-03-PLAN.md — Wave 2 — Mastodon server: public/hashtag timelines + trending tags/links, limit clamp 40, trends-disabled→empty, 401/422 lockdown UX (SRC-11, SRC-13)
+
+**Wave 3** *(blocked on Waves 1–2)*
+
+- [ ] 07-04-PLAN.md — Wave 3 — SEC-02 parameterization audit test: allowlist scan of servers/*/server.js + rss resolve* helpers, negative control (SEC-02, D-16)
 
 ### Phase 8: Universal Distribution
 
