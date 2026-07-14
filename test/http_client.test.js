@@ -931,3 +931,108 @@ test("getText() rejects an initial private-resolving host before fetching (D-02)
   );
   assert.equal(fetchImpl.calls, 0, "no fetch when the initial host is blocked");
 });
+
+// --- D-14 / Pitfall 1: Medium 403 -> clear terminal error ----------------
+test("getText() maps a Medium 403 to a clear 'Medium is blocking' error (D-14)", async () => {
+  const fetchImpl = fetchStub([textRes(403)]);
+  const sleep = sleepSpy();
+  await assert.rejects(
+    () =>
+      getText("https://medium.com/feed/@someone", {
+        fetchImpl,
+        sleep,
+        lookup: publicLookup,
+        cacheKey: "text:medium-403",
+      }),
+    /Medium is blocking/i,
+  );
+  assert.equal(fetchImpl.calls, 1, "a 403 is terminal — fetched exactly once (no retry)");
+  assert.deepEqual(sleep.waited, [], "no backoff on a 4xx");
+});
+
+test("getText() Medium-403 error carries no query string (redactUrl — T-06-01)", async () => {
+  const fetchImpl = fetchStub([textRes(403)]);
+  await assert.rejects(
+    () =>
+      getText("https://medium.com/feed/@someone?token=SECRET&x=1", {
+        fetchImpl,
+        sleep: sleepSpy(),
+        lookup: publicLookup,
+        cacheKey: "text:medium-403-redact",
+      }),
+    (err) => {
+      assert.match(err.message, /Medium is blocking/i);
+      assert.ok(!err.message.includes("?"), "no query segment leaks");
+      assert.ok(!err.message.includes("SECRET"), "no query-carried secret leaks");
+      return true;
+    },
+  );
+});
+
+test("getText() sub-domain medium 403 also maps to the clear error (.medium.com)", async () => {
+  const fetchImpl = fetchStub([textRes(403)]);
+  await assert.rejects(
+    () =>
+      getText("https://www.medium.com/feed/@someone", {
+        fetchImpl,
+        sleep: sleepSpy(),
+        lookup: publicLookup,
+        cacheKey: "text:medium-403-sub",
+      }),
+    /Medium is blocking/i,
+  );
+  assert.equal(fetchImpl.calls, 1);
+});
+
+// --- host-gating: a non-Medium 403 keeps the verbatim generic message ----
+test("getText() 403 from a non-Medium host keeps the generic 'getText: HTTP 403' message", async () => {
+  const fetchImpl = fetchStub([textRes(403)]);
+  const sleep = sleepSpy();
+  await assert.rejects(
+    () =>
+      getText("https://example.com/feed", {
+        fetchImpl,
+        sleep,
+        lookup: publicLookup,
+        cacheKey: "text:nonmedium-403",
+      }),
+    (err) => {
+      assert.match(err.message, /getText: HTTP 403/);
+      assert.ok(!/Medium is blocking/i.test(err.message), "non-Medium host is not special-cased");
+      return true;
+    },
+  );
+  assert.equal(fetchImpl.calls, 1, "still terminal — one fetch, no retry");
+  assert.deepEqual(sleep.waited, []);
+});
+
+test("getText() a look-alike host (notmedium.com) is NOT treated as Medium (boundary-safe)", async () => {
+  const fetchImpl = fetchStub([textRes(403)]);
+  await assert.rejects(
+    () =>
+      getText("https://notmedium.com/feed", {
+        fetchImpl,
+        sleep: sleepSpy(),
+        lookup: publicLookup,
+        cacheKey: "text:notmedium-403",
+      }),
+    /getText: HTTP 403/,
+  );
+});
+
+// --- no stale served on a Medium 403 (terminal 4xx — WR-04 parity) --------
+test("getText() does NOT serve a stale entry on a Medium 403 — it throws (WR-04 parity)", async () => {
+  cacheSet("text:medium-403-stale", "<rss>old-medium</rss>", -1000); // expired seed
+  const fetchImpl = fetchStub([textRes(403)]);
+  await assert.rejects(
+    () =>
+      getText("https://medium.com/feed/@someone", {
+        fetchImpl,
+        sleep: sleepSpy(),
+        lookup: publicLookup,
+        cacheKey: "text:medium-403-stale",
+      }),
+    /Medium is blocking/i,
+  );
+  assert.equal(fetchImpl.calls, 1, "403 not retried");
+});
