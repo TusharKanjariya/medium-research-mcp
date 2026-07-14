@@ -228,6 +228,42 @@ test("each discourse tool declares an outputSchema (contract validation on retur
   }
 });
 
+// --- WR-01: category "slug/id" token validation at the schema boundary ----
+//
+// `category` is interpolated straight into the request path, so its shape is
+// validated by zod BEFORE the handler builds the URL. A malformed token
+// (carrying `?`, `#`, `../`, or a stray `/`) is rejected up front; the
+// legitimate "slug/id" form still passes (the single `/` must survive).
+
+test("WR-01: a malformed category token is rejected before the URL is built", () => {
+  for (const name of ["discourse_latest", "discourse_top"]) {
+    const shape = server._registeredTools[name].inputSchema.shape;
+    assert.ok(shape.category, `${name} declares category`);
+    for (const bad of [
+      "foo/bar?x=1", // query-string injection folds the /l/...json suffix away
+      "../../admin", // path traversal
+      "support", // slug-only (no numeric id)
+      "support/", // trailing slash, no id
+      "support/6/extra", // stray extra segment
+      "support/6#frag", // fragment truncation
+    ]) {
+      const res = shape.category.safeParse(bad);
+      assert.equal(res.success, false, `${name} rejects category=${JSON.stringify(bad)}`);
+      const msg = res.error.issues.map((i) => i.message).join(" ");
+      assert.match(msg, /slug\/id/, "readable slug/id rejection message");
+    }
+  }
+});
+
+test("WR-01: a valid slug/id category is accepted (and an omitted one — optional)", () => {
+  for (const name of ["discourse_latest", "discourse_top"]) {
+    const shape = server._registeredTools[name].inputSchema.shape;
+    assert.equal(shape.category.safeParse("support/6").success, true);
+    assert.equal(shape.category.safeParse("dev-help/123").success, true);
+    assert.equal(shape.category.safeParse(undefined).success, true, "optional");
+  }
+});
+
 test("discourse_top declares the six-value period enum (D-04)", () => {
   const shape = server._registeredTools["discourse_top"].inputSchema.shape;
   assert.ok(shape.period, "period is declared");

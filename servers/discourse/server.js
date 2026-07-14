@@ -48,6 +48,19 @@ const SOURCE = "discourse";
 // fetch, so the upstream `?period=bogus` -> HTTP 400 never surfaces.
 const PERIOD = ["daily", "weekly", "monthly", "quarterly", "yearly", "all"];
 
+// WR-01: `category` is the combined "slug/id" token interpolated straight into
+// the request PATH (/c/<slug>/<id>/l/{latest,top}.json). It is the one user value
+// in this server that is neither encoded nor validated, so validate its SHAPE at
+// the schema boundary — a slug (lowercase letters/digits/hyphen) + "/" + numeric
+// id — rejecting the value BEFORE the URL is built. This blocks a `?` (which would
+// fold the intended `/l/...json` suffix into a query string and change the
+// endpoint), a `#` (fragment-truncates the path), `../` (path traversal), and a
+// stray extra `/`. A blanket encodeURIComponent is WRONG here: the single `/`
+// between slug and id is legitimate and must survive (D-02 Option 1).
+const CATEGORY_TOKEN = z
+  .string()
+  .regex(/^[a-z0-9-]+\/\d+$/i, 'category must be the "slug/id" token, e.g. "support/6"');
+
 // --- Instance parameterization (D-13, SEC-02) -----------------------------
 //
 // The instance is an untrusted per-call tool parameter. normalizeInstance()
@@ -210,7 +223,7 @@ server.registerTool(
       "`limit` bounds results.",
     inputSchema: {
       instance: z.string(),
-      category: z.string().optional(),
+      category: CATEGORY_TOKEN.optional(),
       limit: z.number().int().min(1).max(50).optional(),
     },
     outputSchema: listEnvelopeShape,
@@ -246,7 +259,7 @@ server.registerTool(
     inputSchema: {
       instance: z.string(),
       period: z.enum(PERIOD),
-      category: z.string().optional(),
+      category: CATEGORY_TOKEN.optional(),
       limit: z.number().int().min(1).max(50).optional(),
     },
     outputSchema: listEnvelopeShape,
