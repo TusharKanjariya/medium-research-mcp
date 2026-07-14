@@ -25,6 +25,9 @@ import {
   mapLemmyDetail,
   bearerHeaders,
   lemmyAuthHeaders,
+  normalizeInstance,
+  authInstanceMatches,
+  resolveLemmyHeaders,
   server,
 } from "../servers/lemmy/server.js";
 import {
@@ -141,6 +144,83 @@ test("lemmyAuthHeaders is anonymous (empty headers, no throw) when lemmyJwt is n
   assert.deepEqual(headers, {});
 });
 
+// --- instance normalization (D-13) --------------------------------------
+
+test("normalizeInstance defaults a scheme-less instance to https and strips a trailing slash", () => {
+  assert.equal(normalizeInstance("lemmy.world"), "https://lemmy.world");
+  assert.equal(normalizeInstance("https://lemmy.world/"), "https://lemmy.world");
+  assert.equal(normalizeInstance("https://lemmy.world///"), "https://lemmy.world");
+  // an explicit http scheme is preserved (no forced upgrade — SSRF guard vets it)
+  assert.equal(normalizeInstance("http://lemmy.world"), "http://lemmy.world");
+  // surrounding whitespace is trimmed
+  assert.equal(normalizeInstance("  lemmy.world  "), "https://lemmy.world");
+});
+
+test("normalizeInstance throws a readable, host-literal-free error on empty input", () => {
+  for (const bad of ["", "   ", null, undefined]) {
+    assert.throws(() => normalizeInstance(bad), /instance is required/);
+  }
+  // SEC-02: the error must NOT embed a specific Lemmy forum host literal
+  try {
+    normalizeInstance("");
+  } catch (err) {
+    assert.ok(
+      !/programming\.dev|lemmy\.world/.test(err.message),
+      "empty-input error names no specific forum host",
+    );
+  }
+});
+
+// --- host-gated Bearer decision (D-15, Open Q3) -------------------------
+//
+// The env JWT is minted for lemmyCreds().instance (= LEMMY_INSTANCE). It must
+// NEVER be replayed to a caller-chosen instance. authInstanceMatches() is the
+// pure host-compare seam; resolveLemmyHeaders() wraps lemmyAuthHeaders() behind
+// it. Both are driven with an injected credsImpl/jwtImpl — no network, no env.
+
+const envCreds = () => ({ instance: "https://programming.dev", user: "u", pass: "p" });
+const noCreds = () => undefined;
+
+test("authInstanceMatches is true only when the effective base host equals the env auth host", () => {
+  // same host (scheme/trailing-slash differences are normalized away)
+  assert.equal(authInstanceMatches("https://programming.dev", { credsImpl: envCreds }), true);
+  assert.equal(authInstanceMatches("programming.dev", { credsImpl: envCreds }), true);
+  assert.equal(authInstanceMatches("https://programming.dev/", { credsImpl: envCreds }), true);
+  // different host -> no match (token must not cross)
+  assert.equal(authInstanceMatches("https://lemmy.world", { credsImpl: envCreds }), false);
+  // no auth creds configured -> never matches (stays anonymous)
+  assert.equal(authInstanceMatches("https://programming.dev", { credsImpl: noCreds }), false);
+});
+
+test("resolveLemmyHeaders sends the Bearer when the instance host matches the env auth host", async () => {
+  const headers = await resolveLemmyHeaders("https://programming.dev", {
+    credsImpl: envCreds,
+    jwtImpl: async () => "jwt-abc",
+  });
+  assert.deepEqual(headers, { Authorization: "Bearer jwt-abc" });
+});
+
+test("resolveLemmyHeaders is anonymous ({}) when a tool-param instance host differs from the env host", async () => {
+  let jwtCalled = false;
+  const headers = await resolveLemmyHeaders("https://lemmy.world", {
+    credsImpl: envCreds,
+    jwtImpl: async () => {
+      jwtCalled = true;
+      return "jwt-abc";
+    },
+  });
+  assert.deepEqual(headers, {}, "no Bearer replayed to a caller-chosen host");
+  assert.equal(jwtCalled, false, "the env token is never even resolved for a mismatched host");
+});
+
+test("resolveLemmyHeaders is anonymous when no LEMMY auth creds are configured", async () => {
+  const headers = await resolveLemmyHeaders("https://programming.dev", {
+    credsImpl: noCreds,
+    jwtImpl: async () => "jwt-abc",
+  });
+  assert.deepEqual(headers, {});
+});
+
 // --- contract conformance (OUT-01) --------------------------------------
 
 test("mapLemmyPost results build a list envelope that parses against the contract schema", () => {
@@ -209,6 +289,8 @@ const jsonRes = (status, data, ct = "application/json") => ({
 });
 const publicLookup = async () => [{ address: "93.184.216.34", family: 4 }];
 const privateLookup = async () => [{ address: "10.0.0.5", family: 4 }];
+const loopbackLookup = async () => [{ address: "127.0.0.1", family: 4 }];
+const metadataLookup = async () => [{ address: "169.254.169.254", family: 4 }];
 
 test("SEC-01: a lemmy instance getJson (untrustedHost) builds a valid list envelope on the guarded path", async () => {
   const fetchImpl = async () => jsonRes(200, list); // lemmy list-shaped payload
@@ -218,6 +300,31 @@ test("SEC-01: a lemmy instance getJson (untrustedHost) builds a valid list envel
     lookup: publicLookup,
     untrustedHost: true,
     cacheKey: "lemmy:guarded-public",
+  });
+  const env = buildListEnvelope({
+    source: "lemmy",
+    query: null,
+    results: (raw?.posts ?? []).map(mapLemmyPost),
+  });
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env));
+  assert.equal(env.count, list.posts.length);
+});
+
+// A user-supplied (tool-param) instance now selects the outbound host, so it
+// rides the SAME guarded path. normalizeInstance shapes the string; getJson's
+// untrustedHost guard vets the resolved IP. A public instance succeeds; a
+// private-range or cloud-metadata instance is rejected — the SSRF acceptance
+// property for the newly parameterized instance param (D-15, Pitfall 5).
+
+test("SEC-01: a public tool-param instance builds a valid envelope on the guarded path", async () => {
+  const fetchImpl = async () => jsonRes(200, list);
+  const base = normalizeInstance("lemmy.world"); // scheme-defaulted user instance
+  const raw = await getJson(`${base}/api/v3/post/list?type_=All`, {
+    fetchImpl,
+    sleep: async () => {},
+    lookup: publicLookup,
+    untrustedHost: true,
+    cacheKey: "lemmy:guarded-param-public",
   });
   const env = buildListEnvelope({
     source: "lemmy",
@@ -238,6 +345,38 @@ test("SEC-01: a lemmy instance resolving to a private IP is blocked on the guard
         lookup: privateLookup,
         untrustedHost: true,
         cacheKey: "lemmy:guarded-private",
+      }),
+    /blocked address/,
+  );
+});
+
+test("SEC-01: a tool-param instance resolving to loopback (127.0.0.1) is rejected", async () => {
+  const fetchImpl = async () => jsonRes(200, list); // must never be read
+  const base = normalizeInstance("localhost.lemmy.test");
+  await assert.rejects(
+    () =>
+      getJson(`${base}/api/v3/post/list?type_=All`, {
+        fetchImpl,
+        sleep: async () => {},
+        lookup: loopbackLookup,
+        untrustedHost: true,
+        cacheKey: "lemmy:guarded-loopback",
+      }),
+    /blocked address/,
+  );
+});
+
+test("SEC-01: a tool-param instance resolving to cloud metadata (169.254.169.254) is rejected", async () => {
+  const fetchImpl = async () => jsonRes(200, list); // must never be read
+  const base = normalizeInstance("metadata.lemmy.test");
+  await assert.rejects(
+    () =>
+      getJson(`${base}/api/v3/post/list?type_=All`, {
+        fetchImpl,
+        sleep: async () => {},
+        lookup: metadataLookup,
+        untrustedHost: true,
+        cacheKey: "lemmy:guarded-metadata",
       }),
     /blocked address/,
   );
