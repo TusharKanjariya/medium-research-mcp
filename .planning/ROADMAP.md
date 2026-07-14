@@ -22,7 +22,7 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
 ### v1.1 Writer-Aware, Universal Research (Phases 5–8)
 
 - [x] **Phase 5: Guarded JSON Path & Trending Signals** - Extend the SSRF guard to a guarded JSON path (the milestone's single gating dependency) and add HN rising, Stack Exchange high-view-unanswered, and Dev.to top-window trending tools (completed 2026-07-10)
-- [ ] **Phase 6: Author-Blog Awareness** - Medium/Substack/raw-feed author tools in the normalized contract with honest coverage windows, Substack archive enrichment, tag feeds, and documented dedup/cadence recipes
+- [x] **Phase 6: Author-Blog Awareness** - Medium/Substack/raw-feed author tools in the normalized contract with honest coverage windows, Substack archive enrichment, tag feeds, and documented dedup/cadence recipes (completed 2026-07-14)
 - [ ] **Phase 7: Universal Sources & Parameterization Audit** - Discourse and Mastodon servers with instance-as-tool-parameter (incl. Mastodon trends), Lemmy parameterized, and the no-hardcoded-targets audit across the suite
 - [ ] **Phase 8: Universal Distribution** - `.mcpb` one-click bundles, npm/`npx` packages, per-client setup docs (Claude Desktop, OpenCode, Codex, Cursor), and the cross-source pain-point sweep recipe
 
@@ -68,7 +68,7 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 06-03-PLAN.md — Wave 2 — rss_substack_archive (guarded JSON archive enrichment + graceful RSS fallback) + docs/AUTHOR-BLOG-RECIPES.md (ABLOG-03/05)
+- [x] 06-03-PLAN.md — Wave 2 — rss_substack_archive (guarded JSON archive enrichment + graceful RSS fallback) + docs/AUTHOR-BLOG-RECIPES.md (ABLOG-03/05)
 
 ### Phase 7: Universal Sources & Parameterization Audit
 
@@ -119,7 +119,7 @@ Not part of the v1.1 milestone. Tracked for a later milestone (start via `/gsd-n
 | 3. Keyed Ecosystem & Launch Sources | v1.0 | 2/2 | Complete | 2026-07-02 |
 | 4. RSS Multiplier & Output Proof | v1.0 | 4/4 | Complete | 2026-07-03 |
 | 5. Guarded JSON Path & Trending Signals | v1.1 | 4/4 | Complete    | 2026-07-10 |
-| 6. Author-Blog Awareness | v1.1 | 2/3 | In Progress|  |
+| 6. Author-Blog Awareness | v1.1 | 3/3 | Complete    | 2026-07-14 |
 | 7. Universal Sources & Parameterization Audit | v1.1 | 0/? | Not started | - |
 | 8. Universal Distribution | v1.1 | 0/? | Not started | - |
 
