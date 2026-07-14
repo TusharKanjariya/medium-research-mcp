@@ -31,6 +31,7 @@ import {
   mapTrendingTag,
   mapTrendingLink,
   mapMastodonError,
+  mapTimelineStatuses,
   normalizeInstance,
   server,
 } from "../servers/mastodon/server.js";
@@ -275,6 +276,33 @@ test("mapMastodonError maps an HTTP 401 to the D-11 lockdown message", () => {
 test("mapMastodonError passes an unrelated error through unchanged", () => {
   const err = new Error("getJson: HTTP 500 from https://x.example.test/api/v1/timelines/public");
   assert.equal(mapMastodonError(err, BASE), err);
+});
+
+// --- WR-02: a non-array timeline body is a lockdown signal, not a TypeError -
+
+test("WR-02: a non-array timeline body yields the clear lockdown error, never a raw TypeError", () => {
+  // A 200 carrying an object (e.g. {"error":...}) instead of an array would make
+  // `.map` throw `TypeError: arr.map is not a function`. mapTimelineStatuses maps
+  // it to the SAME clear D-11 lockdown message the 401/422 path produces.
+  for (const body of [{ error: "This method requires an authenticated user" }, {}, null, "nope"]) {
+    assert.throws(
+      () => mapTimelineStatuses(body, BASE),
+      (err) => {
+        assert.ok(!(err instanceof TypeError), "not a raw TypeError");
+        assert.match(err.message, /disallows anonymous reads/);
+        assert.match(err.message, /locked\.example\.test/, "names the instance");
+        return true;
+      },
+      `body=${JSON.stringify(body)}`,
+    );
+  }
+});
+
+test("WR-02: an array timeline body maps normally to contract items", () => {
+  const results = mapTimelineStatuses(timeline, BASE);
+  assert.equal(results.length, timeline.length);
+  assert.equal(results[0].id, String(timeline[0].id));
+  assert.equal(results[0].type, "status");
 });
 
 // --- guarded path (untrustedHost): D-11 terminal + D-10 empty + SSRF ------

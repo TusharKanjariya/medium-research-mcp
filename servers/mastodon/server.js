@@ -178,13 +178,34 @@ export function mapTrendingLink(card) {
 // propagate everything else. Exported so the D-11 mapping is unit-testable offline
 // (the handler wraps its own getJson opts, so there is no injection seam at the
 // tool boundary).
+function lockdownError(base) {
+  return new Error(
+    `Instance ${base} disallows anonymous reads — try another instance (this tool is keyless).`,
+  );
+}
+
 export function mapMastodonError(err, base) {
   if (/HTTP (401|422)/.test(err?.message ?? "")) {
-    return new Error(
-      `Instance ${base} disallows anonymous reads — try another instance (this tool is keyless).`,
-    );
+    return lockdownError(base);
   }
   return err;
+}
+
+// --- WR-02: timeline responses must be a JSON array -----------------------
+//
+// A public/hashtag timeline endpoint returns a JSON array. `getJson` returns
+// whatever JSON the upstream sent, so a 200 carrying an OBJECT instead (e.g.
+// `{"error":"..."}` returned with a 200, or a proxy/interstitial JSON object)
+// would make `.map` throw a raw `TypeError: arr.map is not a function` — which
+// `mapMastodonError` does NOT recognize (its message matches neither HTTP 401 nor
+// 422), so it would re-throw verbatim as a confusing crash. An unexpected
+// non-array body from a public timeline is effectively an anonymous-access/lockdown
+// signal, so map it to the SAME clear tool-level error as the D-11 401/422 path
+// rather than a raw TypeError (a tool call never hard-errors — resilience rule).
+// The trends tools keep their own D-10 empty-path handling (leave those as-is).
+export function mapTimelineStatuses(arr, base) {
+  if (!Array.isArray(arr)) throw lockdownError(base);
+  return arr.map(mapMastodonStatus);
 }
 
 // --- D-10 trends-disabled → empty -----------------------------------------
@@ -249,7 +270,7 @@ server.registerTool(
       const env = buildListEnvelope({
         source: SOURCE,
         query: null,
-        results: (arr ?? []).map(mapMastodonStatus),
+        results: mapTimelineStatuses(arr, base), // WR-02: guard a non-array body
       });
       return toolResult(env);
     } catch (err) {
@@ -287,7 +308,7 @@ server.registerTool(
       const env = buildListEnvelope({
         source: SOURCE,
         query: tag,
-        results: (arr ?? []).map(mapMastodonStatus),
+        results: mapTimelineStatuses(arr, base), // WR-02: guard a non-array body
       });
       return toolResult(env);
     } catch (err) {
