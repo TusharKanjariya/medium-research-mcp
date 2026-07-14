@@ -466,11 +466,13 @@ export async function fetchSubstackArchive(
   const host = resolveSubstackPublication(publication);
   const archiveUrl = `https://${host}/api/v1/archive`;
   try {
-    // untrustedHost is MANDATORY (D-08) — spread jsonOpts AFTER so a test may add
-    // fetchImpl/lookup/cacheKey but cannot silently drop the SSRF guard.
+    // untrustedHost is MANDATORY (D-08) — spread jsonOpts FIRST so a caller/test
+    // may add fetchImpl/lookup/cacheKey, but untrustedHost:true is applied LAST
+    // and therefore cannot be overridden (last-write-wins): the SSRF guard on the
+    // one path that fetches a user-supplied host can never be silently dropped.
     const posts = await getJsonImpl(archiveUrl, {
-      untrustedHost: true,
       ...jsonOpts,
+      untrustedHost: true,
     });
     const results = (Array.isArray(posts) ? posts : []).map(mapSubstackArchiveItem);
     return buildListEnvelope({ source: SOURCE, query: publication, results });

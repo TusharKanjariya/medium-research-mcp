@@ -772,6 +772,31 @@ test("rss_substack_archive: a private-host publication throws on BOTH paths (nev
   );
 });
 
+test("rss_substack_archive: a caller-supplied untrustedHost:false cannot override the mandatory SSRF guard (WR-02)", async () => {
+  // The opts object applies untrustedHost:true LAST, so even a jsonOpts that
+  // explicitly tries to disable the guard is overridden — the private host on
+  // the archive path still rejects (it must never reach the fake envelope).
+  await assert.rejects(
+    () =>
+      fetchSubstackArchive("internal.substack.test", {
+        jsonOpts: {
+          untrustedHost: false, // hostile/mistaken attempt to drop the guard
+          fetchImpl: async () => jsonRes(200, archivePosts), // must never be read
+          sleep: async () => {},
+          lookup: privateLookup,
+          cacheKey: "rss:archive-wr02-override-json",
+        },
+        textOpts: {
+          fetchImpl: async () => textRes(200, "<rss/>"),
+          sleep: async () => {},
+          lookup: privateLookup,
+          cacheKey: "rss:archive-wr02-override-text",
+        },
+      }),
+    /blocked address/,
+  );
+});
+
 test("rss_substack_archive is registered { publication } + outputSchema and documents the archive-vs-window tradeoff", () => {
   const tool = server._registeredTools.rss_substack_archive;
   assert.ok(tool, "rss_substack_archive is registered");
