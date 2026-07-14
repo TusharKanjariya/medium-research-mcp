@@ -209,6 +209,103 @@ export function normalizeFeed(parsed, feedUrl) {
   throw new Error(`rss: ${feedUrl} is not a valid RSS/Atom feed`);
 }
 
+// --- author/tag inference + preview marker (Phase 6, ABLOG-01/02/04) ------
+
+/**
+ * Resolve a single smart `author` string to a feed URL by its SHAPE (D-02/D-03).
+ * PURE — no fetch; the returned URL is fetched downstream by getText, whose
+ * assertSafeUrl enforces the scheme allowlist + private-range denylist on every
+ * hop, so the raw-URL branch is NOT specially trusted.
+ *
+ *   - leading `@`            -> Medium profile feed  https://medium.com/feed/@<user>
+ *   - a `<pub>.substack.com` host (bare OR inside a full http(s):// URL)
+ *                           -> Substack feed        https://<pub>.substack.com/feed
+ *   - any other http(s)://  -> the raw feed URL, verbatim
+ *   - a bare token (no @, no *.substack.com host, no scheme) -> THROW.
+ *
+ * The ambiguous case throws rather than guessing a host: synthesizing a host from
+ * a bare name is an SSRF/typo footgun and breaks the keyless-explicit premise
+ * (T-06-03). The error names the three accepted forms.
+ */
+export function resolveAuthorFeed(author) {
+  const raw = typeof author === "string" ? author.trim() : "";
+  const forms =
+    "supply one of: an @handle (Medium, e.g. @ev), a *.substack.com " +
+    "publication (e.g. pub.substack.com), or a full http(s):// feed URL";
+  if (!raw) {
+    throw new Error(`rss_author_posts: author is required — ${forms}.`);
+  }
+
+  // 1. Medium @handle -> profile feed (encode the user segment).
+  if (raw.startsWith("@")) {
+    const user = raw.slice(1);
+    if (!user) {
+      throw new Error(`rss_author_posts: "${raw}" is not a valid @handle — ${forms}.`);
+    }
+    return `https://medium.com/feed/@${encodeURIComponent(user)}`;
+  }
+
+  const hasScheme = /^https?:\/\//i.test(raw);
+
+  // 2. Substack: extract the host, accept ONLY a real <pub>.substack.com host so
+  //    a string that merely mentions "substack.com" in a path cannot fabricate a
+  //    host. A full Substack URL and a bare pub host both collapse to /feed.
+  let host = null;
+  if (hasScheme) {
+    try {
+      host = new URL(raw).hostname.toLowerCase();
+    } catch {
+      host = null;
+    }
+  } else {
+    host = raw.split("/")[0].toLowerCase();
+  }
+  if (host && host.endsWith(".substack.com")) {
+    return `https://${host}/feed`;
+  }
+
+  // 3. Any other explicit http(s):// URL -> raw feed URL, verbatim (getText guards it).
+  if (hasScheme) return raw;
+
+  // 4. Ambiguous bare token -> throw; NEVER guess a host.
+  throw new Error(
+    `rss_author_posts: ambiguous author "${raw}" — a bare name cannot be ` +
+      `resolved to a host; ${forms}.`,
+  );
+}
+
+/** The literal tag appended to an item's tags[] when its body is a teaser/preview. */
+export const PREVIEW_TAG = "preview-only";
+
+/**
+ * Detect a truncated / paywalled feed body and append the literal `preview-only`
+ * to the item's tags[] (D-06/D-07). Machine-readable for the consuming skill and
+ * keeps `text` clean — the contract stays frozen (`tags` is an existing field).
+ *
+ * Heuristics (tunable per CONTEXT "Claude's Discretion"; the MARKER + tags-append
+ * contract are locked): a Substack paid post truncates its body with a trailing
+ * "Read more" (or a "for paid/paying subscribers" notice); a Medium member-only
+ * story ships an abstract that tails off with "Continue reading on Medium" or a
+ * "member-only" marker. Detection runs over a tag-stripped copy of `text` so an
+ * HTML-wrapped "<a>Read more</a>" still matches; `text` itself is never modified.
+ * Appends at most once and never duplicates an existing `preview-only`.
+ */
+export function markPreviewOnly(item) {
+  if (!item || typeof item !== "object") return item;
+  const raw = typeof item.text === "string" ? item.text : "";
+  const plain = raw.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  const tags = Array.isArray(item.tags) ? item.tags : [];
+  const isPreview =
+    /read more[\s.…»)>\]]*$/i.test(plain) ||
+    /this post is for (?:paid|paying) subscribers/i.test(plain) ||
+    /continue reading on medium/i.test(plain) ||
+    /member[-\s]only/i.test(plain);
+  if (isPreview && !tags.includes(PREVIEW_TAG)) {
+    return { ...item, tags: [...tags, PREVIEW_TAG] };
+  }
+  return item;
+}
+
 // --- MCP wiring (identical shape to the Dev.to template) -----------------
 //
 // registerTool takes RAW Zod shapes (Pitfall 7). The handler fetches ONLY via
