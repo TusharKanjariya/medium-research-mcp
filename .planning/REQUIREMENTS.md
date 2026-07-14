@@ -61,7 +61,7 @@ agent at call time; env is for credentials and optional defaults only.**
       SSRF guard (extends the v1.0 `getText`-only guard to a guarded JSON path;
       Lemmy's instance-parameterized calls move onto the same path)
 
-- [ ] **SEC-02**: No hardcoded accounts/instances/feeds exist anywhere in the
+- [x] **SEC-02**: No hardcoded accounts/instances/feeds exist anywhere in the
       suite — verified by an explicit parameterization audit
 
 ### Universal Distribution (PKG)
@@ -128,7 +128,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SRC-11 | Phase 7 | Pending |
 | SRC-13 | Phase 7 | Pending |
 | SEC-01 | Phase 5 | Complete |
-| SEC-02 | Phase 7 | Pending |
+| SEC-02 | Phase 7 | Complete |
 | PKG-01 | Phase 8 | Pending |
 | PKG-02 | Phase 8 | Pending |
 | PKG-03 | Phase 8 | Pending |

@@ -83,11 +83,11 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
   4. A login-required Discourse or locked-down (`AUTHORIZED_FETCH`) Mastodon instance yields a clear tool-level error, not a crash or a contract violation
   5. The parameterization audit passes: no hardcoded accounts/instances/feeds anywhere in the suite; Lemmy's instance is a tool parameter with env as optional default only
 
-**Plans**: 4 plans
+**Plans**: 1/4 plans executed
 
 **Wave 1**
 
-- [ ] 07-01-PLAN.md — Wave 1 — contract TYPE append (`topic`/`status`) + Lemmy instance parameterization with host-gated Bearer (SEC-02, D-05/D-09/D-13/D-15)
+- [x] 07-01-PLAN.md — Wave 1 — contract TYPE append (`topic`/`status`) + Lemmy instance parameterization with host-gated Bearer (SEC-02, D-05/D-09/D-13/D-15)
 
 **Wave 2** *(blocked on Wave 1)*
 
@@ -133,7 +133,7 @@ Not part of the v1.1 milestone. Tracked for a later milestone (start via `/gsd-n
 | 4. RSS Multiplier & Output Proof | v1.0 | 4/4 | Complete | 2026-07-03 |
 | 5. Guarded JSON Path & Trending Signals | v1.1 | 4/4 | Complete    | 2026-07-10 |
 | 6. Author-Blog Awareness | v1.1 | 3/3 | Complete    | 2026-07-14 |
-| 7. Universal Sources & Parameterization Audit | v1.1 | 0/? | Not started | - |
+| 7. Universal Sources & Parameterization Audit | v1.1 | 1/4 | In Progress|  |
 | 8. Universal Distribution | v1.1 | 0/? | Not started | - |
 
 ---
