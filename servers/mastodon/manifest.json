@@ -1,0 +1,17 @@
+{
+  "manifest_version": "0.3",
+  "name": "medium-research-mastodon",
+  "version": "1.0.0",
+  "description": "Mastodon instance research with normalized MCP output. Keyless — no credentials and no user_config: the target instance is a per-call `instance` tool parameter (scheme defaults to https), so this server hardcodes no instance host. Tools: mastodon_public, mastodon_hashtag, mastodon_trending_tags, mastodon_trending_links. A locked-down instance (anonymous reads disabled) yields a clear tool-level error; an instance with trends disabled returns an empty result set, never an error. Actual .mcpb packing is deferred to v2 (PKG-01); this manifest is documentation/scaffold only.",
+  "author": {
+    "name": "Tushar Kanjariya"
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "server.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server.js"]
+    }
+  }
+}
