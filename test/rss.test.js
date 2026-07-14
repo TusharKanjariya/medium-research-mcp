@@ -314,9 +314,15 @@ test("every fixture builds a ListEnvelope that parses against the contract schem
 
 // --- (i) registration smoke ----------------------------------------------
 
-test("rss server registers exactly ['rss_fetch']", () => {
-  const names = Object.keys(server._registeredTools ?? {}).sort();
-  assert.deepEqual(names, ["rss_fetch"]);
+// Non-brittle registration smoke: assert each expected tool is present WITH an
+// outputSchema, rather than a deepEqual over the exact set — 06-03 later adds
+// rss_substack_archive and finalizes the exact-four assertion without a rewrite.
+test("rss server registers the writer-aware tools, each with an outputSchema", () => {
+  const tools = server._registeredTools ?? {};
+  for (const name of ["rss_fetch", "rss_author_posts"]) {
+    assert.ok(tools[name], `${name} is registered`);
+    assert.ok(tools[name].outputSchema, `${name} declares an outputSchema`);
+  }
 });
 
 test("rss_fetch declares an outputSchema (contract validation on return)", () => {
@@ -473,7 +479,8 @@ test("rss_author_posts is registered with the three-field inputSchema + outputSc
   const tool = server._registeredTools.rss_author_posts;
   assert.ok(tool, "rss_author_posts is registered");
   assert.ok(tool.outputSchema, "has an outputSchema");
-  const keys = Object.keys(tool.inputSchema).sort();
+  // The SDK compiles the raw shape into a ZodObject; read its .shape keys.
+  const keys = Object.keys(tool.inputSchema.shape).sort();
   assert.deepEqual(keys, ["author", "published_before", "query"]);
 });
 

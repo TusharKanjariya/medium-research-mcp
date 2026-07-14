@@ -306,6 +306,35 @@ export function markPreviewOnly(item) {
   return item;
 }
 
+/**
+ * Post-fetch selection for rss_author_posts (D-04). Runs AFTER normalize — the
+ * platform feed window is fixed by the source; these filters only NARROW what is
+ * returned, never widen it. PURE.
+ *   - query: keep items whose title OR text contains the keyword (case-insensitive).
+ *   - published_before: keep items whose created_utc is non-null and strictly
+ *     before the cutoff (compared as Date). An unparseable cutoff is ignored.
+ */
+export function filterAuthorPosts(results, { query, published_before } = {}) {
+  let out = Array.isArray(results) ? results : [];
+  if (query) {
+    const q = String(query).toLowerCase();
+    out = out.filter(
+      (it) =>
+        (it.title && String(it.title).toLowerCase().includes(q)) ||
+        (it.text && String(it.text).toLowerCase().includes(q)),
+    );
+  }
+  if (published_before) {
+    const cutoff = Date.parse(published_before);
+    if (!Number.isNaN(cutoff)) {
+      out = out.filter(
+        (it) => it.created_utc != null && Date.parse(it.created_utc) < cutoff,
+      );
+    }
+  }
+  return out;
+}
+
 // --- MCP wiring (identical shape to the Dev.to template) -----------------
 //
 // registerTool takes RAW Zod shapes (Pitfall 7). The handler fetches ONLY via
@@ -350,6 +379,53 @@ server.registerTool(
     const xml = await getText(url);
     const results = normalizeFeed(parseFeed(xml), url).slice(0, limit);
     const env = buildListEnvelope({ source: SOURCE, query: url, results });
+    return toolResult(env);
+  },
+);
+
+server.registerTool(
+  "rss_author_posts",
+  {
+    title: "Fetch a writer's recent posts (Medium / Substack / raw feed)",
+    description:
+      "Fetch a chosen author's recent posts as normalized contract items " +
+      '(type "article", HTML-stripped text, tags[], created_utc). The `author` ' +
+      "argument is a single smart field whose SHAPE selects the platform:\n\n" +
+      "  • an @handle (e.g. @ev) -> the Medium profile feed\n" +
+      "  • a *.substack.com publication (bare host like pub.substack.com OR a " +
+      "full Substack URL) -> that publication's feed\n" +
+      "  • any other http(s):// URL -> treated as a raw feed URL\n" +
+      "A bare name (no @, no *.substack.com host, no scheme) is AMBIGUOUS and " +
+      "returns an error — the server never guesses a host.\n\n" +
+      "HONEST WINDOW (important): Medium feeds return at most the ~10 most recent " +
+      "posts; Substack ~20. Older history is NOT reachable keylessly (except a " +
+      "Substack publication's full archive via rss_substack_archive). Never read a " +
+      "10-item Medium window as the author's full history — use `count` + each " +
+      "item's `created_utc` to see exactly what was covered.\n\n" +
+      "PAYWALL / PREVIEW: paywalled or member-only bodies are TEASER-quality, not " +
+      'the full post. Such items carry the literal tag "preview-only" in tags[] ' +
+      "(text is left clean); treat their text as a teaser in any dedup/cadence " +
+      "recipe.\n\n" +
+      "SELECTION: `query` keeps only items whose title/teaser contains the keyword " +
+      "(case-insensitive); `published_before` (ISO date) keeps only items published " +
+      "strictly before it. Both narrow the fixed platform window — they do not " +
+      "widen it.\n\n" +
+      "RECIPE — posting cadence: read created_utc across the returned items, but " +
+      "remember the window caps above (see docs/AUTHOR-BLOG-RECIPES.md for the " +
+      "cadence and series/follow-up recipes).",
+    inputSchema: {
+      author: z.string(),
+      query: z.string().optional(),
+      published_before: z.string().optional(),
+    },
+    outputSchema: listEnvelopeShape,
+  },
+  async ({ author, query, published_before }) => {
+    const url = resolveAuthorFeed(author);
+    const xml = await getText(url);
+    const mapped = normalizeFeed(parseFeed(xml), url).map(markPreviewOnly);
+    const results = filterAuthorPosts(mapped, { query, published_before });
+    const env = buildListEnvelope({ source: SOURCE, query: author, results });
     return toolResult(env);
   },
 );
