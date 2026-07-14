@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Stories by Grace Hopper on Medium</title>
+    <link>https://medium.com/@grace</link>
+    <atom:link href="https://medium.com/feed/@grace" rel="self"/>
+    <description>Stories by Grace Hopper on Medium</description>
+    <item>
+      <title>Debugging the first computer bug (members only)</title>
+      <link>https://medium.com/@grace/first-bug-99aa</link>
+      <guid isPermaLink="false">https://medium.com/p/99aa</guid>
+      <dc:creator><![CDATA[Grace Hopper]]></dc:creator>
+      <pubDate>Fri, 03 Jul 2026 12:00:00 GMT</pubDate>
+      <category><![CDATA[history]]></category>
+      <content:encoded><![CDATA[<p>An abstract of the story behind the original moth-in-the-relay incident and what it taught us about hardware faults.</p><p><a href="https://medium.com/@grace/first-bug-99aa">Continue reading on Medium &#187;</a></p>]]></content:encoded>
+    </item>
+    <item>
+      <title>Why compilers matter</title>
+      <link>https://medium.com/@grace/why-compilers-matter-bb22</link>
+      <guid isPermaLink="false">https://medium.com/p/bb22</guid>
+      <dc:creator><![CDATA[Grace Hopper]]></dc:creator>
+      <pubDate>Wed, 01 Jul 2026 12:00:00 GMT</pubDate>
+      <category><![CDATA[compilers]]></category>
+      <content:encoded><![CDATA[<p>A full, freely readable essay on why the invention of the compiler changed programming forever, with the complete argument laid out end to end.</p>]]></content:encoded>
+    </item>
+  </channel>
+</rss>

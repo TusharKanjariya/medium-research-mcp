@@ -30,6 +30,7 @@ import {
   pickAlternate,
   resolveAuthorFeed,
   markPreviewOnly,
+  filterAuthorPosts,
   server,
 } from "../servers/rss/server.js";
 import { buildListEnvelope, ListEnvelopeSchema } from "../shared/contract.js";
@@ -403,4 +404,82 @@ test("markPreviewOnly: never appends preview-only twice", () => {
   const item = { title: "P", tags: ["preview-only"], text: "Read more" };
   const out = markPreviewOnly(item);
   assert.equal(out.tags.filter((t) => t === "preview-only").length, 1);
+});
+
+// --- (l) rss_author_posts: normalize + preview + query/published_before ----
+//
+// The registered handler has no fetchImpl seam (mirror the lemmy SEC-01 note),
+// so drive the normalize -> preview -> filter pipeline directly on parsed
+// fixtures. No network.
+
+const mediumAuthorParsed = parseFeed(fixture("rss-medium-author"));
+const mediumMemberOnlyParsed = parseFeed(fixture("rss-medium-memberonly"));
+const substackPaywallParsed = parseFeed(fixture("rss-substack-paywall"));
+
+const authorPipeline = (parsed, url, opts) =>
+  filterAuthorPosts(
+    normalizeFeed(parsed, url).map(markPreviewOnly),
+    opts ?? {},
+  );
+
+test("rss_author_posts pipeline over a Medium author feed yields a contract-valid envelope", () => {
+  const results = authorPipeline(mediumAuthorParsed, "https://medium.com/feed/@ada");
+  const env = buildListEnvelope({ source: "rss", query: "@ada", results });
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env));
+  assert.equal(env.source, "rss");
+  assert.ok(env.results.length >= 2);
+  for (const it of env.results) {
+    assert.equal(it.type, "article");
+    assert.ok(Array.isArray(it.tags));
+    // HTML-stripped text (no residual tags from content:encoded).
+    assert.ok(it.text == null || !/<[a-z][^>]*>/i.test(it.text), "text is HTML-stripped");
+  }
+});
+
+test("rss_author_posts query narrows by title/teaser substring (case-insensitive)", () => {
+  const results = authorPipeline(mediumAuthorParsed, "u", { query: "RUST" });
+  assert.equal(results.length, 1);
+  assert.match(results[0].title, /Rust/);
+});
+
+test("rss_author_posts published_before drops items at/after the cutoff", () => {
+  // Jul 02 and Jun 01 items; a Jun 15 cutoff keeps only the Jun 01 (Go) post.
+  const results = authorPipeline(mediumAuthorParsed, "u", { published_before: "2026-06-15" });
+  assert.equal(results.length, 1);
+  assert.match(results[0].title, /Go/);
+});
+
+test("rss_author_posts marks a Medium member-only item preview-only; a free item is not", () => {
+  const results = authorPipeline(mediumMemberOnlyParsed, "https://medium.com/feed/@grace");
+  const member = results.find((r) => /members only/i.test(r.title));
+  const free = results.find((r) => /compilers/i.test(r.title));
+  assert.ok(member.tags.includes("preview-only"), "member-only item is preview-only");
+  assert.ok(!free.tags.includes("preview-only"), "free item is not preview-only");
+});
+
+test("rss_author_posts marks a paywalled Substack 'Read more' item preview-only; free item is not", () => {
+  const results = authorPipeline(substackPaywallParsed, "https://pub.substack.com/feed");
+  const paid = results.find((r) => /paid/i.test(r.title));
+  const free = results.find((r) => /free/i.test(r.title));
+  assert.ok(paid.tags.includes("preview-only"), "paid teaser is preview-only");
+  assert.ok(!free.tags.includes("preview-only"), "free post is not preview-only");
+  // text stays clean — no injected marker field, contract frozen.
+  assert.doesNotThrow(() =>
+    ListEnvelopeSchema.parse(buildListEnvelope({ source: "rss", query: "sub", results })),
+  );
+});
+
+test("rss_author_posts is registered with the three-field inputSchema + outputSchema", () => {
+  const tool = server._registeredTools.rss_author_posts;
+  assert.ok(tool, "rss_author_posts is registered");
+  assert.ok(tool.outputSchema, "has an outputSchema");
+  const keys = Object.keys(tool.inputSchema).sort();
+  assert.deepEqual(keys, ["author", "published_before", "query"]);
+});
+
+test("rss_author_posts description states the ~10/~20 window caps and paywall truncation", () => {
+  const desc = server._registeredTools.rss_author_posts.description;
+  assert.match(desc, /~?\s*10/);
+  assert.match(desc, /~?\s*20/);
+  assert.match(desc, /paywall|teaser|preview/i);
 });

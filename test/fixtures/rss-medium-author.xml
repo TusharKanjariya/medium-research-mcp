@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Stories by Ada Lovelace on Medium</title>
+    <link>https://medium.com/@ada</link>
+    <atom:link href="https://medium.com/feed/@ada" rel="self"/>
+    <description>Stories by Ada Lovelace on Medium</description>
+    <item>
+      <title>Rust ownership explained</title>
+      <link>https://medium.com/@ada/rust-ownership-explained-abc123</link>
+      <guid isPermaLink="false">https://medium.com/p/abc123</guid>
+      <dc:creator><![CDATA[Ada Lovelace]]></dc:creator>
+      <pubDate>Thu, 02 Jul 2026 10:00:00 GMT</pubDate>
+      <category><![CDATA[rust]]></category>
+      <category><![CDATA[programming]]></category>
+      <content:encoded><![CDATA[<p>A full, public walkthrough of how Rust's ownership model prevents data races at compile time. The borrow checker is your friend once you learn to read it.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title>Getting started with Go</title>
+      <link>https://medium.com/@ada/getting-started-with-go-def456</link>
+      <guid isPermaLink="false">https://medium.com/p/def456</guid>
+      <dc:creator><![CDATA[Ada Lovelace]]></dc:creator>
+      <pubDate>Mon, 01 Jun 2026 10:00:00 GMT</pubDate>
+      <category><![CDATA[golang]]></category>
+      <content:encoded><![CDATA[<p>A complete beginner's tour of the Go toolchain, modules, and goroutines, with runnable examples throughout.</p>]]></content:encoded>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>The Pragmatic Ledger</title>
+    <link>https://pub.substack.com</link>
+    <atom:link href="https://pub.substack.com/feed" rel="self"/>
+    <description>Notes on software economics</description>
+    <item>
+      <title>The real cost of a rewrite (paid)</title>
+      <link>https://pub.substack.com/p/the-real-cost-of-a-rewrite</link>
+      <guid isPermaLink="false">https://pub.substack.com/p/the-real-cost-of-a-rewrite</guid>
+      <dc:creator><![CDATA[The Pragmatic Ledger]]></dc:creator>
+      <pubDate>Thu, 02 Jul 2026 08:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[<p>Every rewrite is sold as a fresh start, but the ledger tells a different story. In this piece I break down the three hidden line items that turn a six-month rewrite into an eighteen-month one&#8230;</p><p><a href="https://pub.substack.com/p/the-real-cost-of-a-rewrite">Read more</a></p>]]></content:encoded>
+    </item>
+    <item>
+      <title>Why estimates drift (free)</title>
+      <link>https://pub.substack.com/p/why-estimates-drift</link>
+      <guid isPermaLink="false">https://pub.substack.com/p/why-estimates-drift</guid>
+      <dc:creator><![CDATA[The Pragmatic Ledger]]></dc:creator>
+      <pubDate>Mon, 01 Jun 2026 08:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[<p>A complete, freely readable post walking through why software estimates drift, with the full model and worked examples included from start to finish.</p>]]></content:encoded>
+    </item>
+  </channel>
+</rss>
