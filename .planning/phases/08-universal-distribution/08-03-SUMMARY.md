@@ -36,7 +36,7 @@ key-decisions:
   - "dist/ rebuilt fresh each run (rm -rf then mkdir) so no stale/partial bundle survives a failed build; dist/ gitignored so nothing is ever committed"
   - "mcpb CLI invoked from the pinned local devDependency bin (node_modules/.bin/mcpb 2.1.2), never a global or npx-latest (T-08-SC)"
 
-requirements-completed: []
+requirements-completed: [PKG-01]
 
 coverage:
   - id: D1
@@ -58,28 +58,31 @@ coverage:
     requirement: PKG-01
     verification:
       - kind: other
-        ref: "Manual Claude Desktop install of dist/medium-research-{librariesio,producthunt}.mcpb + one tool call each (BLOCKING human gate)"
-        status: pending
+        ref: "Server-side credential path verified live with real test-account creds (throwaway harness, no secret committed): librariesio_search returned 5 normalized packages with a real LIBRARIESIO_KEY and throws 'Missing credential: set LIBRARIESIO_KEY' with none; producthunt GraphQL auth ACCEPTED with a valid v2 Developer Token (real launches returned), throws 'Missing credential: set PRODUCTHUNT_TOKEN' with none, and surfaces a 401 (never a silent empty list) on a bad token"
+        status: pass
+      - kind: other
+        ref: "Live Claude Desktop keychain→env injection UI test (install the two .mcpb in Desktop, confirm the OS-keychain sensitive user_config value reaches the running server) — cannot be driven headlessly; DEFERRED to phase UAT (/gsd-verify-work) per explicit user decision"
+        status: deferred
     human_judgment: true
 
 duration: 15min
 completed: 2026-07-16
-status: blocked
+status: complete
 ---
 
 # Phase 8 Plan 03: Build all 11 .mcpb bundles (stage → validate → spawn-test → pack) Summary
 
-**A single staging script builds all 11 `.mcpb` bundles in Option-A repo-mirroring layout, gating each with `mcpb validate` AND a real MCP-initialize spawn test before `mcpb pack` — 11 validated + spawn-tested bundles now sit in `dist/`; the plan is PAUSED at the blocking D-04 Claude Desktop keychain smoke (human-only) for the two credentialed bundles.**
+**A single staging script builds all 11 `.mcpb` bundles in Option-A repo-mirroring layout, gating each with `mcpb validate` AND a real MCP-initialize spawn test before `mcpb pack` — 11 validated + spawn-tested bundles sit in `dist/`; the D-04 credential path is verified server-side live (librariesio + producthunt), with only the live Claude Desktop keychain→env UI test deferred to phase UAT per explicit user decision.**
 
-## Status: BLOCKED at Task 2 (D-04 keychain smoke — human verification required)
+## Status: COMPLETE (Task 2 server-side verified; Desktop keychain UI test deferred to UAT)
 
-All autonomous work (Task 1) is complete and committed. Task 2 is a `checkpoint:human-verify` with `gate="blocking-human"` — it cannot be automated or self-approved. See the checkpoint returned to the orchestrator for the exact manual steps. STATE.md/ROADMAP.md tracking is intentionally left to the continuation run per the plan's checkpoint protocol.
+All autonomous work (Task 1) is complete and committed. Task 2 (D-04) is resolved as complete-with-caveat: the **server-side credential path is verified live** and the **live Claude Desktop keychain→env injection UI test is deferred to phase UAT** (`/gsd-verify-work`) per the user's explicit decision — it cannot be driven headlessly. The Desktop-keychain UI is NOT claimed as tested here.
 
 ## Performance
 
 - **Duration (autonomous portion):** ~15 min
-- **Completed:** 2026-07-16 (Task 1); Task 2 pending human smoke
-- **Tasks:** 1 of 2 (Task 2 is the blocking human gate)
+- **Completed:** 2026-07-16 (Task 1 build; Task 2 server-side D-04 smoke)
+- **Tasks:** 2 of 2 (Task 2 server-side verified; Desktop keychain UI deferred to UAT)
 - **Files:** 2 created, 1 modified; 11 gitignored bundles emitted to dist/
 
 ## Accomplishments (Task 1)
@@ -94,8 +97,19 @@ All autonomous work (Task 1) is complete and committed. Task 2 is a `checkpoint:
 ## Task Commits
 
 1. **Task 1: mcpb build script + ignore files** - `ecfa03e` (feat)
+2. **SUMMARY at checkpoint** - `d65da31` (docs)
+3. **Task 2 resolution — SUMMARY finalized** - this commit (docs)
 
-_Task 2 is the blocking human keychain smoke — no commit; it is verified by a live Claude Desktop install, not code._
+_Task 2 (D-04) has no runtime-code commit: the server-side credential path was verified live via a throwaway harness (deleted, no secret committed), and the Desktop keychain UI half is a deferred UAT gate, not code._
+
+## Task 2 (D-04) — Verification Evidence
+
+**Server-side credential path — VERIFIED LIVE this session** (throwaway harness importing the servers' exported functions + shared `getJson`/`postJson` — the reusable phase-6/7 pattern; harness deleted, no secret committed; creds kept only in the gitignored `.env`, `.env.example` remains names-only):
+
+- **librariesio:** `librariesio_search` returned 5 normalized packages with a real key (e.g. `"typescript"`, score 1452903). With no key, `librariesIoParams()` throws the clear `Missing credential: set LIBRARIESIO_KEY`.
+- **producthunt:** with a valid Product Hunt v2 **Developer Token**, the GraphQL auth handshake was ACCEPTED — real launches returned (e.g. `"Paradigm"`). With no token, `productHuntHeaders()` throws the clear `Missing credential: set PRODUCTHUNT_TOKEN`. An earlier smoke with the wrong value (an API key/secret pair) was rejected by PH as `invalid_oauth_token` — confirming fail-visible behavior: PH auth rejection surfaces as an HTTP 401 error, never a silent empty list.
+
+**Live Claude Desktop keychain→env injection UI test — DEFERRED to phase UAT (user-approved).** Installing `dist/medium-research-{librariesio,producthunt}.mcpb` in Claude Desktop and confirming the OS-keychain-stored `sensitive` user_config value reaches the running server cannot be driven headlessly; it belongs in `/gsd-verify-work`. NOT claimed as passed — an explicit, user-approved deferral.
 
 ## Files Created/Modified
 - `scripts/build-mcpb.mjs` (new) - stage → validate → spawn-test → pack loop over 11 servers
@@ -114,22 +128,21 @@ None - Task 1 executed exactly as written. The build gates each stage with `mcpb
 ## Issues Encountered
 - Node emits a `DEP0190` deprecation warning when running the mcpb `.cmd` shim / `npm` with `shell:true` and args on Windows. It is cosmetic here — all args are internally constructed from `mkdtemp` temp paths and the hardcoded server list (no external/user input, so no injection surface). The `.cmd` shims genuinely require `shell:true` on Windows (Node's post-CVE spawn posture), so the warning is accepted rather than worked around.
 
-## User Setup Required (BLOCKING — Task 2 / D-04)
-Manual Claude Desktop keychain smoke for the two credentialed bundles — see the returned checkpoint for exact steps:
-- Install `dist/medium-research-librariesio.mcpb`, enter a real Libraries.io key, call `librariesio_search`; then reinstall without a key and confirm the error names `LIBRARIESIO_KEY`.
-- Install `dist/medium-research-producthunt.mcpb`, enter a Product Hunt developer token, call one tool.
+## Deferred to Phase UAT (user-approved)
+- **D-04 live Claude Desktop keychain→env UI test** for the two credentialed bundles. Verify in `/gsd-verify-work`: install `dist/medium-research-{librariesio,producthunt}.mcpb`, enter the key when prompted (field masked), call one tool each, then reinstall with no key and confirm the error names the env var (`LIBRARIESIO_KEY` / `PRODUCTHUNT_TOKEN`). Server-side behavior is already proven (see Task 2 evidence); only the host keychain injection remains.
 
 ## Next Phase Readiness
-- 11 validated + spawn-tested bundles are in `dist/` ready for the D-04 smoke and (post-approval) the D-06 manual distribution gate.
-- On checkpoint approval, the continuation run advances STATE.md/ROADMAP.md and marks PKG-01's build half done.
-- Blocker: D-04 keychain smoke (human-only) — this plan cannot be marked complete until approved.
+- 11 validated + spawn-tested bundles are in `dist/`; server-side D-04 credential path is verified. Ready for the D-06 manual distribution gate.
+- PKG-01 build + server-side credential path complete; the live Desktop keychain UI check rides into phase UAT.
 
 ## Self-Check: PASSED
 - scripts/build-mcpb.mjs — FOUND
 - .mcpbignore — FOUND
 - dist/medium-research-hn.mcpb (+ 10 others) — FOUND (gitignored)
 - Commit ecfa03e — present in git history
+- Task 1: 11 bundles built / validated / spawn-tested — verified
+- Task 2: server-side D-04 credential path verified live (librariesio + producthunt); Desktop keychain UI test deferred to UAT (NOT claimed as passed)
 
 ---
 *Phase: 08-universal-distribution*
-*Paused at blocking D-04 keychain smoke: 2026-07-16*
+*Task 2 resolved (server-side D-04 verified; Desktop keychain deferred to UAT): 2026-07-16*
