@@ -110,12 +110,12 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
   3. User can follow per-client setup docs (Claude Desktop, OpenCode, Codex, Cursor) — including the Windows `cmd /c npx` spawn and explicit env-block quirks — and reach a working connection
   4. User can follow the cross-source pain-point sweep recipe (one tag through Stack Exchange + Discourse + Mastodon + Dev.to, merged via `mergeRank`) end to end
 
-**Plans**: 1/4 plans executed
+**Plans**: 2/4 plans executed
 
 **Wave 1**
 
 - [x] 08-01-PLAN.md — npm package identity + bin-ability: package.json (11 medium-research-* bins, files whitelist, v1.1.0, private removed, @anthropic-ai/mcpb devDep) + shared/main.js isEntry() + shebang/guard-swap across 11 servers (PKG-02)
-- [ ] 08-02-PLAN.md — manifest retarget/cleanup (Option A entry_point/args, v1.1.0, hn credential cleanup) + D-05 manifest⇄credentials consistency test (PKG-01)
+- [x] 08-02-PLAN.md — manifest retarget/cleanup (Option A entry_point/args, v1.1.0, hn credential cleanup) + D-05 manifest⇄credentials consistency test (PKG-01)
 
 **Wave 2** *(blocked on Wave 1)*
 
@@ -144,7 +144,7 @@ Not part of the v1.1 milestone. Tracked for a later milestone (start via `/gsd-n
 | 5. Guarded JSON Path & Trending Signals | v1.1 | 4/4 | Complete    | 2026-07-10 |
 | 6. Author-Blog Awareness | v1.1 | 3/3 | Complete    | 2026-07-14 |
 | 7. Universal Sources & Parameterization Audit | v1.1 | 4/4 | Complete    | 2026-07-14 |
-| 8. Universal Distribution | v1.1 | 1/4 | In Progress|  |
+| 8. Universal Distribution | v1.1 | 2/4 | In Progress|  |
 
 ---
 *Roadmap updated: 2026-07-08 — v1.1 phases added (coverage 17/17 v1.1 requirements)*

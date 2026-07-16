@@ -66,7 +66,7 @@ agent at call time; env is for credentials and optional defaults only.**
 
 ### Universal Distribution (PKG)
 
-- [ ] **PKG-01**: User can install any server as a one-click `.mcpb` custom
+- [x] **PKG-01**: User can install any server as a one-click `.mcpb` custom
       connector in Claude Desktop (staged build that bundles `shared/` +
       production deps so `../../shared` imports survive; credentials marked
       `sensitive` in `user_config`)
@@ -129,7 +129,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SRC-13 | Phase 7 | Complete |
 | SEC-01 | Phase 5 | Complete |
 | SEC-02 | Phase 7 | Complete |
-| PKG-01 | Phase 8 | Pending |
+| PKG-01 | Phase 8 | Complete |
 | PKG-02 | Phase 8 | Complete |
 | PKG-03 | Phase 8 | Pending |
 | DOC-01 | Phase 8 | Pending |
