@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Writer-Aware, Universal Research
 current_phase: 8
-current_phase_name: Universal Distribution
+current_phase_name: universal-distribution
 status: executing
-stopped_at: Phase 8 context gathered
-last_updated: "2026-07-16T10:15:31.671Z"
-last_activity: 2026-07-14
-last_activity_desc: Phase 7 complete, transitioned to Phase 8
+stopped_at: Completed 08-01-PLAN.md
+last_updated: "2026-07-16T10:33:22.219Z"
+last_activity: 2026-07-16
+last_activity_desc: Phase 8 execution started
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 15
+  completed_plans: 12
   percent: 75
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-08)
 
 **Core value:** Uniform normalized output across every source, so `medium-blog-pro` consumes any source with zero per-source logic.
-**Current focus:** Phase 7 — Universal Sources & Parameterization Audit
+**Current focus:** Phase 8 — universal-distribution
 
 ## Current Position
 
-Phase: 8 — Universal Distribution
-Plan: Not started
+Phase: 8 (universal-distribution) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-07-14 — Phase 7 complete, transitioned to Phase 8
+Last activity: 2026-07-16 — Phase 8 execution started
 
 **v1.1 phase structure:**
 
@@ -86,6 +86,11 @@ Last activity: 2026-07-14 — Phase 7 complete, transitioned to Phase 8
 | Phase 07 P02 | 5m | 3 tasks | 6 files |
 | Phase 07 P03 | 14min | 3 tasks | 6 files |
 | Phase 07 P04 | 18min | 1 task | 1 file |
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 08 P01 | 12min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -134,6 +139,7 @@ Recent decisions affecting current work:
 - [Phase ?]: 07-03 Mastodon: keyless 4-tool server over guarded untrustedHost path; instance a per-call param with no host literal (SEC-02); boosts map from status.reblog; trending score = sum(history[].uses via Number)
 - [Phase ?]: 07-03 D-11 Mastodon lockdown: exported mapMastodonError maps /HTTP (401|422)/ to a clear disallows-anonymous-reads message per tool call; D-10 trends /HTTP 404/ -> empty count:0, never throws
 - [Phase ?]: 07-04 SEC-02 audit (D-16): committed test/parameterization-audit.test.js scans servers/*/server.js (rss resolve* covered), allowlists fixed platform bases + .substack.com/.medium.com suffixes + programming.dev; string-preserving comment stripper (naive // strip would decapitate https:// literals); URL-embedded @handle guard catches account-in-feed-URL; non-vacuous negative controls; your.lemmy.instance admitted as a documented non-routable placeholder
+- [Phase ?]: isEntry() realpaths process.argv[1] so bins work under copy + symlinked installs (Pitfall B); @anthropic-ai/mcpb pinned 2.1.2 devDependency only; files whitelist ships servers/ + shared/
 
 ### Pending Todos
 
@@ -163,9 +169,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-16T08:57:26.746Z
-Stopped at: Phase 8 context gathered
-Resume file: .planning/phases/08-universal-distribution/08-CONTEXT.md
+Last session: 2026-07-16T10:33:22.201Z
+Stopped at: Completed 08-01-PLAN.md
+Resume file: None
 
 ## Operator Next Steps
 

@@ -71,7 +71,7 @@ agent at call time; env is for credentials and optional defaults only.**
       production deps so `../../shared` imports survive; credentials marked
       `sensitive` in `user_config`)
 
-- [ ] **PKG-02**: User can run any server from npm via `npx` on any MCP client
+- [x] **PKG-02**: User can run any server from npm via `npx` on any MCP client
       (one scoped package, bin entry per server, Windows-safe shebangs)
 
 - [ ] **PKG-03**: User can follow per-client setup docs — Claude Desktop,
@@ -130,7 +130,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SEC-01 | Phase 5 | Complete |
 | SEC-02 | Phase 7 | Complete |
 | PKG-01 | Phase 8 | Pending |
-| PKG-02 | Phase 8 | Pending |
+| PKG-02 | Phase 8 | Complete |
 | PKG-03 | Phase 8 | Pending |
 | DOC-01 | Phase 8 | Pending |
 

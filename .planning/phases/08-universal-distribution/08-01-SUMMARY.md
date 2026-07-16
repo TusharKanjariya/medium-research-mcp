@@ -111,6 +111,10 @@ None - no external service configuration required. Publishing (`npm publish`, gi
 - `build:mcpb` and `example:sweep` scripts are forward-referenced; the target files (`scripts/build-mcpb.mjs`, `examples/pain-point-sweep.mjs`) are produced by plans 03/04.
 - No blockers.
 
+## Self-Check: PASSED
+
+All created files exist on disk (shared/main.js, package.json, 08-01-SUMMARY.md) and all task commits are present in git history (fb957a7, 0e4e6f6, 7ff08ef).
+
 ---
 *Phase: 08-universal-distribution*
 *Completed: 2026-07-16*
