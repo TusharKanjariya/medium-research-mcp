@@ -5,16 +5,16 @@ milestone_name: Writer-Aware, Universal Research
 current_phase: 8
 current_phase_name: universal-distribution
 status: executing
-stopped_at: Completed 08-02-PLAN.md
-last_updated: "2026-07-16T10:39:52.407Z"
+stopped_at: Completed 08-04-PLAN.md
+last_updated: "2026-07-16T10:56:02.590Z"
 last_activity: 2026-07-16
-last_activity_desc: Phase 8 execution started
+last_activity_desc: 08-02 complete (manifests retargeted + D-05 consistency test)
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 15
-  completed_plans: 13
-  percent: 87
+  completed_plans: 15
+  percent: 100
 ---
 
 # Project State
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 ## Current Position
 
 Phase: 8 (universal-distribution) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-07-16 — 08-02 complete (manifests retargeted + D-05 consistency test)
 
@@ -92,6 +92,7 @@ Last activity: 2026-07-16 — 08-02 complete (manifests retargeted + D-05 consis
 |------|----------|-------|-------|
 | Phase 08 P01 | 12min | 2 tasks | 13 files |
 | Phase 08 P02 | 9min | 2 tasks | 12 files |
+| Phase 08 P04 | 15min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -142,6 +143,7 @@ Recent decisions affecting current work:
 - [Phase ?]: 07-04 SEC-02 audit (D-16): committed test/parameterization-audit.test.js scans servers/*/server.js (rss resolve* covered), allowlists fixed platform bases + .substack.com/.medium.com suffixes + programming.dev; string-preserving comment stripper (naive // strip would decapitate https:// literals); URL-embedded @handle guard catches account-in-feed-URL; non-vacuous negative controls; your.lemmy.instance admitted as a documented non-routable placeholder
 - [Phase ?]: isEntry() realpaths process.argv[1] so bins work under copy + symlinked installs (Pitfall B); @anthropic-ai/mcpb pinned 2.1.2 devDependency only; files whitelist ships servers/ + shared/
 - [Phase ?]: [Phase 08 P02]: manifest_version stays 0.3 (current MCPB spec); D-05 consistency test reads ENV names from credentials.js source and asserts manifest env ⇒ ENV_VAR AND read-by-server (direction-safe, REDDIT_* maps to no server); hn env over-declaration removed
+- [Phase ?]: 08-04: cross-source pain-point sweep merges via shared mergeRank with per-source graceful degradation; INSTALL.md is Windows-first per-client with a manual (non-automated) release checklist
 
 ### Pending Todos
 
@@ -171,8 +173,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-16T10:39:40.377Z
-Stopped at: Completed 08-02-PLAN.md
+Last session: 2026-07-16T10:55:50.643Z
+Stopped at: Completed 08-04-PLAN.md
 Resume file: None
 
 ## Operator Next Steps

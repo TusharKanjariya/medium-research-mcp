@@ -74,13 +74,13 @@ agent at call time; env is for credentials and optional defaults only.**
 - [x] **PKG-02**: User can run any server from npm via `npx` on any MCP client
       (one scoped package, bin entry per server, Windows-safe shebangs)
 
-- [ ] **PKG-03**: User can follow per-client setup docs — Claude Desktop,
+- [x] **PKG-03**: User can follow per-client setup docs — Claude Desktop,
       OpenCode, Codex, Cursor — including Windows `cmd /c npx` spawn and
       env-passing quirks
 
 ### Documentation (DOC)
 
-- [ ] **DOC-01**: User can follow the cross-source pain-point sweep recipe (one
+- [x] **DOC-01**: User can follow the cross-source pain-point sweep recipe (one
       tag through SE + Discourse + Mastodon + Dev.to, merged via `mergeRank`)
 
 ## v2+ Requirements
@@ -131,8 +131,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SEC-02 | Phase 7 | Complete |
 | PKG-01 | Phase 8 | Complete |
 | PKG-02 | Phase 8 | Complete |
-| PKG-03 | Phase 8 | Pending |
-| DOC-01 | Phase 8 | Pending |
+| PKG-03 | Phase 8 | Complete |
+| DOC-01 | Phase 8 | Complete |
 
 **Coverage:**
 

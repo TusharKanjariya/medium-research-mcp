@@ -110,7 +110,7 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
   3. User can follow per-client setup docs (Claude Desktop, OpenCode, Codex, Cursor) — including the Windows `cmd /c npx` spawn and explicit env-block quirks — and reach a working connection
   4. User can follow the cross-source pain-point sweep recipe (one tag through Stack Exchange + Discourse + Mastodon + Dev.to, merged via `mergeRank`) end to end
 
-**Plans**: 2/4 plans executed
+**Plans**: 4/4 plans executed
 
 **Wave 1**
 
@@ -119,8 +119,8 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 08-03-PLAN.md — scripts/build-mcpb.mjs (stage → mcpb validate → spawn-test → pack, 11 bundles) + .mcpbignore + dist/ gitignore + manual D-04 keychain smoke (PKG-01)
-- [ ] 08-04-PLAN.md — docs/INSTALL.md (per-client per-OS setup + manual release checklist) + examples/pain-point-sweep.mjs cross-source sweep + README link (PKG-03, DOC-01)
+- [x] 08-03-PLAN.md — scripts/build-mcpb.mjs (stage → mcpb validate → spawn-test → pack, 11 bundles) + .mcpbignore + dist/ gitignore + manual D-04 keychain smoke (PKG-01)
+- [x] 08-04-PLAN.md — docs/INSTALL.md (per-client per-OS setup + manual release checklist) + examples/pain-point-sweep.mjs cross-source sweep + README link (PKG-03, DOC-01)
 
 ## Future / Deferred (v2+)
 
@@ -144,7 +144,7 @@ Not part of the v1.1 milestone. Tracked for a later milestone (start via `/gsd-n
 | 5. Guarded JSON Path & Trending Signals | v1.1 | 4/4 | Complete    | 2026-07-10 |
 | 6. Author-Blog Awareness | v1.1 | 3/3 | Complete    | 2026-07-14 |
 | 7. Universal Sources & Parameterization Audit | v1.1 | 4/4 | Complete    | 2026-07-14 |
-| 8. Universal Distribution | v1.1 | 2/4 | In Progress|  |
+| 8. Universal Distribution | v1.1 | 4/4 | In Progress|  |
 
 ---
 *Roadmap updated: 2026-07-08 — v1.1 phases added (coverage 17/17 v1.1 requirements)*
