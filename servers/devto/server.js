@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // servers/devto/server.js — Dev.to (Forem) source server (SRC-05).
 //
 // Copied from the HN reference server (servers/hn/server.js): same imports,
@@ -30,7 +31,7 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { pathToFileURL } from "node:url";
+import { isEntry } from "../../shared/main.js";
 import { z } from "zod";
 import { getJson } from "../../shared/http_client.js";
 import {
@@ -294,9 +295,6 @@ server.registerTool(
 
 // Connect over stdio only when run directly (`node servers/devto/server.js`),
 // so importing this module for tests does NOT start a live transport.
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
-) {
+if (isEntry(import.meta.url)) {
   await server.connect(new StdioServerTransport());
 }

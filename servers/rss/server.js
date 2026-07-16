@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // servers/rss/server.js — generic RSS/Atom feed fetcher (SRC-09, YT-01).
 //
 // Copied from the Dev.to reference server (servers/devto/server.js): same
@@ -37,7 +38,7 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { pathToFileURL } from "node:url";
+import { isEntry } from "../../shared/main.js";
 import { z } from "zod";
 import { XMLParser } from "fast-xml-parser";
 import { getText, getJson } from "../../shared/http_client.js";
@@ -667,9 +668,6 @@ server.registerTool(
 
 // Connect over stdio only when run directly (`node servers/rss/server.js`), so
 // importing this module for tests does NOT start a live transport.
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
-) {
+if (isEntry(import.meta.url)) {
   await server.connect(new StdioServerTransport());
 }
