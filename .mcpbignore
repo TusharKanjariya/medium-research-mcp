@@ -1,0 +1,8 @@
+# Belt-and-suspenders excludes on top of mcpb pack defaults (T-08-05).
+# A stage only ever contains manifest + node_modules + shared/ + one server.js,
+# but if anything else leaks in, keep docs, tests, planning, and secrets OUT.
+test/
+*.md
+.planning/
+.env
+.env.*
