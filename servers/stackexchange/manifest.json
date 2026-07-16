@@ -1,8 +1,8 @@
 {
   "manifest_version": "0.3",
   "name": "medium-research-stackexchange",
-  "version": "1.0.0",
-  "description": "Stack Exchange research with normalized MCP output. Wraps Stack Exchange API 2.3 network-wide (so_hot_questions, so_search, so_get_question) — the `site` param defaults to \"stackoverflow\" and accepts any SE network site string. Runs fully keyless; an optional STACKEXCHANGE_KEY raises the daily API quota and is injected via the sensitive user_config field below (stored in the OS keychain, masked on input, never written to disk in plaintext). Actual .mcpb packing is deferred to v2 (PKG-01); this manifest is documentation/scaffold only.",
+  "version": "1.1.0",
+  "description": "Stack Exchange research with normalized MCP output. Wraps Stack Exchange API 2.3 network-wide (so_hot_questions, so_search, so_get_question) — the `site` param defaults to \"stackoverflow\" and accepts any SE network site string. Runs fully keyless; an optional STACKEXCHANGE_KEY raises the daily API quota and is injected via the sensitive user_config field below (stored in the OS keychain, masked on input, never written to disk in plaintext).",
   "author": {
     "name": "Tushar Kanjariya"
   },
@@ -17,10 +17,10 @@
   },
   "server": {
     "type": "node",
-    "entry_point": "server.js",
+    "entry_point": "servers/stackexchange/server.js",
     "mcp_config": {
       "command": "node",
-      "args": ["${__dirname}/server.js"],
+      "args": ["${__dirname}/servers/stackexchange/server.js"],
       "env": {
         "STACKEXCHANGE_KEY": "${user_config.stackexchange_key}"
       }

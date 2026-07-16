@@ -1,8 +1,8 @@
 {
   "manifest_version": "0.3",
   "name": "medium-research-lemmy",
-  "version": "1.0.0",
-  "description": "Lemmy research with normalized MCP output. Wraps the federated Lemmy 0.19+ API v3 (lemmy_hot, lemmy_search, lemmy_post) against a configured instance (default programming.dev), reading anonymously by default. When LEMMY_* credentials are set, reads carry an Authorization: Bearer <jwt> from the shared auth path (D-06). IMPORTANT: authenticated reads require LEMMY_INSTANCE to be set explicitly (even to the default https://programming.dev) alongside LEMMY_USERNAME/LEMMY_PASSWORD; with username/password set but LEMMY_INSTANCE unset, reads stay anonymous by design (no error). Secrets follow the .mcpb keychain pattern (\"sensitive\": true, injected via ${user_config.*} into mcp_config.env). Actual .mcpb packing is deferred to v2 (PKG-01); this manifest is documentation/scaffold only.",
+  "version": "1.1.0",
+  "description": "Lemmy research with normalized MCP output. Wraps the federated Lemmy 0.19+ API v3 (lemmy_hot, lemmy_search, lemmy_post) against a configured instance (default programming.dev), reading anonymously by default. When LEMMY_* credentials are set, reads carry an Authorization: Bearer <jwt> from the shared auth path (D-06). IMPORTANT: authenticated reads require LEMMY_INSTANCE to be set explicitly (even to the default https://programming.dev) alongside LEMMY_USERNAME/LEMMY_PASSWORD; with username/password set but LEMMY_INSTANCE unset, reads stay anonymous by design (no error). Secrets follow the .mcpb keychain pattern (\"sensitive\": true, injected via ${user_config.*} into mcp_config.env).",
   "author": {
     "name": "Tushar Kanjariya"
   },
@@ -31,10 +31,10 @@
   },
   "server": {
     "type": "node",
-    "entry_point": "server.js",
+    "entry_point": "servers/lemmy/server.js",
     "mcp_config": {
       "command": "node",
-      "args": ["${__dirname}/server.js"],
+      "args": ["${__dirname}/servers/lemmy/server.js"],
       "env": {
         "LEMMY_INSTANCE": "${user_config.lemmy_instance}",
         "LEMMY_USERNAME": "${user_config.lemmy_username}",

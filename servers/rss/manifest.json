@@ -1,18 +1,18 @@
 {
   "manifest_version": "0.3",
   "name": "medium-research-rss",
-  "version": "1.0.0",
-  "description": "Generic RSS 2.0 / Atom 1.0 feed research with normalized MCP output. A single rss_fetch(url, limit?) tool ingests ANY feed URL and maps each entry onto the shared item contract with type \"article\" and BOTH score and num_comments null (RSS carries no engagement metric). Deliberately ships ONE tool (no *_get / *_search): feed items already carry their content and the feed URL is the query. Two documented recipes: (1) read-only subreddit — rss_fetch(\"https://www.reddit.com/r/<sub>/.rss\"); (2) YouTube channel/playlist — rss_fetch(\"https://www.youtube.com/feeds/videos.xml?channel_id=<UC…>\") or \"?playlist_id=<PL…>\", surfacing each video's watch link (url), channel (author), and description (text). YouTube feeds are per-channel/playlist only — no keyword search (retired; the paid Data API is out of scope). Fetches only through the shared SSRF-guarded getText path (scheme allowlist + private-range denylist + per-redirect re-validation); the optional RSS_ALLOWED_HOSTS operator allowlist locks fetching to listed hosts. Runs keyless — no credentials. Actual .mcpb packing is deferred to v2 (PKG-01); this manifest is documentation/scaffold only.",
+  "version": "1.1.0",
+  "description": "Generic RSS 2.0 / Atom 1.0 feed research with normalized MCP output. A single rss_fetch(url, limit?) tool ingests ANY feed URL and maps each entry onto the shared item contract with type \"article\" and BOTH score and num_comments null (RSS carries no engagement metric). Deliberately ships ONE tool (no *_get / *_search): feed items already carry their content and the feed URL is the query. Two documented recipes: (1) read-only subreddit — rss_fetch(\"https://www.reddit.com/r/<sub>/.rss\"); (2) YouTube channel/playlist — rss_fetch(\"https://www.youtube.com/feeds/videos.xml?channel_id=<UC…>\") or \"?playlist_id=<PL…>\", surfacing each video's watch link (url), channel (author), and description (text). YouTube feeds are per-channel/playlist only — no keyword search (retired; the paid Data API is out of scope). Fetches only through the shared SSRF-guarded getText path (scheme allowlist + private-range denylist + per-redirect re-validation); the optional RSS_ALLOWED_HOSTS operator allowlist locks fetching to listed hosts. Runs keyless — no credentials.",
   "author": {
     "name": "Tushar Kanjariya"
   },
   "user_config": {},
   "server": {
     "type": "node",
-    "entry_point": "server.js",
+    "entry_point": "servers/rss/server.js",
     "mcp_config": {
       "command": "node",
-      "args": ["${__dirname}/server.js"]
+      "args": ["${__dirname}/servers/rss/server.js"]
     }
   }
 }

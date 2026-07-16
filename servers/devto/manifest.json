@@ -1,18 +1,18 @@
 {
   "manifest_version": "0.3",
   "name": "medium-research-devto",
-  "version": "1.0.0",
-  "description": "Dev.to research with normalized MCP output. Wraps the public Forem REST API (dev.to/api) with devto_top (top-of-week trending), devto_tag (top articles by tag), a client-side devto_search over the top window, and devto_get for a single article with its full body and top-level comments. Sends the Forem versioned Accept header on every call. Runs fully keyless — Dev.to reads need no credentials, so there is no user_config. Actual .mcpb packing is deferred to v2 (PKG-01); this manifest is documentation/scaffold only.",
+  "version": "1.1.0",
+  "description": "Dev.to research with normalized MCP output. Wraps the public Forem REST API (dev.to/api) with devto_top (top-of-week trending), devto_tag (top articles by tag), a client-side devto_search over the top window, and devto_get for a single article with its full body and top-level comments. Sends the Forem versioned Accept header on every call. Runs fully keyless — Dev.to reads need no credentials, so there is no user_config.",
   "author": {
     "name": "Tushar Kanjariya"
   },
   "user_config": {},
   "server": {
     "type": "node",
-    "entry_point": "server.js",
+    "entry_point": "servers/devto/server.js",
     "mcp_config": {
       "command": "node",
-      "args": ["${__dirname}/server.js"]
+      "args": ["${__dirname}/servers/devto/server.js"]
     }
   }
 }

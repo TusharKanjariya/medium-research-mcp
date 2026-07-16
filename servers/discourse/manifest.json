@@ -1,17 +1,17 @@
 {
   "manifest_version": "0.3",
   "name": "medium-research-discourse",
-  "version": "1.0.0",
-  "description": "Discourse forum research with normalized MCP output. Keyless — no credentials and no user_config: the target forum is a per-call `instance` tool parameter (scheme defaults to https), so this server hardcodes no forum host. Tools: discourse_latest, discourse_top (by period), discourse_topic. Actual .mcpb packing is deferred to v2 (PKG-01); this manifest is documentation/scaffold only.",
+  "version": "1.1.0",
+  "description": "Discourse forum research with normalized MCP output. Keyless — no credentials and no user_config: the target forum is a per-call `instance` tool parameter (scheme defaults to https), so this server hardcodes no forum host. Tools: discourse_latest, discourse_top (by period), discourse_topic.",
   "author": {
     "name": "Tushar Kanjariya"
   },
   "server": {
     "type": "node",
-    "entry_point": "server.js",
+    "entry_point": "servers/discourse/server.js",
     "mcp_config": {
       "command": "node",
-      "args": ["${__dirname}/server.js"]
+      "args": ["${__dirname}/servers/discourse/server.js"]
     }
   }
 }

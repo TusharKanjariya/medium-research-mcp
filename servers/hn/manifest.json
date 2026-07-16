@@ -1,37 +1,18 @@
 {
   "manifest_version": "0.3",
   "name": "medium-research-hn",
-  "version": "1.0.0",
-  "description": "Hacker News research with normalized MCP output. Documents the .mcpb user_config keychain pattern every credentialed server copies: each secret is a user_config field marked \"sensitive\": true (stored in the OS keychain, masked on input) and injected into mcp_config.env via ${user_config.<field>} at spawn — never written to disk in plaintext. HN itself needs no credentials; the fields below illustrate the pattern for later credentialed sources. KNOWN GOTCHA: ${user_config.*} env refs are solid in Claude Desktop but rough on the Claude Code plugin path (a bundled server can silently fail to spawn) — if it does not appear, check `claude mcp list`. Actual .mcpb packing is deferred to v2 (PKG-01); this manifest is documentation/scaffold only.",
+  "version": "1.1.0",
+  "description": "Hacker News research with normalized MCP output. Wraps the public Algolia HN Search + Firebase APIs (hn_search, hn_top, hn_rising, hn_get). Runs fully keyless — HN needs no credentials, so there is no user_config. KNOWN GOTCHA (Claude Code plugin path): a bundled server can silently fail to spawn — if it does not appear, check `claude mcp list`.",
   "author": {
     "name": "Tushar Kanjariya"
   },
-  "user_config": {
-    "reddit_client_secret": {
-      "type": "string",
-      "title": "Reddit client secret",
-      "description": "Optional — enables the authenticated Reddit OAuth2 password grant (also needs a registered script app's client_id + username/password).",
-      "sensitive": true,
-      "required": false
-    },
-    "librariesio_key": {
-      "type": "string",
-      "title": "Libraries.io API key",
-      "description": "Required for the Libraries.io source.",
-      "sensitive": true,
-      "required": false
-    }
-  },
+  "user_config": {},
   "server": {
     "type": "node",
-    "entry_point": "server.js",
+    "entry_point": "servers/hn/server.js",
     "mcp_config": {
       "command": "node",
-      "args": ["${__dirname}/server.js"],
-      "env": {
-        "REDDIT_CLIENT_SECRET": "${user_config.reddit_client_secret}",
-        "LIBRARIESIO_KEY": "${user_config.librariesio_key}"
-      }
+      "args": ["${__dirname}/servers/hn/server.js"]
     }
   }
 }
