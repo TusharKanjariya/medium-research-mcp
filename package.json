@@ -1,19 +1,42 @@
 {
   "name": "medium-research-mcp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A suite of MCP servers pulling normalized blog-topic research from developer sources",
   "type": "module",
-  "private": true,
   "engines": {
     "node": ">=18"
   },
+  "files": [
+    "servers/",
+    "shared/",
+    "docs/INSTALL.md",
+    "README.md"
+  ],
+  "bin": {
+    "medium-research-hn": "servers/hn/server.js",
+    "medium-research-stackexchange": "servers/stackexchange/server.js",
+    "medium-research-lobsters": "servers/lobsters/server.js",
+    "medium-research-lemmy": "servers/lemmy/server.js",
+    "medium-research-devto": "servers/devto/server.js",
+    "medium-research-github": "servers/github/server.js",
+    "medium-research-librariesio": "servers/librariesio/server.js",
+    "medium-research-producthunt": "servers/producthunt/server.js",
+    "medium-research-rss": "servers/rss/server.js",
+    "medium-research-discourse": "servers/discourse/server.js",
+    "medium-research-mastodon": "servers/mastodon/server.js"
+  },
   "scripts": {
     "test": "node --test",
-    "inspect:hn": "npx @modelcontextprotocol/inspector node servers/hn/server.js"
+    "inspect:hn": "npx @modelcontextprotocol/inspector node servers/hn/server.js",
+    "build:mcpb": "node scripts/build-mcpb.mjs",
+    "example:sweep": "node examples/pain-point-sweep.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "fast-xml-parser": "^4.5.7",
     "zod": "^4.4"
+  },
+  "devDependencies": {
+    "@anthropic-ai/mcpb": "2.1.2"
   }
 }
