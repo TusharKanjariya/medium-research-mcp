@@ -1,40 +1,40 @@
 {
   "version": "1.0",
-  "timestamp": "2026-07-14T11:23:42.015Z",
+  "timestamp": "2026-07-16T12:16:02.099Z",
   "phase": "8",
   "phase_name": "Universal Distribution",
-  "phase_dir": ".planning/phases/ (08 not yet created)",
+  "phase_dir": ".planning/phases/08-universal-distribution",
   "milestone": "v1.1 Writer-Aware, Universal Research",
-  "plan": null,
+  "plan": 4,
   "task": null,
   "total_tasks": null,
   "status": "paused",
-  "context_note": "Clean pause at a phase boundary. Phase 7 (Universal Sources & Parameterization Audit) is FULLY complete — discussed, researched, planned (4 plans), executed, code-reviewed (3 warnings fixed), verified (5/5 must-haves), live-UAT'd (both multi-instance smokes passed), and phase.complete. Nothing is in progress. Phase 8 (Universal Distribution, the LAST v1.1 phase) is the next unstarted phase and has no CONTEXT.md yet.",
+  "context_note": "Phase 8 (LAST of v1.1) fully executed: all 4 plans committed, code-reviewed (0 crit / 4 warn, WR-01/02/03 fixed), and goal-verified. Verifier returned human_needed (7/8 truths verified in-codebase). The ONLY thing left is one live human UAT — the Claude Desktop keychain->env test for the 2 credentialed .mcpb bundles — captured in 08-UAT.md; it cannot run headlessly. Nothing is broken or in-progress; the phase is intentionally held pending that UAT. Run /gsd-verify-work 8 to complete it.",
   "completed_tasks": [
-    {"id": "05", "name": "Phase 5 Guarded JSON Path & Trending Signals", "status": "done"},
-    {"id": "06", "name": "Phase 6 Author-Blog Awareness (ABLOG-01..05)", "status": "done"},
-    {"id": "07-discuss", "name": "Phase 7 CONTEXT.md (D-01..D-16)", "status": "done"},
-    {"id": "07-research", "name": "Phase 7 RESEARCH.md (live-probed field maps; corrected 3 CONTEXT assumptions)", "status": "done"},
-    {"id": "07-plan", "name": "4 plans (07-01..04), 3 waves, plan-checker PASSED", "status": "done", "commit": "98eb508"},
-    {"id": "07-01", "name": "TYPE append topic/status + Lemmy instance param (host-gated Bearer)", "status": "done"},
-    {"id": "07-02", "name": "Discourse server (latest/top/topic)", "status": "done"},
-    {"id": "07-03", "name": "Mastodon server (public/hashtag/trending tags+links)", "status": "done"},
-    {"id": "07-04", "name": "SEC-02 parameterization-audit test", "status": "done"},
-    {"id": "07-review", "name": "Code review (0 crit, 3 warn) + fixes WR-01/02/03 (incl. cross-origin auth-header stripping)", "status": "done"},
-    {"id": "07-verify", "name": "VERIFICATION.md passed 5/5 + live UAT (07-UAT.md) both smokes passed", "status": "done"}
+    {"id": "08-01", "name": "npm package: 11 medium-research-<source> bins, files whitelist (servers/+shared/), v1.1.0, private removed, @anthropic-ai/mcpb@2.1.2 devDep, shared/main.js isEntry() + shebangs on 11 servers", "status": "done", "commit": "0e4e6f6"},
+    {"id": "08-02", "name": "11 manifests retargeted to Option-A (mv 0.3), hn cred cleanup, test/manifest-consistency.test.js (D-05)", "status": "done", "commit": "b73f721"},
+    {"id": "08-03", "name": "scripts/build-mcpb.mjs (stage/validate/spawn-test/pack) -> 11 validated bundles in dist/; D-04 server-side keychain smoke verified live", "status": "done", "commit": "0f02168"},
+    {"id": "08-04", "name": "docs/INSTALL.md (per-client per-OS + release checklist) + examples/pain-point-sweep.mjs (DOC-01) + README link", "status": "done", "commit": "b922525"},
+    {"id": "08-review", "name": "Code review (0 crit / 4 warn); WR-01/02/03 fixed in build-mcpb.mjs; WR-04 accepted", "status": "done", "commit": "10eacdf"},
+    {"id": "08-verify", "name": "gsd-verifier: 7/8 truths verified -> human_needed; 08-VERIFICATION.md + 08-UAT.md written", "status": "done", "commit": "d894afe"}
   ],
   "remaining_tasks": [
-    {"id": "08", "name": "Phase 8 Universal Distribution (PKG-01, PKG-02, PKG-03, DOC-01) — not started", "status": "not_started"}
+    {"id": "08-uat", "name": "Live Claude Desktop keychain->env UAT for dist/medium-research-{librariesio,producthunt}.mcpb (2 items in 08-UAT.md). Run /gsd-verify-work 8.", "status": "not_started"},
+    {"id": "08-secure", "name": "OPTIONAL: /gsd-secure-phase 8 — verify packaging threat mitigations (vendored node_modules supply chain via --ignore-scripts, sensitive keychain secrets, npm tarball leakage) before public release", "status": "not_started"},
+    {"id": "milestone", "name": "After UAT passes: phase 8 auto-completes -> /gsd-complete-milestone to close v1.1", "status": "not_started"}
   ],
   "blockers": [],
   "async_jobs": [],
-  "human_actions_pending": [],
+  "human_actions_pending": [
+    {"action": "Run the live Claude Desktop keychain smoke: install dist/medium-research-librariesio.mcpb + dist/medium-research-producthunt.mcpb in Claude Desktop, enter the real creds when prompted (confirm masked), call one tool from each, then reinstall one WITHOUT the key and confirm a clear 'set X' error. Then /gsd-verify-work 8.", "context": "D-04 half that cannot run headlessly; server-side credential path already verified live this session. Completes Phase 8 (and v1.1).", "blocking": true},
+    {"action": "Push master to origin (23 commits ahead, unpushed)", "context": "Restores parallel worktree execution (currently degraded to sequential per #683) and the INSTALL.md docs reference the repo URL. Recommended before/at release.", "blocking": false}
+  ],
   "decisions": [
-    {"decision": "Phase 7 Discourse = 3 tools (latest/top/topic), Mastodon = 4 tools (public/hashtag/trending_tags/trending_links); explicit instance URL param; Lemmy keeps LEMMY_INSTANCE as optional default; SEC-02 delivered as an automated audit test", "rationale": "matches SRC-10/11/13 ACs; explicit self-documenting tools; regression-proof no-hardcoded-targets enforcement", "phase": "7"},
-    {"decision": "RESEARCH corrected 3 CONTEXT assumptions, all confirmed live during UAT", "rationale": "mastodon.social public timeline is now 422 auth-required (per-endpoint lockdown; trends still anon); Discourse category route needs slug AND numeric id; Lemmy already passes untrustedHost:true (only param+host-gated-Bearer remained)", "phase": "7"},
-    {"decision": "WR-03 cross-origin Authorization/Cookie stripping added to shared/http_client.js fetchTextManual", "rationale": "defense-in-depth complementing the Lemmy token host-gate; a redirect must not carry credentials to a different origin", "phase": "7"}
+    {"decision": "D-04 split: server-side credential path verified live (librariesio returned real packages; producthunt Developer Token accepted, returned launches; both fail-loud without the cred). Live Claude Desktop keychain UI test deferred to phase UAT.", "rationale": "The keychain->env injection is Claude Desktop host UI behavior; cannot be driven headlessly. User explicitly deferred it to UAT.", "phase": "8"},
+    {"decision": "Fixed code-review WR-01/02/03 in scripts/build-mcpb.mjs (dist wipe on failure; node-direct mcpb invocation, space-safe, no shell; temp-dir leak tracking). Rebuilt: 11 bundles, exit 0.", "rationale": "WR-01 (half-populated dist looks complete) is a real pre-release hazard; the fixes are isolated to dev-time tooling with no runtime/contract risk.", "phase": "8"},
+    {"decision": "Moved real test creds out of git-tracked .env.example into the gitignored .env; restored .env.example to the names-only committed template.", "rationale": ".env.example is committed/pushed publicly; real secrets (even test-account) must live only in .env. No secret is tracked.", "phase": "8"}
   ],
   "uncommitted_files": [],
-  "next_action": "Run /gsd-discuss-phase 8 to start Phase 8 (Universal Distribution). Packaging has real gray areas: one scoped npm package name + bin-per-server, the .mcpb staging strategy (stage repo layout + vendored prod node_modules so ../../shared survives), which clients to document (Claude Desktop/OpenCode/Codex/Cursor), and whether .mcpb bundles ship in v1.1 or defer. Milestone research already covers Phase 8 as SUMMARY.md 'Phase 4: Universal distribution' + PITFALLS.md 7/8/9/10.",
-  "context_notes": "v1.1 is 3/4 phases done (5,6,7 complete; only Phase 8 remains — 75%). 418 tests pass, tree clean, HEAD b55f14c. Local master is 57 commits ahead of origin (UNPUSHED) — this is why executors auto-degrade to sequential-on-master (worktree base-check #683); expected, not a bug. Pushing before Phase 8 is recommended: it restores parallel worktrees AND packaging docs reference the repo URL. auto_advance:true/mode:yolo is set but the user drives each phase manually and pauses at boundaries (saved as the manual-gsd-pacing memory) — do NOT auto-chain into the next phase. The live-UAT harness pattern (a scratchpad .mjs importing the server's exported functions + getJson/getText, run against real instances) worked well for Phase 6 & 7 human-verification and is reusable. Phase 8 adds only dev-time packaging tooling (@anthropic-ai/mcpb devDependency) — no new RUNTIME deps; the 11 manifests are scaffold-only today and Phase 8 activates packing (PKG-01)."
+  "next_action": "Run /gsd-verify-work 8 to walk the 2 live Claude Desktop keychain UAT items in 08-UAT.md; on pass, Phase 8 auto-completes and v1.1 is done.",
+  "context_notes": "Working tree clean, HEAD d894afe, 23 commits ahead of origin/master (unpushed -> executors auto-degrade to sequential-on-master, expected, not a bug). 430 tests pass. dist/ holds 11 built+validated bundles (gitignored; rebuild anytime with `npm run build:mcpb`). Real working creds are in the gitignored .env: LIBRARIESIO_KEY + PRODUCTHUNT_TOKEN=***PRODUCTHUNT-TOKEN-REDACTED*** (the PH v2 Developer Token — the earlier .env.example value was the wrong field, an API key/secret pair, which PH 401'd). auto_advance:true/mode:yolo is set but the user drives phases manually and pauses at boundaries (manual-gsd-pacing memory) — do NOT auto-chain. No blocking anti-patterns this session; execution was clean. The verifier correctly returned human_needed (not gaps_found) — do not re-plan or gap-close; just run the UAT."
 }
