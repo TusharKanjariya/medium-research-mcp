@@ -32,24 +32,24 @@ const MIN_KB = 200;        // deps must be present (not source-only)
 const MAX_KB = 20 * 1024;  // dev deps must be absent (not tens of MB)
 const SPAWN_TIMEOUT_MS = 15000;
 
-const mcpbBin = path.join(
-  ROOT, "node_modules", ".bin",
-  process.platform === "win32" ? "mcpb.cmd" : "mcpb",
-);
+// Invoke mcpb via its ESM cli.js directly through node — NOT the .bin/.cmd shim.
+// With no shell, interpolated stage/out/manifest paths (which can contain spaces)
+// are passed as literal argv entries, so the build is quoting-safe cross-platform
+// (WR-02). cli.js path is stable for @anthropic-ai/mcpb@2.x (bin: dist/cli/cli.js).
+const mcpbCli = path.join(ROOT, "node_modules", "@anthropic-ai", "mcpb", "dist", "cli", "cli.js");
 
 function runMcpb(args) {
-  // .cmd shims require shell:true on Windows (Node CVE-2024-27980 posture).
-  execFileSync(mcpbBin, args, {
+  execFileSync(process.execPath, [mcpbCli, ...args], {
     cwd: ROOT,
     stdio: ["ignore", "pipe", "pipe"],
-    shell: process.platform === "win32",
   });
 }
 
 // Build the prod-only node_modules once, in an isolated temp dir seeded with the
 // pinned package.json + lockfile, then hand back its node_modules path.
-function buildProdModules() {
+function buildProdModules(temps) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "mcpb-prod-"));
+  temps.push(dir); // track BEFORE the copies / npm ci so a throw still cleans it (WR-03)
   fs.copyFileSync(path.join(ROOT, "package.json"), path.join(dir, "package.json"));
   fs.copyFileSync(path.join(ROOT, "package-lock.json"), path.join(dir, "package-lock.json"));
   execFileSync("npm", ["ci", "--omit=dev", "--ignore-scripts"], {
@@ -126,8 +126,9 @@ function spawnTest(entryPath, name) {
 }
 
 // Stage one server in Option-A layout and return the stage dir path.
-function stageServer(name, prodModules) {
+function stageServer(name, prodModules, temps) {
   const stage = fs.mkdtempSync(path.join(os.tmpdir(), `mcpb-${name}-`));
+  temps.push(stage); // track BEFORE the copies so a mid-copy throw still cleans it (WR-03)
   fs.copyFileSync(
     path.join(ROOT, "servers", name, "manifest.json"),
     path.join(stage, "manifest.json"),
@@ -148,15 +149,16 @@ async function main() {
   fs.rmSync(DIST, { recursive: true, force: true });
   fs.mkdirSync(DIST, { recursive: true });
 
-  console.log("Building prod-only node_modules (npm ci --omit=dev --ignore-scripts)…");
-  const prodModules = path.join(buildProdModules(), "node_modules");
-
   const built = [];
-  const stages = [];
+  // Every temp dir we create (prod modules + per-server stages) is tracked here and
+  // removed in finally — even if a copy / npm ci / gate throws mid-op (WR-03).
+  const temps = [];
   try {
+    console.log("Building prod-only node_modules (npm ci --omit=dev --ignore-scripts)…");
+    const prodModules = path.join(buildProdModules(temps), "node_modules");
+
     for (const name of SERVERS) {
-      const stage = stageServer(name, prodModules);
-      stages.push(stage);
+      const stage = stageServer(name, prodModules, temps);
       const entry = path.join(stage, "servers", name, "server.js");
 
       // Gate 1: manifest validity.
@@ -175,8 +177,7 @@ async function main() {
       console.log(`✓ medium-research-${name}.mcpb  (${kb.toFixed(0)} KB)`);
     }
   } finally {
-    for (const s of stages) fs.rmSync(s, { recursive: true, force: true });
-    fs.rmSync(path.dirname(prodModules), { recursive: true, force: true });
+    for (const t of temps) fs.rmSync(t, { recursive: true, force: true });
   }
 
   if (built.length !== SERVERS.length) {
@@ -187,5 +188,8 @@ async function main() {
 
 main().catch((e) => {
   console.error(`\nBUILD FAILED: ${e.message}`);
+  // WR-01: a partial build must not leave a half-populated dist/ that reads as a
+  // complete set — remove it so a failed run yields no shippable artifacts.
+  try { fs.rmSync(DIST, { recursive: true, force: true }); } catch { /* best effort */ }
   process.exit(1);
 });
