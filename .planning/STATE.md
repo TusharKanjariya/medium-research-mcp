@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Writer-Aware, Universal Research
-current_phase: 08
-status: completed
-stopped_at: Completed 08-04-PLAN.md
-last_updated: "2026-07-17T08:18:51.994Z"
+status: Awaiting next milestone
+stopped_at: "Phase 08 complete (UAT 2/2 passed, SECURITY.md threats_open: 0) — v1.1 milestone 100% complete"
+last_updated: "2026-07-17T09:31:10.897Z"
 last_activity: 2026-07-17
-last_activity_desc: Phase 08 complete
+last_activity_desc: Milestone v1.1 completed and archived
 progress:
   total_phases: 4
   completed_phases: 4
   total_plans: 15
   completed_plans: 15
   percent: 100
+current_phase: 08
 current_phase_name: universal-distribution
 ---
 
@@ -24,21 +24,14 @@ current_phase_name: universal-distribution
 See: .planning/PROJECT.md (updated 2026-07-17)
 
 **Core value:** Uniform normalized output across every source, so `medium-blog-pro` consumes any source with zero per-source logic.
-**Current focus:** v1.1 milestone 100% complete — ready to archive (`/gsd-complete-milestone v1.1`)
+**Current focus:** Planning next milestone (v1.1 shipped + archived) — start via `/gsd-new-milestone`
 
 ## Current Position
 
-Phase: 08
-Plan: Not started
-Status: All phases complete
-Last activity: 2026-07-17 — Phase 08 complete
-
-**v1.1 phase structure:**
-
-- Phase 5: Guarded JSON Path & Trending Signals (SEC-01, TREND-01..03)
-- Phase 6: Author-Blog Awareness (ABLOG-01..05) — parallelizable with Phase 5; coordinate the shared `http_client.js` UA change
-- Phase 7: Universal Sources & Parameterization Audit (SRC-10, SRC-11, SRC-13, SEC-02) — gated by Phase 5's guarded JSON path
-- Phase 8: Universal Distribution (PKG-01..03, DOC-01) — strictly last, ships the final tool surface
+Phase: Milestone v1.1 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-07-17 — Milestone v1.1 completed and archived
 
 ## Performance Metrics
 
@@ -180,5 +173,4 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Archive the milestone: `/gsd-complete-milestone v1.1`
-- Then scope v2: `/gsd-new-milestone` (candidates: Bluesky SRC-12, IP-pinning SSRF follow-up SEC-03, npm publish of v1.1.0)
+- Start the next milestone with /gsd-new-milestone

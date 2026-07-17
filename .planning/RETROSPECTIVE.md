@@ -52,6 +52,34 @@ Nine single-purpose MCP servers under one normalized output contract, plus the p
 - Sessions: ~1 continuous build session across 3 calendar days.
 - Notable: research→plan→execute→review→verify per phase kept rework low; the only real rework was the YouTube-scope correction and the SRC-09 traceability fix.
 
+## Milestone: v1.1 — Writer-Aware, Universal Research
+
+**Shipped:** 2026-07-17
+**Phases:** 4 (5–8) | **Plans:** 15
+
+### What Was Built
+Guarded JSON path + trending tools (SEC-01, TREND-01..03); writer-aware `servers/rss` (Medium/Substack author + tag feeds, Substack archive enrichment, honest windows); keyless Discourse + Mastodon with instance-as-parameter + a parameterization audit (SEC-02); dual distribution — one npx npm package (11 bins) + 11 keychain-credentialed `.mcpb` bundles with validate + spawn-test gating; per-client INSTALL docs + a cross-source pain-point sweep. 9 → 11 servers, contract frozen throughout.
+
+### What Worked
+- **Zero new runtime deps** held for the whole milestone — every new source rode existing shared modules (`getJson`/`getText`/`parseFeed`); `@anthropic-ai/mcpb` stayed devDependency-only.
+- **SEC-01 first** (the single gating dependency) unblocked every tool-param-host server cleanly — no rework when Discourse/Mastodon/Lemmy landed on the guarded path.
+- **Live smoke at close** paid off immediately: caught a latent Discourse object-tags contract bug that 430 fixture tests missed.
+
+### What Was Inefficient
+- Fixtures used clean/empty tag data, so the Discourse `tags: string[]` violation only surfaced against a real tagged instance — a fixture with object-shaped tags would have caught it in Phase 7.
+- The `verify:pre` api-coverage gate false-positived on a doc-reference line, needing a COVERAGE.md to clear — minor friction on a distribution-only phase.
+
+### Patterns Established
+- Coerce-don't-assume for external list fields (`toTagNames`) — sources vary shape by instance/plugin.
+- Required-credential UX = fail-closed at the manifest (`required: true` → Desktop gates launch) rather than a runtime tool error.
+
+### Key Lessons
+- A fixture-only suite proves shape, not drift; a live smoke before milestone close is cheap insurance against instance-specific contract violations.
+
+### Cost Observations
+- Model mix: Opus throughout (orchestrator + all subagents).
+- Notable: per-phase verify + a final live smoke kept rework to one small Discourse fix.
+
 ## Cross-Milestone Trends
 
 *(Populated as more milestones ship.)*
@@ -59,3 +87,4 @@ Nine single-purpose MCP servers under one normalized output contract, plus the p
 | Milestone | Phases | Plans | Tests | Deps added | Notable |
 |-----------|--------|-------|-------|-----------|---------|
 | v1.0 MVP | 4 | 12 | 254 | fast-xml-parser@4 | Contract proven live; 1 Critical SSRF caught in review |
+| v1.1 Writer-Aware | 4 | 15 | 432 | none | 9→11 servers; live smoke caught a Discourse contract bug fixtures missed |

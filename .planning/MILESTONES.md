@@ -1,5 +1,23 @@
 # Milestones
 
+## v1.1 Writer-Aware, Universal Research (Shipped: 2026-07-17)
+
+**Phases completed:** 4 phases (5–8), 15 plans, 18 tasks
+**Timeline:** 2026-07-08 → 2026-07-17 · **Tests:** 432 passing, 0 fail · **Source:** ~4.9k LOC (servers + shared)
+**Closeout:** verified (all 4 phases verified; open-artifact audit clean; Phase 8 SECURITY.md threats_open: 0)
+
+**Delivered:** Upgraded the suite from 9 to 11 normalized-contract MCP servers, made it writer-aware, parameterized every target, and shipped it as both an npm package and 11 one-click `.mcpb` bundles — installable and driveable by any MCP client.
+
+**Key accomplishments:**
+
+- **Guarded JSON path + trending signals (Phase 5, SEC-01/TREND-01..03):** extended the SSRF chokepoint to opt-in `getJson({ untrustedHost })`, then added `hn_rising` (points/hour velocity), `so_unanswered` (high-view unanswered, backoff-aware), and `devto_top` (top/rising window + tag) — output contract kept frozen.
+- **Author-blog awareness in `servers/rss` (Phase 6, ABLOG-01..05):** `rss_author_posts` / `rss_tag_posts` read a chosen Medium/Substack/raw feed (platform inferred from the author string, ambiguous tokens rejected without guessing a host), `preview-only` tag flags paywalled bodies, and `rss_substack_archive` enriches score/comments off the guarded path with graceful RSS fallback.
+- **Universal sources + parameterization audit (Phase 7, SRC-10/11/13, SEC-02):** keyless Discourse and Mastodon servers (incl. Mastodon trends) with instance-as-tool-parameter, Lemmy parameterized, and a committed `parameterization-audit.test.js` proving no hardcoded accounts/instances/feeds anywhere.
+- **Dual distribution (Phase 8, PKG-01..03, DOC-01):** one unscoped npx-runnable npm package (11 `medium-research-<source>` bins, realpath-hardened `isEntry()` guard) + 11 keychain-credentialed `.mcpb` bundles, each gated by `mcpb validate` and a real MCP-initialize spawn test before pack; `@anthropic-ai/mcpb` stays devDependency-only.
+- **Setup docs + live proof:** per-client `INSTALL.md` (Claude Desktop, OpenCode, Codex, Cursor) with a manual release checklist, a runnable cross-source pain-point sweep, live Claude Desktop UAT of the keychain→env credential path, and a full 11-server live smoke (which caught and fixed a latent Discourse object-tags contract bug).
+
+---
+
 ## v1.0 MVP (Shipped: 2026-07-03)
 
 **Phases completed:** 4 phases, 12 plans, 23 tasks
