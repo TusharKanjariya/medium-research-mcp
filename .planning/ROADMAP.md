@@ -24,7 +24,7 @@ Nine MCP servers under one normalized output contract + a live multi-source unif
 - [x] **Phase 5: Guarded JSON Path & Trending Signals** - Extend the SSRF guard to a guarded JSON path (the milestone's single gating dependency) and add HN rising, Stack Exchange high-view-unanswered, and Dev.to top-window trending tools (completed 2026-07-10)
 - [x] **Phase 6: Author-Blog Awareness** - Medium/Substack/raw-feed author tools in the normalized contract with honest coverage windows, Substack archive enrichment, tag feeds, and documented dedup/cadence recipes (completed 2026-07-14)
 - [x] **Phase 7: Universal Sources & Parameterization Audit** - Discourse and Mastodon servers with instance-as-tool-parameter (incl. Mastodon trends), Lemmy parameterized, and the no-hardcoded-targets audit across the suite (completed 2026-07-14)
-- [ ] **Phase 8: Universal Distribution** - `.mcpb` one-click bundles, npm/`npx` packages, per-client setup docs (Claude Desktop, OpenCode, Codex, Cursor), and the cross-source pain-point sweep recipe
+- [x] **Phase 8: Universal Distribution** - `.mcpb` one-click bundles, npm/`npx` packages, per-client setup docs (Claude Desktop, OpenCode, Codex, Cursor), and the cross-source pain-point sweep recipe (completed 2026-07-17)
 
 ## Phase Details (v1.1)
 
@@ -144,7 +144,7 @@ Not part of the v1.1 milestone. Tracked for a later milestone (start via `/gsd-n
 | 5. Guarded JSON Path & Trending Signals | v1.1 | 4/4 | Complete    | 2026-07-10 |
 | 6. Author-Blog Awareness | v1.1 | 3/3 | Complete    | 2026-07-14 |
 | 7. Universal Sources & Parameterization Audit | v1.1 | 4/4 | Complete    | 2026-07-14 |
-| 8. Universal Distribution | v1.1 | 4/4 | In Progress|  |
+| 8. Universal Distribution | v1.1 | 4/4 | Complete    | 2026-07-17 |
 
 ---
 *Roadmap updated: 2026-07-08 — v1.1 phases added (coverage 17/17 v1.1 requirements)*

@@ -68,22 +68,23 @@ never hardcoded.
       `so_unanswered` (high-view no-answers, view_count rank, backoff sleep-within),
       Dev.to `devto_top` extended with `mode`/`days`/`tag`; output contract kept frozen
       — v1.1 Phase 5 (TREND-01..03)
+- ✓ Author-blog awareness — Medium/Substack feed reading in the normalized contract
+      inside `servers/rss` (author as tool param; dedup, follow-up, cadence; Substack
+      archive score/comment enrichment; preview-only paywall tag) — v1.1 Phase 6 (ABLOG-01..05)
+- ✓ Discourse generic fetcher (SRC-10) + Mastodon public/hashtag timelines (SRC-11) —
+      instance as tool parameter, keyless over the guarded untrustedHost path — v1.1 Phase 7 (SRC-10, SRC-11, SRC-13)
+- ✓ Parameterization audit — no hardcoded accounts/instances/feeds; committed
+      `parameterization-audit.test.js` scans every server (SEC-02) — v1.1 Phase 7
+- ✓ Universal distribution — one npx-runnable npm package (11 `medium-research-<source>`
+      bins) + 11 `.mcpb` keychain-credentialed bundles + per-client INSTALL docs +
+      live cross-source pain-point sweep — v1.1 Phase 8 (PKG-01..03, DOC-01)
 
 ### Active
 
 <!-- Current scope for the NEXT milestone. Empty until /gsd-new-milestone. -->
 
-<!-- v1.1 scope — REQ-IDs assigned in REQUIREMENTS.md -->
-
-- [ ] Author-blog tools: Medium/Substack feed reading in the normalized contract,
-      author as tool parameter (dedup, follow-up, cadence)
-- [x] Trending & pain-point mining on existing servers (Dev.to top window,
-      Stack Exchange high-view unanswered, HN rising) — ✓ shipped v1.1 Phase 5
-- [ ] Discourse generic fetcher (SRC-10), instance as tool parameter
-- [ ] Mastodon public/hashtag timelines (SRC-11), instance as tool parameter
-- [ ] Universal distribution: `.mcpb` bundles + npm packages + client config docs
-      (PKG-01+)
-- [ ] Parameterization rule: no hardcoded accounts/instances/feeds anywhere
+None — **v1.1 (Writer-Aware, Universal Research) is 100% complete** (Phases 5–8 shipped).
+Run `/gsd-complete-milestone v1.1` to archive, then `/gsd-new-milestone` for v2 scope.
 
 ### Out of Scope
 
@@ -159,6 +160,8 @@ follow-up. Start with `/gsd-new-milestone`.
 | Drop the Python YouTube OCR wrapper; surface YouTube links via the RSS recipe | User owns the OCR script and runs it manually; avoids a second runtime + supply-chain surface | ✓ Good — YT-01 met with zero new code |
 | Add one vetted runtime dep (`fast-xml-parser@4`) behind a human supply-chain gate | Robust RSS 2.0/Atom parsing beats a fragile hand-roll; v4 keeps the tree to `+strnum` only | ✓ Good — `--ignore-scripts`, tree verified |
 | SSRF chokepoint on the shared `getText`, not per-server | RSS is the first user-controlled outbound host; centralizing the guard protects every future text source | ✓ Good — code review caught + fixed a real IPv6 `::` bypass |
+| Dual distribution: one npx-runnable npm package AND per-source `.mcpb` bundles | npm covers any MCP client; `.mcpb` gives Claude Desktop keychain-backed one-click install; `@anthropic-ai/mcpb` stays devDependency-only | ✓ Good — v1.1 Phase 8; live Desktop UAT confirmed keychain→env injection + fail-closed required-cred UX |
+| `isEntry()` realpath entry guard shared across all 11 bins | One guard works under both copy (npx/registry/Windows) and symlinked (pnpm/npm link) installs | ✓ Good — bins run with no build step; 73 server tests unchanged |
 
 ## Evolution
 
@@ -178,4 +181,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-10 after completing v1.1 Phase 5 (Guarded JSON Path & Trending Signals — SEC-01, TREND-01..03; 291 tests, 0 fail; output contract frozen)*
+*Last updated: 2026-07-17 after completing v1.1 Phase 8 (Universal Distribution — PKG-01..03, DOC-01). Milestone v1.1 is 100% complete (Phases 5–8): author-blog awareness, Discourse + Mastodon, parameterization audit, and dual npm + `.mcpb` distribution. Live Claude Desktop UAT passed; per-phase threat models verified (Phase 8 SECURITY.md, threats_open: 0).*

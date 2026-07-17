@@ -1,19 +1,22 @@
 ---
 phase: 08-universal-distribution
 verified: 2026-07-16T12:10:48Z
-status: human_needed
+status: passed
 score: 7/8 must-haves verified
 behavior_unverified: 1
 overrides_applied: 0
 behavior_unverified_items:
+
   - truth: "A sensitive user_config secret reaches the running server as env via the OS keychain on a live Claude Desktop install (librariesio → LIBRARIESIO_KEY, producthunt → PRODUCTHUNT_TOKEN), and the no-key path errors naming the env var"
     test: "Install dist/medium-research-librariesio.mcpb and dist/medium-research-producthunt.mcpb in Claude Desktop (double-click or Settings → Extensions). Enter a real key when prompted (confirm the field is masked), call one tool (e.g. librariesio_search). Then reinstall with no key and call the tool again."
     expected: "With the key: a normal normalized result — proving the keychain-stored secret was injected as the env var. Without the key: a clear 'set LIBRARIESIO_KEY' / 'set PRODUCTHUNT_TOKEN' error, not a crash or silent empty list."
     why_human: "The keychain→env injection is host-specific Claude Desktop UI behavior that cannot be driven headlessly; grep/spawn checks cannot observe the OS keychain path. Server-side credential path (accessor throws/accepts) was verified live this session; only the live Desktop keychain UI remains. Explicitly deferred to phase UAT per user decision (08-03-SUMMARY 'Task 2 (D-04)')."
 human_verification:
+
   - test: "Install dist/medium-research-librariesio.mcpb + dist/medium-research-producthunt.mcpb in Claude Desktop, enter a real API key/token when prompted (confirm masked), and call one tool from each"
     expected: "A normalized result returns — the OS-keychain sensitive user_config value reached the server as its env var (LIBRARIESIO_KEY / PRODUCTHUNT_TOKEN)"
     why_human: "Live Claude Desktop keychain→env injection is host UI behavior; cannot run headlessly. Server-side credential path already verified live; only the Desktop keychain half remains (D-04, user-deferred to UAT)"
+
   - test: "Reinstall a credentialed bundle without entering the key and call its tool"
     expected: "A clear 'set LIBRARIESIO_KEY' / 'set PRODUCTHUNT_TOKEN' error naming the env var — not a crash or a silent empty list"
     why_human: "Required-credential failure UX on the live plugin/Desktop path (Pitfall E) diverges by host and only surfaces on a real install"
@@ -116,6 +119,7 @@ All 4 requirement IDs from PLAN frontmatter (PKG-01, PKG-02, PKG-03, DOC-01) are
 ### Gaps Summary
 
 No gaps. Every machine-checkable must-have for the phase goal is verified in the codebase:
+
 - **npx path (PKG-02):** package identity, 11 bins, Windows-safe shebangs + realpath-hardened isEntry, and a tarball that ships `servers/`+`shared/` while excluding `test/`/`.planning/` — all confirmed directly.
 - **`.mcpb` path (PKG-01):** 11 built, validated + spawn-tested, in-band, gitignored bundles from a supply-chain-hardened staging script; retargeted+consistency-locked manifests with `sensitive` credentials.
 - **Docs (PKG-03):** a complete Windows-first per-client INSTALL guide with the required env/GUI-inheritance/cold-start caveats and a manual release checklist.
