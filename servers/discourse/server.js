@@ -108,6 +108,25 @@ function resolveTopicAuthor(topic, usersById) {
 }
 
 /**
+ * Coerce a Discourse `tags` field to the contract's `tags: string[]`. Most
+ * instances return an array of name strings, but some (newer serializers /
+ * plugins, e.g. community.openai.com) return tag OBJECTS — passing those through
+ * makes the envelope fail its own outputSchema (`expected string, received
+ * object`). Extract the name string from either shape; drop anything without one.
+ * (Caught by the live smoke; fixtures only ever had string/empty tags — SRC-10.)
+ * @param {unknown} tags
+ * @returns {string[]}
+ */
+export function toTagNames(tags) {
+  if (!Array.isArray(tags)) return [];
+  return tags
+    .map((tag) =>
+      typeof tag === "string" ? tag : (tag?.name ?? tag?.slug ?? tag?.text ?? null),
+    )
+    .filter((t) => typeof t === "string" && t.length > 0);
+}
+
+/**
  * Map one Discourse topic_list.topics[] entry onto a raw contract item
  * (pre-normalize). Pure field mapping — buildListEnvelope -> normalizeItem does
  * the String(id)/?? null defaulting and strips `excerpt` HTML downstream.
@@ -127,7 +146,7 @@ export function mapDiscourseTopic(topic, usersById, base) {
     created_utc: t.created_at ?? null, // already ISO-8601
     url: null, // list carries no canonical URL; permalink is constructed
     permalink: `${base}/t/${t.slug}/${t.id}`,
-    tags: t.tags ?? [], // already an array of strings
+    tags: toTagNames(t.tags), // string tags OR object tags -> string[] (contract)
     text: t.excerpt ?? null, // HTML-ish; stripped by normalizeItem
   };
 }
@@ -155,7 +174,7 @@ export function mapDiscourseDetail(raw, base) {
     created_utc: r.created_at ?? null,
     url: null,
     permalink: `${base}/t/${r.slug}/${r.id}`,
-    tags: r.tags ?? [],
+    tags: toTagNames(r.tags), // string tags OR object tags -> string[] (contract)
     text: op.cooked ?? null, // OP body (HTML) -> stripped downstream
   };
   const comments = posts.slice(1).map((p) => ({

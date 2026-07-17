@@ -31,6 +31,7 @@ import {
   mapDiscourseDetail,
   mapDiscourseError,
   normalizeInstance,
+  toTagNames,
   server,
 } from "../servers/discourse/server.js";
 import {
@@ -99,6 +100,32 @@ test("mapDiscourseTopic yields null score/num_comments and [] tags when omitted"
   assert.equal(m.score, null);
   assert.equal(m.num_comments, null);
   assert.deepEqual(m.tags, []);
+});
+
+// Regression: some instances (e.g. community.openai.com) return `tags` as an
+// array of OBJECTS, not name strings. Passing those through broke the
+// `tags: string[]` output contract at runtime (live smoke, 2026-07-17).
+test("toTagNames coerces string, object, and mixed tag shapes to string[]", () => {
+  assert.deepEqual(toTagNames(["a", "b"]), ["a", "b"]); // strings unchanged
+  assert.deepEqual(toTagNames([{ name: "ai" }, { slug: "gpt" }, { text: "ml" }]), [
+    "ai",
+    "gpt",
+    "ml",
+  ]);
+  assert.deepEqual(toTagNames(["ok", { id: 1 }, null, { name: "" }, "keep"]), [
+    "ok",
+    "keep",
+  ]); // drop nameless objects, null, and empty
+  assert.deepEqual(toTagNames(undefined), []); // non-array -> []
+});
+
+test("mapDiscourseTopic with object-shaped tags still satisfies the contract", () => {
+  const objTagged = { id: 9, title: "t", slug: "t", tags: [{ name: "ai" }, { name: "llm" }] };
+  const m = mapDiscourseTopic(objTagged, usersById, BASE);
+  assert.deepEqual(m.tags, ["ai", "llm"]);
+  // and the full envelope parses against the frozen schema (the runtime failure path)
+  const env = buildListEnvelope({ source: "discourse", query: null, results: [m] });
+  assert.doesNotThrow(() => ListEnvelopeSchema.parse(env));
 });
 
 test("mapDiscourseTopic excerpt text is HTML-stripped via the shared contract path", () => {
