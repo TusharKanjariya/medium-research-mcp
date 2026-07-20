@@ -197,6 +197,35 @@ export const server = new McpServer({ name: "github", version: "1.0.0" });
 const SINCE = z.enum(["day", "week", "month"]);
 const SINCE_DAYS = { day: 1, week: 7, month: 30 };
 
+/**
+ * Build the gh_trending_repos search q string (exported pure builder — the
+ * seUrl/devtoTopUrl convention — so the window logic tests offline with an
+ * injected `now`). Recency window as a YYYY-MM-DD date string (D-03): GitHub has
+ * no trending API, so `pushed:>cutoff` + sort=stars emulates it. That default
+ * lets all-time star giants (pushed daily, score = total stars) dominate every
+ * window; `newOnly` swaps the window to `created:>cutoff` so only repos CREATED
+ * inside the window qualify — genuinely new repos, opt-in, default frozen.
+ * Composition order (query, language, window) and falsy-drop are unchanged.
+ */
+export function ghTrendingQualifiers({
+  query,
+  language,
+  since = "week",
+  newOnly = false,
+  now = Date.now(),
+} = {}) {
+  const cutoff = new Date(now - SINCE_DAYS[since] * 864e5)
+    .toISOString()
+    .slice(0, 10);
+  return [
+    query,
+    language && `language:${language}`,
+    `${newOnly ? "created" : "pushed"}:>${cutoff}`,
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
 server.registerTool(
   "gh_trending_repos",
   {
@@ -205,28 +234,21 @@ server.registerTool(
       "Recently-active repositories ranked by stars, via the GitHub Search API " +
       "(GitHub has no official trending API — this emulates it). `since` = " +
       "day/week/month (default week) sets the recent-activity window; optional " +
-      "`query` free text and `language` narrow the results. stars -> score.",
+      "`query` free text and `language` narrow the results. stars -> score. " +
+      "Set `newOnly` true to window by repo CREATION date instead of recent " +
+      "pushes, surfacing genuinely new repos rather than all-time star giants " +
+      "(default false — behavior unchanged).",
     inputSchema: {
       query: z.string().optional(),
       language: z.string().optional(),
       since: SINCE.optional(),
       limit: z.number().int().min(1).max(50).optional(),
+      newOnly: z.boolean().optional(),
     },
     outputSchema: listEnvelopeShape,
   },
-  async ({ query, language, since = "week", limit = 20 }) => {
-    // Recency window as a YYYY-MM-DD date string (D-03). GitHub has no trending
-    // API, so a `pushed:>cutoff` qualifier + sort=stars emulates it.
-    const cutoff = new Date(Date.now() - SINCE_DAYS[since] * 864e5)
-      .toISOString()
-      .slice(0, 10);
-    const qualifiers = [
-      query,
-      language && `language:${language}`,
-      `pushed:>${cutoff}`,
-    ]
-      .filter(Boolean)
-      .join(" ");
+  async ({ query, language, since = "week", limit = 20, newOnly = false }) => {
+    const qualifiers = ghTrendingQualifiers({ query, language, since, newOnly });
     const url = searchUrl("/search/repositories", qualifiers, {
       sort: "stars",
       limit,
