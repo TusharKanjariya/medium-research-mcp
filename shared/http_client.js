@@ -409,7 +409,32 @@ export async function getJson(url, opts = {}) {
 
       // Any 4xx (incl. 429/408) or other non-retryable status: do NOT retry, and
       // do NOT serve stale — this is a definitive client-error terminal state.
-      lastError = new Error(`getJson: HTTP ${status} from ${redactUrl(url)}`);
+      //
+      // Append a bounded body snippet so structured upstream errors stay legible
+      // (Stack Exchange 400s carry {error_id,error_name,error_message} for BOTH
+      // bad requests and throttle violations — without the body they are
+      // indistinguishable). The read is SELF-CONTAINED: a missing .text() or a
+      // failed read throws here, and letting that escape to the outer catch
+      // would misclassify a terminal 4xx as a retryable network TypeError. Any
+      // failure leaves the snippet empty and the message exactly as before —
+      // the "getJson: HTTP {status} from {url}" prefix is byte-identical either
+      // way, keeping every per-server regex matcher green. `key=` tokens are
+      // scrubbed so an upstream body echoing a query-string credential cannot
+      // leak it into a tool-visible error (WR-01).
+      let snippet = "";
+      try {
+        snippet = String(await response.text())
+          .replace(/\s+/g, " ")
+          .trim()
+          .slice(0, 300)
+          .replace(/key=[^&\s"']+/gi, "key=[redacted]");
+      } catch {
+        // body unreadable — keep the unadorned message
+      }
+      lastError = new Error(
+        `getJson: HTTP ${status} from ${redactUrl(url)}` +
+          (snippet ? ` — body: ${snippet}` : ""),
+      );
       transientFailure = false;
       break;
     } catch (err) {
