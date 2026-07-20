@@ -4,9 +4,9 @@ milestone: v1.1
 milestone_name: Writer-Aware, Universal Research
 status: Awaiting next milestone
 stopped_at: "Phase 08 complete (UAT 2/2 passed, SECURITY.md threats_open: 0) — v1.1 milestone 100% complete"
-last_updated: "2026-07-17T09:31:10.897Z"
-last_activity: 2026-07-17
-last_activity_desc: Milestone v1.1 completed and archived
+last_updated: "2026-07-20T12:48:00.000Z"
+last_activity: 2026-07-20
+last_activity_desc: Quick task 260720-p45 — SE error opacity + gh_trending newOnly window
 progress:
   total_phases: 4
   completed_phases: 4
@@ -152,6 +152,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260708-h5g | Fix CONCERNS.md bugs: astral entity decoding in shared/contract.js, content:encoded bypassing textOf in servers/rss/server.js, and CLAUDE.md drift (nonexistent build-mcpb.sh and inspect:hn) | 2026-07-08 | 80c05ff | [260708-h5g-fix-concerns-md-bugs-astral-entity-decod](./quick/260708-h5g-fix-concerns-md-bugs-astral-entity-decod/) |
+| 260720-p45 | Fix SE error opacity (getJson terminal-4xx errors carry a bounded, key=-scrubbed body snippet so throttle_violation is distinguishable from a bad request) and add opt-in gh_trending_repos newOnly created:> window via exported ghTrendingQualifiers | 2026-07-20 | f867996 | [260720-p45-fix-se-error-opacity-and-gh-trending-win](./quick/260720-p45-fix-se-error-opacity-and-gh-trending-win/) |
 
 ## Deferred Items
 
@@ -167,8 +168,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-17
-Stopped at: Phase 08 complete (UAT 2/2 passed, SECURITY.md threats_open: 0) — v1.1 milestone 100% complete
+Last session: 2026-07-20
+Stopped at: Quick task 260720-p45 complete (4 commits, 439/439 tests) — SE 4xx errors now carry error_name/error_message; gh_trending_repos newOnly ships
 Resume file: None
 
 ## Operator Next Steps
