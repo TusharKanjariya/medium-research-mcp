@@ -175,6 +175,84 @@ test("a 408 is NOT retried — strict no-4xx-retry (fetch called once)", async (
   assert.equal(fetchImpl.calls, 1, "408 must never be retried");
 });
 
+// --- terminal 4xx body snippet (SE error opacity fix) --------------------
+// Stack Exchange returns HTTP 400 for BOTH bad requests and throttle violations,
+// always with a compact JSON error body (error_id/error_name/error_message).
+// getJson appends a bounded, secret-scrubbed body snippet to terminal HTTP-status
+// errors so a live throttle is distinguishable from a bad request — while the
+// exact "getJson: HTTP {status} from {url}" prefix stays byte-identical for every
+// existing regex matcher (discourse mapDiscourseError, mastodon mapMastodonError).
+
+test("a 400 with an SE-style JSON error body surfaces error_name/error_message in the rejection (fetch once)", async () => {
+  const seBody =
+    '{"error_id":502,"error_name":"throttle_violation",' +
+    '"error_message":"too many requests from this ip, will be blocked for 0.5 secs"}';
+  const fetchImpl = fetchStub([
+    { ok: false, status: 400, async text() { return seBody; } },
+  ]);
+  const sleep = sleepSpy();
+  await assert.rejects(
+    () =>
+      getJson("https://api.stackexchange.test/2.3/questions/no-answers", {
+        fetchImpl,
+        sleep,
+        cacheKey: "http:se-400-body",
+      }),
+    (err) => {
+      assert.match(err.message, /getJson: HTTP 400 from/, "prefix byte-identical");
+      assert.match(err.message, /throttle_violation/, "error_name surfaced");
+      assert.match(err.message, /too many requests/, "error_message surfaced");
+      return true;
+    },
+  );
+  assert.equal(fetchImpl.calls, 1, "terminal 4xx — never retried");
+  assert.deepEqual(sleep.waited, []);
+});
+
+test("a 400 whose body cannot be read (no .text()) still throws the unchanged terminal error on attempt 1", async () => {
+  // res() deliberately has NO .text() — a bare await response.text() would throw
+  // a TypeError, which the outer catch would misclassify as a retryable network
+  // error. The body read must be self-contained so the 4xx stays terminal.
+  const fetchImpl = fetchStub([res(400, null)]);
+  const sleep = sleepSpy();
+  await assert.rejects(
+    () =>
+      getJson("https://example.test/no-text-400", {
+        fetchImpl,
+        sleep,
+        cacheKey: "http:no-text-400",
+      }),
+    (err) => {
+      assert.match(err.message, /getJson: HTTP 400 from/);
+      assert.ok(!/body:/.test(err.message), "no body suffix when the body is unreadable");
+      return true;
+    },
+  );
+  assert.equal(fetchImpl.calls, 1, "unreadable body must NOT convert a 4xx into a retry");
+  assert.deepEqual(sleep.waited, [], "no backoff — the TypeError never escaped");
+});
+
+test("a 400 body snippet is bounded (~300 chars) and key= secrets are scrubbed (WR-01)", async () => {
+  const hugeBody = `{"error":"key=SECRET123 rejected","detail":"${"x".repeat(1200)}"}`;
+  const fetchImpl = fetchStub([
+    { ok: false, status: 400, async text() { return hugeBody; } },
+  ]);
+  await assert.rejects(
+    () =>
+      getJson("https://example.test/big-body", {
+        fetchImpl,
+        sleep: sleepSpy(),
+        cacheKey: "http:big-body-400",
+      }),
+    (err) => {
+      assert.match(err.message, /getJson: HTTP 400 from/);
+      assert.ok(!/SECRET123/.test(err.message), "key= secret scrubbed from the snippet");
+      assert.ok(err.message.length < 400, "snippet bounded to ~300 chars");
+      return true;
+    },
+  );
+});
+
 // --- WR-01: credential/query-string redaction in error messages ----------
 test("getJson error message strips the URL query string so a key= secret cannot leak (WR-01)", async () => {
   const fetchImpl = fetchStub([res(404, null)]);
