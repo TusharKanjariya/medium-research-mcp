@@ -27,6 +27,7 @@ import {
   mapGhIssueDetail,
   requireGhResource,
   requireGhIssueNotPr,
+  ghTrendingQualifiers,
   server,
 } from "../servers/github/server.js";
 import {
@@ -232,6 +233,44 @@ test("requireGhIssueNotPr returns a genuine issue unchanged (happy path)", () =>
   assert.equal(requireGhIssueNotPr(issueWithReactions, "a/b#42"), issueWithReactions);
   // an issue detail node with no pull_request key passes through
   assert.equal(requireGhIssueNotPr(issueDetail, "a/b#42"), issueDetail);
+});
+
+// --- ghTrendingQualifiers: trending q-string builder (newOnly window) -----
+// Deterministic via an injected `now` (seUrl/devtoTopUrl exported-pure-builder
+// precedent). Default path MUST stay byte-identical to the historical inline
+// construction (pushed:>cutoff); newOnly swaps the window to created:>cutoff so
+// genuinely new repos surface instead of all-time star giants pushed daily.
+
+const FIXED_NOW = Date.UTC(2026, 0, 15); // 2026-01-15T00:00:00Z
+
+test("ghTrendingQualifiers default emits pushed:>cutoff (now - 7d for week) — frozen behavior", () => {
+  const q = ghTrendingQualifiers({ since: "week", now: FIXED_NOW });
+  assert.equal(q, "pushed:>2026-01-08");
+  assert.ok(!q.includes("created:>"), "default never uses the creation window");
+});
+
+test("ghTrendingQualifiers newOnly swaps the window to created:>cutoff (same date)", () => {
+  const q = ghTrendingQualifiers({ since: "week", newOnly: true, now: FIXED_NOW });
+  assert.equal(q, "created:>2026-01-08");
+  assert.ok(!q.includes("pushed:>"), "newOnly never uses the pushed window");
+});
+
+test("ghTrendingQualifiers preserves composition order: query, language, window (falsy dropped)", () => {
+  const q = ghTrendingQualifiers({
+    query: "rust cli",
+    language: "Rust",
+    since: "day",
+    now: FIXED_NOW,
+  });
+  assert.equal(q, "rust cli language:Rust pushed:>2026-01-14");
+});
+
+test("gh_trending_repos inputSchema gained newOnly append-only (query/language/since/limit intact)", () => {
+  const schema = server._registeredTools["gh_trending_repos"].inputSchema;
+  const shape = schema?.shape ?? schema;
+  for (const key of ["query", "language", "since", "limit", "newOnly"]) {
+    assert.ok(key in shape, `inputSchema carries ${key}`);
+  }
 });
 
 // --- registration smoke (FOUND-05) --------------------------------------
