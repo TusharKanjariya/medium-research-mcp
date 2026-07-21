@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: One-Shot Install
-status: planning
-last_updated: "2026-07-21T09:59:16.861Z"
+status: roadmap_created
+last_updated: "2026-07-21T00:00:00.000Z"
 last_activity: 2026-07-21
 progress:
-  total_phases: 0
+  total_phases: 2
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,17 +17,19 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-07-17)
+See: .planning/PROJECT.md (updated 2026-07-20)
 
 **Core value:** Uniform normalized output across every source, so `medium-blog-pro` consumes any source with zero per-source logic.
-**Current focus:** Planning next milestone (v1.1 shipped + archived) — start via `/gsd-new-milestone`
+**Current focus:** Milestone v1.2 One-Shot Install — roadmap created (Phases 9–10), next `/gsd-plan-phase 9`
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 9 of 10 (Aggregator & One-Shot Installer) — not started
 Plan: —
-Status: Defining requirements
-Last activity: 2026-07-21 — Milestone v1.2 started
+Status: Roadmap created — ready to plan Phase 9
+Last activity: 2026-07-21 — v1.2 roadmap created (Phases 9–10, 5/5 requirements mapped)
+
+Progress: [----------] 0% (0/2 phases)
 
 ## Performance Metrics
 
@@ -98,6 +100,9 @@ Recent decisions affecting current work:
 - [v1.1 roadmap]: Distribution (PKG-01..03) is strictly last (Phase 8) — packaging ships the final tool surface once; nothing feeds back into code.
 - [v1.1 roadmap]: Author-blog tools live IN `servers/rss` (not a sibling server) — avoids duplicating the parser or breaking the `servers/* -> shared/*` dependency direction (per research SUMMARY.md).
 - [v1.1 roadmap]: Zero new runtime dependencies for v1.1 — `@anthropic-ai/mcpb` is devDependency-only; all new endpoints are keyless JSON/RSS through existing shared modules.
+- [v1.2 roadmap]: Code before publish — AGG-01 (aggregator bin) and INST-01 (installer command) land in Phase 9 so the Phase 10 publish ships them in one release; publishing first would force a second release.
+- [v1.2 roadmap]: `npm publish` (PKG-04) is a human-gated checkpoint — npm login + INSTALL.md manual release checklist; never automated.
+- [v1.2 roadmap]: Zero new runtime dependencies — installer + aggregator use Node stdlib, existing shared modules, and the already-present `@modelcontextprotocol/sdk`; output contract frozen; credentials only via `shared/credentials.js`; the 11 single-purpose servers and `.mcpb` bundles unchanged.
 - [Phase ?]: SE text mapped from body_markdown ?? body: built-in withbody filter returns HTML body not body_markdown (A1 corrected); stripHtml cleans downstream
 - [Phase 02 P02]: Lemmy authenticated reads require LEMMY_INSTANCE set explicitly (even to the default programming.dev) alongside LEMMY_USERNAME/LEMMY_PASSWORD — lemmyCreds() needs all three; username/password alone degrade to anonymous with no error. Documented in manifest + tool descriptions and asserted by tests.
 - [Phase 02 P02]: Lobsters author = plain-string submitter_user (Pitfall 6); Lemmy permalink = post.ap_id (federation URL); Lemmy posts have no tags (tags: []).
@@ -164,10 +169,10 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-20
-Stopped at: Quick task 260720-p45 complete (4 commits, 439/439 tests) — SE 4xx errors now carry error_name/error_message; gh_trending_repos newOnly ships
+Last session: 2026-07-21
+Stopped at: v1.2 roadmap created — Phases 9–10 mapped, 5/5 requirements covered, traceability updated
 Resume file: None
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Plan Phase 9 with /gsd-plan-phase 9

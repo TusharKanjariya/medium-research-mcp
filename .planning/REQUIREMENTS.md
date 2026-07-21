@@ -55,8 +55,8 @@ no contract changes. Prior milestone requirements live in PROJECT.md § Validate
 
 | REQ | Phase | Status |
 |-----|-------|--------|
-| PKG-04 | — | pending roadmap |
-| PKG-05 | — | pending roadmap |
-| INST-01 | — | pending roadmap |
-| AGG-01 | — | pending roadmap |
-| DOC-02 | — | pending roadmap |
+| PKG-04 | Phase 10 | Pending |
+| PKG-05 | Phase 10 | Pending |
+| INST-01 | Phase 9 | Pending |
+| AGG-01 | Phase 9 | Pending |
+| DOC-02 | Phase 10 | Pending |
