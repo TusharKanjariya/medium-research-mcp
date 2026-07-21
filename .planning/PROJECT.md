@@ -21,25 +21,25 @@ results[] }` for lists and `{ source, item }` for details, with a fixed item
 schema — because that is what lets the consuming skill rank, filter, and cite
 across sources without a single source-specific branch.
 
-## Current Milestone: v1.1 Writer-Aware, Universal Research
+## Current Milestone: v1.2 One-Shot Install
 
-**Goal:** Upgrade the suite into a writer-aware idea engine that any MCP-capable
-agent (Claude Desktop, OpenCode, Codex, GPT clients, …) can install and drive —
-with all targets (blogs, forums, instances) chosen by the agent at call time,
-never hardcoded.
+**Goal:** Anyone can get all 11 servers into any MCP client with one command —
+no manual per-server adds, no local-path hacks.
 
 **Target features:**
-- Author-blog tools — local stdio server exposing Medium/Substack feed reading in
-  the normalized contract; author username/feed URL is a tool parameter; enables
-  topic dedup, follow-up detection, and cadence view for any author
-- Trending & pain-point mining — Dev.to top-of-week/month, Stack Exchange
-  high-view unanswered questions, HN rising — new tools/params on existing servers
-- Discourse server (SRC-10) — instance URL as tool parameter, any public forum
-- Mastodon server (SRC-11) — instance + hashtag as tool parameters, keyless
-- Universal distribution (PKG-01+) — `.mcpb` custom-connector bundles for Claude
-  Desktop and npm-published packages + config docs for all other MCP clients
-- Parameterization rule (cross-cutting) — no hardcoded accounts/instances/feeds;
-  targets are tool inputs, env only for credentials/optional defaults
+- npm publish (PKG-04) — `medium-research-mcp` published publicly so the
+  documented `npx -y medium-research-<source>` config works on any machine;
+  INSTALL.md's manual release checklist is the base
+- GitHub install path (PKG-05) — same package runnable via
+  `npx github:<owner>/medium-research-mcp`; both routes documented
+- One-shot installer (INST-01) — `npx medium-research-mcp install` detects the
+  client (Claude Desktop, OpenCode, Codex, Cursor), backs up its config, merges
+  all 11 entries non-destructively, prompts for the 2 required keys
+- Aggregator server (AGG-01) — new `medium-research-all` bin exposing all 11
+  sources' tools from one process, so a client needs exactly one config entry;
+  the 11 single-purpose servers remain the primary shape
+- Docs (DOC-02) — INSTALL.md rewritten around the new install paths; retire the
+  temp local-path config file
 
 ## Requirements
 
@@ -83,8 +83,11 @@ never hardcoded.
 
 <!-- Current scope for the NEXT milestone. Empty until /gsd-new-milestone. -->
 
-None — **v1.1 (Writer-Aware, Universal Research) is 100% complete** (Phases 5–8 shipped).
-Run `/gsd-complete-milestone v1.1` to archive, then `/gsd-new-milestone` for v2 scope.
+- [ ] **PKG-04**: User can configure any server on any machine with `npx -y medium-research-<source>` (package published to npm)
+- [ ] **PKG-05**: User can install without npm registry via `npx github:<owner>/medium-research-mcp` (documented GitHub path)
+- [ ] **INST-01**: User can add all 11 servers to their MCP client in one command (`npx medium-research-mcp install` — detect, backup, merge, prompt for required keys)
+- [ ] **AGG-01**: User can add ONE config entry (`medium-research-all`) and get every source's tools
+- [ ] **DOC-02**: User can follow INSTALL.md for npm, GitHub, installer, and aggregator paths (temp local-path file retired)
 
 ### Out of Scope
 
@@ -181,4 +184,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-17 after completing v1.1 Phase 8 (Universal Distribution — PKG-01..03, DOC-01). Milestone v1.1 is 100% complete (Phases 5–8): author-blog awareness, Discourse + Mastodon, parameterization audit, and dual npm + `.mcpb` distribution. Live Claude Desktop UAT passed; per-phase threat models verified (Phase 8 SECURITY.md, threats_open: 0).*
+*Last updated: 2026-07-20 — started milestone v1.2 One-Shot Install (PKG-04/05, INST-01, AGG-01, DOC-02).*

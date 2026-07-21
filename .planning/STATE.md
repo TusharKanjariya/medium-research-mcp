@@ -1,20 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Writer-Aware, Universal Research
-status: Awaiting next milestone
-stopped_at: "Phase 08 complete (UAT 2/2 passed, SECURITY.md threats_open: 0) — v1.1 milestone 100% complete"
-last_updated: "2026-07-20T12:48:00.000Z"
-last_activity: 2026-07-20
-last_activity_desc: Quick task 260720-p45 — SE error opacity + gh_trending newOnly window
+milestone: v1.2
+milestone_name: One-Shot Install
+status: planning
+last_updated: "2026-07-21T09:59:16.861Z"
+last_activity: 2026-07-21
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 15
-  completed_plans: 15
-  percent: 100
-current_phase: 08
-current_phase_name: universal-distribution
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -28,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-07-17)
 
 ## Current Position
 
-Phase: Milestone v1.1 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-07-17 — Milestone v1.1 completed and archived
+Status: Defining requirements
+Last activity: 2026-07-21 — Milestone v1.2 started
 
 ## Performance Metrics
 
