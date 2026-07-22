@@ -49,7 +49,9 @@ Upgraded the suite from 9 to 11 normalized-contract servers, made it writer-awar
   3. The installer backs up the existing config file before writing and merges all 11 server entries without removing or altering any unrelated server entry already in the config
   4. The installer prompts for the 2 required keys (LIBRARIESIO_KEY, PRODUCTHUNT_TOKEN) and each prompt can be skipped — skipping leaves those servers configured keyless with their existing fail-loudly behavior
   5. The 11 single-purpose bins and `.mcpb` bundles behave exactly as before — the full existing test suite still passes with zero contract changes
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 09-01-PLAN.md — Aggregator (AGG-01): `registerTools` seam + `medium-research-all` server exposing the full 37-tool union (wave 1)
+- [ ] 09-02-PLAN.md — Installer (INST-01): `npx medium-research-mcp install` — detect 4 clients, backup + non-destructive merge, skippable key prompts (wave 2)
 
 ### Phase 10: Publish & Install-Path Docs
 **Goal**: Anyone on any machine can install via npm or GitHub with the documented commands — no clone, no local-path hacks
