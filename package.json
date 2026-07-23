@@ -23,7 +23,8 @@
     "medium-research-producthunt": "servers/producthunt/server.js",
     "medium-research-rss": "servers/rss/server.js",
     "medium-research-discourse": "servers/discourse/server.js",
-    "medium-research-mastodon": "servers/mastodon/server.js"
+    "medium-research-mastodon": "servers/mastodon/server.js",
+    "medium-research-all": "servers/aggregator/server.js"
   },
   "scripts": {
     "test": "node --test",

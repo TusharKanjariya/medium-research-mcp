@@ -153,8 +153,11 @@ export function mapHnItem(detail) {
 // assembles the envelope with the shared factories, and returns toolResult()
 // so both structuredContent and JSON-text content are emitted (FOUND-05).
 
-export const server = new McpServer({ name: "hn", version: "1.0.0" });
-
+// registerTools(server) is the aggregator merge seam (AGG-01/D-01): the same
+// registerTool calls, wrapped so the aggregator can mount them onto its own
+// McpServer. The standalone bin calls it locally right after constructing its
+// own `server` below, so `node servers/hn/server.js` keeps every tool.
+export function registerTools(server) {
 server.registerTool(
   "hn_front_page",
   {
@@ -261,6 +264,10 @@ server.registerTool(
     return toolResult(env);
   },
 );
+}
+
+export const server = new McpServer({ name: "hn", version: "1.0.0" });
+registerTools(server);
 
 // Connect over stdio only when run directly (`node servers/hn/server.js`), so
 // importing this module for tests does NOT start a live transport.
