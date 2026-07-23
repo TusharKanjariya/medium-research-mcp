@@ -16,6 +16,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { createInterface } from "node:readline/promises";
 import { isEntry } from "../shared/main.js";
 
 // The 11 source bins (mirror package.json bin map / docs/INSTALL.md).
@@ -200,35 +201,238 @@ export function detectClients(opts = {}) {
   return clientDescriptors(opts).filter((d) => fs.existsSync(d.dir));
 }
 
+// --- Entry sets: aggregator (default) vs the 11 separate (--separate) ---------
+
+/** Per-source key placement (separate mode): keys go ONLY on their own server. */
+function keysForSource(source, keys) {
+  const env = {};
+  if (source === "librariesio" && keys?.LIBRARIESIO_KEY) env.LIBRARIESIO_KEY = keys.LIBRARIESIO_KEY;
+  if (source === "producthunt" && keys?.PRODUCTHUNT_TOKEN) env.PRODUCTHUNT_TOKEN = keys.PRODUCTHUNT_TOKEN;
+  return env;
+}
+
+/** Assemble one JSON entry. format "opencode" → array command + `environment`; else `env`. */
+function jsonEntry(bin, env, format, platform) {
+  const hasEnv = env && Object.keys(env).length > 0;
+  if (format === "opencode") {
+    return { ...opencodeEntry(bin, platform), ...(hasEnv ? { environment: env } : {}) };
+  }
+  return { ...stdioEntry(bin, platform), ...(hasEnv ? { env } : {}) };
+}
+
+/**
+ * Default D-06 entry set: the SINGLE `medium-research-all` aggregator entry carrying
+ * whichever provided keys in ONE env/environment block (both keyed servers run inside
+ * the aggregator process). `format` = "env" (Claude/Cursor) | "opencode".
+ */
+export function aggregatorEntries(keys, platform = process.platform, format = "env") {
+  const bin = "medium-research-all";
+  return { [bin]: jsonEntry(bin, envFor(keys), format, platform) };
+}
+
+/**
+ * `--separate` entry set: the 11 `medium-research-<source>` entries, with keys attached
+ * only to librariesio / producthunt.
+ */
+export function separateEntries(keys, platform = process.platform, format = "env") {
+  const out = {};
+  for (const s of SOURCES) {
+    const bin = `medium-research-${s}`;
+    out[bin] = jsonEntry(bin, keysForSource(s, keys), format, platform);
+  }
+  return out;
+}
+
+/** TOML table map (name -> block) for the aggregator single entry. */
+export function aggregatorTomlTables(keys, platform = process.platform) {
+  const name = "medium-research-all";
+  const env = envFor(keys);
+  return {
+    [`mcp_servers.${name}`]: tomlBlock(name, name, Object.keys(env).length ? env : null, platform),
+  };
+}
+
+/** TOML table map (name -> block) for the 11 separate entries. */
+export function separateTomlTables(keys, platform = process.platform) {
+  const out = {};
+  for (const s of SOURCES) {
+    const name = `medium-research-${s}`;
+    const env = keysForSource(s, keys);
+    out[`mcp_servers.${name}`] = tomlBlock(name, name, Object.keys(env).length ? env : null, platform);
+  }
+  return out;
+}
+
+// --- Argv parsing ------------------------------------------------------------
+
+export const CLIENT_IDS = ["claude", "cursor", "codex", "opencode"];
+
+/**
+ * Parse the install argv (process.argv.slice(2)). Validates `--client` against the
+ * 4-value allowlist and rejects unknown flags/values with a clear error (V5 input
+ * validation, T-09B-04).
+ */
+export function parseArgs(argv) {
+  const opts = { install: argv[0] === "install", separate: false, yes: false, client: null };
+  const rest = opts.install ? argv.slice(1) : argv;
+  for (const a of rest) {
+    if (a === "--separate") opts.separate = true;
+    else if (a === "--yes" || a === "-y") opts.yes = true;
+    else if (a.startsWith("--client=")) {
+      const v = a.slice("--client=".length);
+      if (!CLIENT_IDS.includes(v)) {
+        throw new Error(`Unknown --client "${v}" (expected one of: ${CLIENT_IDS.join(", ")}).`);
+      }
+      opts.client = v;
+    } else {
+      throw new Error(`Unknown argument "${a}".`);
+    }
+  }
+  return opts;
+}
+
+// --- Write dispatch ----------------------------------------------------------
+
+const OPENCODE_SKELETON = { $schema: "https://opencode.ai/config.json", mcp: {} };
+
+/** Back up then non-destructively write the chosen entry set to one client. */
+export function writeToClient(desc, mode, keys, platform = process.platform) {
+  const bak = backupConfig(desc.configPath);
+  if (desc.format === "toml") {
+    const tables = mode === "separate"
+      ? separateTomlTables(keys, platform)
+      : aggregatorTomlTables(keys, platform);
+    mergeToml(desc.configPath, tables);
+  } else if (desc.format === "opencode") {
+    const entries = mode === "separate"
+      ? separateEntries(keys, platform, "opencode")
+      : aggregatorEntries(keys, platform, "opencode");
+    mergeJson(desc.configPath, desc.container, entries, structuredClone(OPENCODE_SKELETON));
+  } else {
+    const entries = mode === "separate"
+      ? separateEntries(keys, platform, "env")
+      : aggregatorEntries(keys, platform, "env");
+    mergeJson(desc.configPath, desc.container, entries);
+  }
+  return bak;
+}
+
 // --- CLI ---------------------------------------------------------------------
 
-/** Resolve the Claude Desktop config path per-OS (see constraints callout). */
-function claudeConfigPath(
-  { home = os.homedir(), platform = process.platform, appData = process.env.APPDATA } = {},
-) {
-  const dir =
-    platform === "win32"
-      ? path.join(appData || path.join(home, "AppData", "Roaming"), "Claude")
-      : platform === "darwin"
-        ? path.join(home, "Library", "Application Support", "Claude")
-        : path.join(home, ".config", "Claude");
-  return path.join(dir, "claude_desktop_config.json");
+const PLAINTEXT_WARNING =
+  "NOTE: keys are stored in PLAINTEXT in the client config file. For Claude Desktop, " +
+  "the .mcpb bundle stores secrets in the OS keychain instead.";
+
+function printUsage() {
+  console.log(
+    "Usage: npx medium-research-mcp install [--separate] [--client=<claude|cursor|codex|opencode>] [--yes]\n" +
+      "\n  Interactive by default: detects your MCP client(s), backs up the config, and\n" +
+      "  non-destructively merges the medium-research server entries.\n" +
+      "  --separate  install the 11 individual servers instead of the single aggregator\n" +
+      "  --client=   non-interactive target (required in a non-TTY/CI run)\n" +
+      "  --yes       skip the confirm prompt",
+  );
+}
+
+/** Non-interactive (CI / non-TTY) install: requires --client, writes keyless. */
+function runNonInteractive(opts, mode) {
+  const desc = clientDescriptors().find((d) => d.id === opts.client);
+  const bak = writeToClient(desc, mode, {});
+  const what = mode === "separate" ? `${SOURCES.length} separate entries` : "medium-research-all";
+  console.log(`Wrote ${what} to ${desc.configPath}`);
+  if (bak) console.log(`Backed up previous config to ${bak}`);
+}
+
+/** Interactive wizard: detect → pick → prompt keys (skippable) → confirm → write. */
+async function runInteractive(opts, mode) {
+  const detected = detectClients();
+  if (detected.length === 0) {
+    console.log("No supported MCP client detected. Looked for:");
+    for (const d of clientDescriptors()) console.log(`  - ${d.id}: ${d.dir}`);
+    console.log("Nothing written.");
+    return;
+  }
+
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  try {
+    console.log("Detected MCP clients:");
+    detected.forEach((d, i) => console.log(`  ${i + 1}. ${d.id} (${d.configPath})`));
+    const pick = (await rl.question("Install to which? (comma-separated numbers, or 'all') [all]: ")).trim();
+    let targets;
+    if (!pick || pick.toLowerCase() === "all") {
+      targets = detected;
+    } else {
+      targets = pick
+        .split(",")
+        .map((s) => parseInt(s.trim(), 10) - 1)
+        .filter((i) => i >= 0 && i < detected.length)
+        .map((i) => detected[i]);
+    }
+    if (targets.length === 0) {
+      console.log("No client selected. Nothing written.");
+      return;
+    }
+
+    console.log(
+      "\nEnter API keys (press Enter to skip — a skipped key leaves that server keyless / fail-loud):",
+    );
+    console.log(PLAINTEXT_WARNING);
+    const keys = {};
+    const lib = (await rl.question("LIBRARIESIO_KEY (Enter to skip): ")).trim();
+    if (lib) keys.LIBRARIESIO_KEY = lib;
+    const ph = (await rl.question("PRODUCTHUNT_TOKEN (Enter to skip): ")).trim();
+    if (ph) keys.PRODUCTHUNT_TOKEN = ph;
+
+    const what = mode === "separate" ? `${SOURCES.length} separate entries` : "the single medium-research-all entry";
+    console.log(`\nAbout to write ${what} to:`);
+    targets.forEach((d) => console.log(`  - ${d.configPath}`));
+    const ok = opts.yes || /^y(es)?$/i.test((await rl.question("Proceed? [y/N]: ")).trim());
+    if (!ok) {
+      console.log("Aborted. Nothing written.");
+      return;
+    }
+
+    for (const d of targets) {
+      const bak = writeToClient(d, mode, keys);
+      console.log(`  ${d.id}: wrote to ${d.configPath}${bak ? ` (backup: ${bak})` : ""}`);
+    }
+    console.log("Done. Restart your client to load the new server(s).");
+  } finally {
+    rl.close();
+  }
 }
 
 async function main(argv) {
-  if (argv[0] !== "install") {
-    console.log("Usage: npx medium-research-mcp install");
+  let opts;
+  try {
+    opts = parseArgs(argv);
+  } catch (e) {
+    console.error(e.message);
+    process.exitCode = 1;
     return;
   }
-  // Task-1 minimal path: write the single medium-research-all aggregator entry into
-  // Claude Desktop, backup-first. The full wizard (other clients, prompts, flags)
-  // lands in later tasks.
-  const cfgPath = claudeConfigPath();
-  const entries = { "medium-research-all": stdioEntry("medium-research-all") };
-  const bak = backupConfig(cfgPath);
-  mergeJson(cfgPath, "mcpServers", entries);
-  console.log(`Wrote medium-research-all to ${cfgPath}`);
-  if (bak) console.log(`Backed up previous config to ${bak}`);
+  if (!opts.install) {
+    printUsage();
+    return;
+  }
+
+  const mode = opts.separate ? "separate" : "aggregator";
+
+  // Non-TTY guard (T-09B-05): never block on a prompt — require --client in CI.
+  if (opts.client) {
+    runNonInteractive(opts, mode);
+    return;
+  }
+  if (!process.stdin.isTTY) {
+    console.error(
+      "Non-interactive run (no TTY): pass --client=<claude|cursor|codex|opencode> " +
+        "(optionally with --separate/--yes). Nothing written.",
+    );
+    process.exitCode = 1;
+    return;
+  }
+
+  await runInteractive(opts, mode);
 }
 
 if (isEntry(import.meta.url)) {

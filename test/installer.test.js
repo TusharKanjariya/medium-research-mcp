@@ -10,6 +10,8 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import {
   backupConfig,
   mergeJson,
@@ -21,7 +23,13 @@ import {
   spliceTomlTable,
   mergeToml,
   detectClients,
+  aggregatorEntries,
+  separateEntries,
+  parseArgs,
+  SOURCES,
 } from "../bin/install.js";
+
+const INSTALL_JS = fileURLToPath(new URL("../bin/install.js", import.meta.url));
 
 // A fresh tmpdir per call so cases never collide.
 function tmp() {
@@ -225,4 +233,69 @@ test("detectClients returns exactly the clients whose config dir exists", () => 
   fs.mkdirSync(path.join(home, ".codex"));
   const all = detectClients({ home, platform: "linux" }).map((d) => d.id).sort();
   assert.deepEqual(all, ["claude", "codex", "cursor", "opencode"]);
+});
+
+// --- Entry sets: aggregator (default) vs separate (--separate) ---------------
+
+test("aggregatorEntries is one medium-research-all entry carrying both provided keys", () => {
+  const e = aggregatorEntries({ LIBRARIESIO_KEY: "L", PRODUCTHUNT_TOKEN: "P" }, "linux", "env");
+  assert.deepEqual(Object.keys(e), ["medium-research-all"]);
+  assert.deepEqual(e["medium-research-all"], {
+    command: "npx",
+    args: ["-y", "medium-research-all"],
+    env: { LIBRARIESIO_KEY: "L", PRODUCTHUNT_TOKEN: "P" },
+  });
+  // No keys → no env block at all.
+  assert.equal(aggregatorEntries({}, "linux", "env")["medium-research-all"].env, undefined);
+});
+
+test("separateEntries is 11 entries with keys only on librariesio/producthunt", () => {
+  const e = separateEntries({ LIBRARIESIO_KEY: "L", PRODUCTHUNT_TOKEN: "P" }, "linux", "env");
+  assert.equal(Object.keys(e).length, 11);
+  assert.deepEqual(Object.keys(e).sort(), SOURCES.map((s) => `medium-research-${s}`).sort());
+  assert.deepEqual(e["medium-research-librariesio"].env, { LIBRARIESIO_KEY: "L" });
+  assert.deepEqual(e["medium-research-producthunt"].env, { PRODUCTHUNT_TOKEN: "P" });
+  // A keyless server has no env block, and does not carry the other server's key.
+  assert.equal(e["medium-research-hn"].env, undefined);
+  assert.equal(e["medium-research-librariesio"].env.PRODUCTHUNT_TOKEN, undefined);
+});
+
+test("separateEntries in opencode format uses environment (not env) and array command", () => {
+  const e = separateEntries({ LIBRARIESIO_KEY: "L" }, "linux", "opencode");
+  assert.deepEqual(e["medium-research-librariesio"].command, ["npx", "-y", "medium-research-librariesio"]);
+  assert.deepEqual(e["medium-research-librariesio"].environment, { LIBRARIESIO_KEY: "L" });
+  assert.equal(e["medium-research-librariesio"].env, undefined);
+});
+
+// --- parseArgs: flag validation ----------------------------------------------
+
+test("parseArgs accepts the 4 client ids and the known flags", () => {
+  assert.deepEqual(parseArgs(["install"]), { install: true, separate: false, yes: false, client: null });
+  assert.deepEqual(parseArgs(["install", "--separate", "--yes", "--client=codex"]), {
+    install: true, separate: true, yes: true, client: "codex",
+  });
+  for (const id of ["claude", "cursor", "codex", "opencode"]) {
+    assert.equal(parseArgs(["install", `--client=${id}`]).client, id);
+  }
+});
+
+test("parseArgs rejects an out-of-allowlist --client and unknown flags", () => {
+  assert.throws(() => parseArgs(["install", "--client=vscode"]), /Unknown --client "vscode"/);
+  assert.throws(() => parseArgs(["install", "--bogus"]), /Unknown argument "--bogus"/);
+});
+
+// --- Non-TTY guard (spawned; stdin is piped, not a TTY) ----------------------
+
+test("non-TTY install without --client exits non-zero and writes nothing", () => {
+  let err;
+  try {
+    execFileSync(process.execPath, [INSTALL_JS, "install"], {
+      stdio: ["pipe", "pipe", "pipe"], // no TTY on stdin
+      encoding: "utf8",
+    });
+  } catch (e) {
+    err = e;
+  }
+  assert.ok(err, "process exited non-zero");
+  assert.match(err.stderr, /Non-interactive run \(no TTY\).*--client/s);
 });
