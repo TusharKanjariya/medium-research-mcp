@@ -52,8 +52,8 @@ export function backupConfig(cfgPath) {
  * writes pretty JSON. A parse failure ABORTS and names the untouched file (no
  * partial write). Caller is responsible for backupConfig() first.
  */
-export function mergeJson(cfgPath, containerKey, entries) {
-  let obj = {};
+export function mergeJson(cfgPath, containerKey, entries, whenAbsent = {}) {
+  let obj = whenAbsent;
   if (fs.existsSync(cfgPath)) {
     const raw = fs.readFileSync(cfgPath, "utf8");
     try {
@@ -86,6 +86,22 @@ export function stdioEntry(bin, platform = process.platform) {
 }
 
 /**
+ * OpenCode entry: `command` is a single array, needs `type:"local"` + `enabled:true`,
+ * and (caller-added) env goes under `environment`, not `env`. Windows folds the shell
+ * shim into the array.
+ */
+export function opencodeEntry(bin, platform = process.platform) {
+  return {
+    type: "local",
+    command:
+      platform === "win32"
+        ? ["cmd", "/c", "npx", "-y", bin]
+        : ["npx", "-y", bin],
+    enabled: true,
+  };
+}
+
+/**
  * Reduce a raw key map to only the provided (non-empty) required keys. A skipped key
  * is simply absent, so the server stays keyless with its existing fail-loud behavior.
  */
@@ -93,6 +109,95 @@ export function envFor(keys) {
   const env = {};
   for (const v of KEY_VARS) if (keys?.[v]) env[v] = keys[v];
   return env;
+}
+
+// --- Codex TOML: generate + splice our OWN tables (never parse user TOML) -----
+
+/**
+ * Escape a string value for a TOML basic-string literal: escape `\` and `"`, and
+ * REJECT control chars / newlines (a stray one would corrupt the file). Tab is allowed.
+ */
+export function escapeTomlString(s) {
+  const str = String(s);
+  // eslint-disable-next-line no-control-regex
+  if (/[\x00-\x08\x0a-\x1f\x7f]/.test(str)) {
+    throw new Error("Secret contains a control character or newline; refusing to write TOML.");
+  }
+  return str.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
+
+/**
+ * Generate ONE `[mcp_servers.<name>]` table (+ nested `.env` sub-table) as a controlled
+ * string — we own every byte. Platform-aware command/args, escaped env values.
+ */
+export function tomlBlock(name, bin, envObj, platform = process.platform) {
+  const command = platform === "win32" ? "cmd" : "npx";
+  const args = platform === "win32" ? ["/c", "npx", "-y", bin] : ["-y", bin];
+  const argsStr = args.map((a) => `"${escapeTomlString(a)}"`).join(", ");
+  let block = `[mcp_servers.${name}]\ncommand = "${command}"\nargs = [${argsStr}]\n`;
+  const envKeys = envObj ? Object.keys(envObj) : [];
+  if (envKeys.length) {
+    block += `[mcp_servers.${name}.env]\n`;
+    for (const k of envKeys) block += `${k} = "${escapeTomlString(envObj[k])}"\n`;
+  }
+  return block;
+}
+
+/**
+ * Idempotent, non-destructive splice of OUR table into TOML text. Removes any existing
+ * top-level block for `tableName` (and its `.env` sub-table), stopping at the next
+ * line-start `[` so unrelated tables are never swallowed, then appends the fresh block.
+ * ponytail: regex splice, not a TOML parser — safe because we only ever add/replace our
+ * own [mcp_servers.medium-research-*] tables. Upgrade to a parser only if we ever need
+ * to READ arbitrary user TOML.
+ */
+export function spliceTomlTable(text, tableName, block) {
+  const re = new RegExp(
+    `(^|\\n)\\[${tableName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(\\.[^\\]]+)?\\][^]*?(?=\\n\\[|$)`,
+    "g",
+  );
+  const cleaned = text.replace(re, "").replace(/\n{3,}/g, "\n\n").trimStart().trimEnd();
+  return cleaned ? `${cleaned}\n\n${block.trim()}\n` : `${block.trim()}\n`;
+}
+
+/** Merge our `[mcp_servers.<name>]` tables (name -> block) into a Codex config.toml. */
+export function mergeToml(cfgPath, tables) {
+  let text = fs.existsSync(cfgPath) ? fs.readFileSync(cfgPath, "utf8") : "";
+  for (const [name, block] of Object.entries(tables)) {
+    text = spliceTomlTable(text, name, block);
+  }
+  fs.mkdirSync(path.dirname(cfgPath), { recursive: true });
+  fs.writeFileSync(cfgPath, text);
+}
+
+// --- Client detection --------------------------------------------------------
+
+/**
+ * Per-OS descriptors for the 4 target clients: `{ id, dir, configPath, format,
+ * container? }`. `dir` is the existence-probe signal; `format` selects the writer.
+ * home/platform/appData are injectable for tests.
+ */
+export function clientDescriptors(
+  { home = os.homedir(), platform = process.platform, appData = process.env.APPDATA } = {},
+) {
+  const claudeDir =
+    platform === "win32"
+      ? path.join(appData || path.join(home, "AppData", "Roaming"), "Claude")
+      : platform === "darwin"
+        ? path.join(home, "Library", "Application Support", "Claude")
+        : path.join(home, ".config", "Claude");
+  const opencodeDir = path.join(home, ".config", "opencode");
+  return [
+    { id: "claude", dir: claudeDir, configPath: path.join(claudeDir, "claude_desktop_config.json"), format: "json", container: "mcpServers" },
+    { id: "cursor", dir: path.join(home, ".cursor"), configPath: path.join(home, ".cursor", "mcp.json"), format: "json", container: "mcpServers" },
+    { id: "codex", dir: path.join(home, ".codex"), configPath: path.join(home, ".codex", "config.toml"), format: "toml" },
+    { id: "opencode", dir: opencodeDir, configPath: path.join(opencodeDir, "opencode.json"), format: "opencode", container: "mcp" },
+  ];
+}
+
+/** Return descriptors for only the clients whose config directory exists. */
+export function detectClients(opts = {}) {
+  return clientDescriptors(opts).filter((d) => fs.existsSync(d.dir));
 }
 
 // --- CLI ---------------------------------------------------------------------
