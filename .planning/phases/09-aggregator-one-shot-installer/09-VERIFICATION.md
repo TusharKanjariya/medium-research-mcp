@@ -1,11 +1,12 @@
 ---
 phase: 09-aggregator-one-shot-installer
 verified: 2026-07-23T05:48:21Z
-status: human_needed
+status: passed
 score: 5/5 must-haves verified
 behavior_unverified: 0
 overrides_applied: 0
 human_verification:
+
   - test: "Run `npx medium-research-mcp install` interactively (in a real TTY) against a machine with at least one of Claude Desktop / Cursor / Codex / OpenCode installed. Walk the wizard: pick a client, press Enter to skip LIBRARIESIO_KEY, paste a value for PRODUCTHUNT_TOKEN, confirm."
     expected: "Wizard lists detected clients, prints the plaintext-vs-.mcpb-keychain warning, writes a timestamped .bak-* backup, merges the medium-research-all entry non-destructively, and the skipped key is absent while the provided key is present in the written env block."
     why_human: "The readline interactive loop (prompt display, skip-on-empty, plaintext warning, confirm-before-write) is the headline UX and has no automated test — the plan deliberately deferred it, testing only the pure entry-builders/flag-parser it wraps. A real interactive smoke is the only way to confirm the end-to-end user flow before Phase 10 publish."

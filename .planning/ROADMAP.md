@@ -34,7 +34,7 @@ Upgraded the suite from 9 to 11 normalized-contract servers, made it writer-awar
 
 ### v1.2 One-Shot Install (Phases 9–10)
 
-- [ ] **Phase 9: Aggregator & One-Shot Installer** - The package gains the `medium-research-all` aggregator server and the `npx medium-research-mcp install` command, so everything v1.2 distributes exists before publish
+- [x] **Phase 9: Aggregator & One-Shot Installer** - The package gains the `medium-research-all` aggregator server and the `npx medium-research-mcp install` command, so everything v1.2 distributes exists before publish (completed 2026-07-23)
 - [ ] **Phase 10: Publish & Install-Path Docs** - Package published to npm, GitHub install path verified, INSTALL.md rewritten around all four install paths (human-gated publish checkpoint)
 
 ## Phase Details
@@ -100,7 +100,7 @@ Not part of the v1.2 milestone. Tracked for a later milestone (start via `/gsd-n
 | 6. Author-Blog Awareness | v1.1 | 3/3 | Complete | 2026-07-14 |
 | 7. Universal Sources & Parameterization Audit | v1.1 | 4/4 | Complete | 2026-07-14 |
 | 8. Universal Distribution | v1.1 | 4/4 | Complete | 2026-07-17 |
-| 9. Aggregator & One-Shot Installer | v1.2 | 2/2 | In Progress|  |
+| 9. Aggregator & One-Shot Installer | v1.2 | 2/2 | Complete    | 2026-07-23 |
 | 10. Publish & Install-Path Docs | v1.2 | 0/? | Not started | - |
 
 ---
