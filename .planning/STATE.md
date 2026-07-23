@@ -4,17 +4,17 @@ milestone: v1.2
 milestone_name: One-Shot Install
 current_phase: 09
 current_phase_name: Aggregator & One-Shot Installer
-status: executing
-stopped_at: Completed 09-01-PLAN.md
-last_updated: "2026-07-23T05:30:19.320Z"
+status: verifying
+stopped_at: Completed 09-02-PLAN.md
+last_updated: "2026-07-23T05:42:52.673Z"
 last_activity: 2026-07-23
 last_activity_desc: Phase 09 execution started
 progress:
   total_phases: 2
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
-  percent: 0
+  completed_plans: 2
+  percent: 50
 ---
 
 # Project State
@@ -30,10 +30,10 @@ See: .planning/PROJECT.md (updated 2026-07-20)
 
 Phase: 09 (Aggregator & One-Shot Installer) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-23 — Phase 09 execution started
 
-Progress: [█████░░░░░] 50% (0/2 phases)
+Progress: [██████████] 100% (0/2 phases)
 
 ## Performance Metrics
 
@@ -90,6 +90,7 @@ Progress: [█████░░░░░] 50% (0/2 phases)
 | Phase 08 P02 | 9min | 2 tasks | 12 files |
 | Phase 08 P04 | 15min | 2 tasks | 3 files |
 | Phase 09 P01 | 18min | 2 tasks | 13 files |
+| Phase 09 P02 | 30min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -145,6 +146,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 08 P02]: manifest_version stays 0.3 (current MCPB spec); D-05 consistency test reads ENV names from credentials.js source and asserts manifest env ⇒ ENV_VAR AND read-by-server (direction-safe, REDDIT_* maps to no server); hn env over-declaration removed
 - [Phase ?]: 08-04: cross-source pain-point sweep merges via shared mergeRank with per-source graceful degradation; INSTALL.md is Windows-first per-client with a manual (non-automated) release checklist
 - [Phase ?]: [Phase 09 P01]: Aggregator merge seam is registerTools(server) exported per server; aggregator calls all 11 against one McpServer (public SDK API only, no private _registeredTools). medium-research-all exposes the full 37-tool union; keyed sources mounted unconditionally, fail-loud at call time (D-02).
+- [Phase ?]: Installer is stdlib-only (node:readline/promises + fs/path/os); zero new deps — inquirer and TOML parser both rejected, we generate our own TOML tables and never parse user TOML.
+- [Phase ?]: Default install writes the single medium-research-all aggregator entry (both keys on one env block); --separate writes the 11 with keys only on librariesio/producthunt. Backup-first, non-destructive merge for all 4 client formats.
 
 ### Pending Todos
 
@@ -175,8 +178,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-23T05:30:19.296Z
-Stopped at: Completed 09-01-PLAN.md
+Last session: 2026-07-23T05:42:35.008Z
+Stopped at: Completed 09-02-PLAN.md
 Resume file: None
 
 ## Operator Next Steps

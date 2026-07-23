@@ -18,7 +18,7 @@ no contract changes. Prior milestone requirements live in PROJECT.md § Validate
 
 ### Installer (INST)
 
-- [ ] **INST-01**: User can add all 11 servers to their MCP client in one
+- [x] **INST-01**: User can add all 11 servers to their MCP client in one
       command — `npx medium-research-mcp install` detects the client
       (Claude Desktop, OpenCode, Codex, Cursor), backs up the existing config,
       merges all 11 entries non-destructively (never clobbers unrelated
@@ -60,6 +60,6 @@ no contract changes. Prior milestone requirements live in PROJECT.md § Validate
 |-----|-------|--------|
 | PKG-04 | Phase 10 | Pending |
 | PKG-05 | Phase 10 | Pending |
-| INST-01 | Phase 9 | Pending |
+| INST-01 | Phase 9 | Complete |
 | AGG-01 | Phase 9 | Complete |
 | DOC-02 | Phase 10 | Pending |

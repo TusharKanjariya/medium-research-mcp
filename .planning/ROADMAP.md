@@ -52,10 +52,10 @@ Upgraded the suite from 9 to 11 normalized-contract servers, made it writer-awar
   4. The installer prompts for the 2 required keys (LIBRARIESIO_KEY, PRODUCTHUNT_TOKEN) and each prompt can be skipped — skipping leaves those servers configured keyless with their existing fail-loudly behavior
   5. The 11 single-purpose bins and `.mcpb` bundles behave exactly as before — the full existing test suite still passes with zero contract changes
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans executed
 
 - [x] 09-01-PLAN.md — Aggregator (AGG-01): `registerTools` seam + `medium-research-all` server exposing the full 37-tool union (wave 1)
-- [ ] 09-02-PLAN.md — Installer (INST-01): `npx medium-research-mcp install` — detect 4 clients, backup + non-destructive merge, skippable key prompts (wave 2)
+- [x] 09-02-PLAN.md — Installer (INST-01): `npx medium-research-mcp install` — detect 4 clients, backup + non-destructive merge, skippable key prompts (wave 2)
 
 ### Phase 10: Publish & Install-Path Docs
 
@@ -100,7 +100,7 @@ Not part of the v1.2 milestone. Tracked for a later milestone (start via `/gsd-n
 | 6. Author-Blog Awareness | v1.1 | 3/3 | Complete | 2026-07-14 |
 | 7. Universal Sources & Parameterization Audit | v1.1 | 4/4 | Complete | 2026-07-14 |
 | 8. Universal Distribution | v1.1 | 4/4 | Complete | 2026-07-17 |
-| 9. Aggregator & One-Shot Installer | v1.2 | 1/2 | In Progress|  |
+| 9. Aggregator & One-Shot Installer | v1.2 | 2/2 | In Progress|  |
 | 10. Publish & Install-Path Docs | v1.2 | 0/? | Not started | - |
 
 ---
