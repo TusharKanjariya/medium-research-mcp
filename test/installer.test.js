@@ -115,6 +115,20 @@ test("mergeJson on a non-JSON file throws and leaves the file byte-unchanged", (
   assert.equal(fs.readFileSync(cfg, "utf8"), garbage, "file left exactly as it was");
 });
 
+test("mergeJson throws (not silent no-op) when the container key holds a non-object", () => {
+  const dir = tmp();
+  const cfg = path.join(dir, "cfg.json");
+  // An array container: `??=` would no-op and JSON.stringify would silently drop
+  // our named entry — the guard must fail loudly instead.
+  const original = '{"mcpServers": []}';
+  fs.writeFileSync(cfg, original);
+  assert.throws(
+    () => mergeJson(cfg, "mcpServers", { "medium-research-all": stdioEntry("medium-research-all", "linux") }),
+    /"mcpServers" is not a JSON object/,
+  );
+  assert.equal(fs.readFileSync(cfg, "utf8"), original, "file left exactly as it was");
+});
+
 // --- stdioEntry: platform shape ----------------------------------------------
 
 test("stdioEntry emits cmd /c npx on win32 and bare npx elsewhere", () => {

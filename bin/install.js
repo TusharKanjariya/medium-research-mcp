@@ -69,7 +69,11 @@ export function mergeJson(cfgPath, containerKey, entries, whenAbsent = {}) {
     throw new Error(`${cfgPath} is not a JSON object. Left unchanged.`);
   }
   obj[containerKey] ??= {};
-  for (const [name, entry] of Object.entries(entries)) obj[containerKey][name] = entry;
+  const container = obj[containerKey];
+  if (typeof container !== "object" || container === null || Array.isArray(container)) {
+    throw new Error(`${cfgPath} "${containerKey}" is not a JSON object. Left unchanged.`);
+  }
+  for (const [name, entry] of Object.entries(entries)) container[name] = entry;
   fs.mkdirSync(path.dirname(cfgPath), { recursive: true });
   fs.writeFileSync(cfgPath, JSON.stringify(obj, null, 2) + "\n");
 }
