@@ -70,7 +70,10 @@ Upgraded the suite from 9 to 11 normalized-contract servers, made it writer-awar
   3. The published tarball contains the aggregator and installer (verified via `npm pack --dry-run` before publish) so no second release is needed
   4. A user can follow INSTALL.md end-to-end for each of the four install paths (npm, GitHub, one-shot installer, aggregator), and the temp `docs/claude_desktop_config.all-servers.json` local-path file is gone
 
-**Plans**: TBD
+**Plans**: 2 plans
+
+- [ ] 10-01-PLAN.md — Prep: version bump 1.2.0 + provenance metadata + tarball verify (SC3), four-path INSTALL.md rewrite (installer-led), delete temp file (SC4), git-history secret scan (wave 1, autonomous)
+- [ ] 10-02-PLAN.md — Human-gated release: license go/no-go, npm publish 1.2.0 + SC1 live-verify, repo public flip + push + SC2 GitHub live-verify (wave 2, checkpoints)
 
 ## Future / Deferred (v2+)
 
@@ -101,7 +104,7 @@ Not part of the v1.2 milestone. Tracked for a later milestone (start via `/gsd-n
 | 7. Universal Sources & Parameterization Audit | v1.1 | 4/4 | Complete | 2026-07-14 |
 | 8. Universal Distribution | v1.1 | 4/4 | Complete | 2026-07-17 |
 | 9. Aggregator & One-Shot Installer | v1.2 | 2/2 | Complete    | 2026-07-23 |
-| 10. Publish & Install-Path Docs | v1.2 | 0/? | Not started | - |
+| 10. Publish & Install-Path Docs | v1.2 | 0/2 | Planned | - |
 
 ---
 *Roadmap updated: 2026-07-21 — v1.2 One-Shot Install roadmap created (Phases 9–10, 5/5 requirements mapped). Next: `/gsd-plan-phase 9`.*
