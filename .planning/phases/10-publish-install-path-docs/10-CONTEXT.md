@@ -62,8 +62,10 @@ execution pauses for the operator; do not automate.
   — **Reversibility:** one-way (practically) — a public repo can be re-privatized,
   but the published npm package and any external clones/forks persist. Treat the
   visibility flip as a deliberate, gated release step.
-- **D-07:** PKG-05 and SC2 stay **in scope as written** (the user reversed an
-  initial "keep private" answer). No requirement deferral needed.
+- **D-07 [informational]:** PKG-05 and SC2 stay **in scope as written** (the user
+  reversed an initial "keep private" answer). No requirement deferral needed. Scope-
+  retention note only — the actual PKG-05 work is tracked via the requirement + D-06
+  and covered by plan 10-02; nothing separate to implement here.
 
 ### Retire the temp file (DOC-02)
 - **D-08:** Delete `docs/claude_desktop_config.all-servers.json` — the installer now

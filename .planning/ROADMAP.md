@@ -71,8 +71,12 @@ Upgraded the suite from 9 to 11 normalized-contract servers, made it writer-awar
   4. A user can follow INSTALL.md end-to-end for each of the four install paths (npm, GitHub, one-shot installer, aggregator), and the temp `docs/claude_desktop_config.all-servers.json` local-path file is gone
 
 **Plans**: 2 plans
+**Wave 1**
 
 - [ ] 10-01-PLAN.md — Prep: version bump 1.2.0 + provenance metadata + tarball verify (SC3), four-path INSTALL.md rewrite (installer-led), delete temp file (SC4), git-history secret scan (wave 1, autonomous)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 10-02-PLAN.md — Human-gated release: license go/no-go, npm publish 1.2.0 + SC1 live-verify, repo public flip + push + SC2 GitHub live-verify (wave 2, checkpoints)
 
 ## Future / Deferred (v2+)

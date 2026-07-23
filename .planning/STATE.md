@@ -4,15 +4,15 @@ milestone: v1.2
 milestone_name: One-Shot Install
 current_phase: 10
 current_phase_name: Publish & Install-Path Docs
-status: planning
+status: executing
 stopped_at: Phase 10 context gathered
-last_updated: "2026-07-23T10:31:59.069Z"
+last_updated: "2026-07-23T11:00:36.396Z"
 last_activity: 2026-07-23
 last_activity_desc: Phase 09 complete, transitioned to Phase 10
 progress:
   total_phases: 2
   completed_phases: 1
-  total_plans: 2
+  total_plans: 4
   completed_plans: 2
   percent: 50
 ---
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-20)
 
 Phase: 10 — Publish & Install-Path Docs
 Plan: Not started
-Status: Ready to plan
+Status: Ready to execute
 Last activity: 2026-07-23 — Phase 09 complete, transitioned to Phase 10
 
 Progress: [██████████] 100% (0/2 phases)
