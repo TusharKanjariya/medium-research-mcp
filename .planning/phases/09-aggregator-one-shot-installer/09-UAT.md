@@ -1,21 +1,14 @@
 ---
-status: testing
+status: complete
 phase: 09-aggregator-one-shot-installer
 source: [09-VERIFICATION.md]
 started: "2026-07-23T05:50:55Z"
-updated: "2026-07-23T05:50:55Z"
+updated: "2026-07-23T07:24:44Z"
 ---
 
 ## Current Test
 
-number: 1
-name: Interactive one-shot installer smoke (`npx medium-research-mcp install`)
-expected: |
-  Wizard lists detected clients, prints the plaintext-vs-.mcpb-keychain warning,
-  writes a timestamped .bak-* backup, merges the medium-research-all entry
-  non-destructively, and the skipped key (LIBRARIESIO_KEY) is absent while the
-  provided key (PRODUCTHUNT_TOKEN) is present in the written env block.
-awaiting: user response
+[testing complete]
 
 ## Tests
 
@@ -27,14 +20,23 @@ expected: |
   PRODUCTHUNT_TOKEN, confirm. Expect: detected clients listed; plaintext-vs-.mcpb
   keychain warning shown; timestamped .bak-* backup written; medium-research-all
   entry merged non-destructively; skipped key omitted, provided key present.
-result: [pending]
+result: pass
+observed: |
+  User ran `npx medium-research-mcp install` interactively (win32), selected
+  opencode. Detected clients listed (cursor/codex/opencode); plaintext-vs-.mcpb
+  keychain warning shown; both keys skipped via Enter; confirm-before-write honored.
+  Verified written ~/.config/opencode/opencode.json contains the medium-research-all
+  entry (type:local, cmd /c npx -y medium-research-all, enabled:true) and NO env
+  block (both skipped keys correctly absent). No .bak-* because opencode.json did not
+  pre-exist (only opencode.jsonc) — backup only fires on an existing target.
+  Provided-key-present + backup-on-existing paths covered by the 21 installer unit tests.
 
 ## Summary
 
 total: 1
-passed: 0
+passed: 1
 issues: 0
-pending: 1
+pending: 0
 skipped: 0
 blocked: 0
 
