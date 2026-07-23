@@ -9,6 +9,7 @@
   "files": [
     "servers/",
     "shared/",
+    "bin/",
     "docs/INSTALL.md",
     "README.md"
   ],
@@ -24,7 +25,8 @@
     "medium-research-rss": "servers/rss/server.js",
     "medium-research-discourse": "servers/discourse/server.js",
     "medium-research-mastodon": "servers/mastodon/server.js",
-    "medium-research-all": "servers/aggregator/server.js"
+    "medium-research-all": "servers/aggregator/server.js",
+    "medium-research-mcp": "bin/install.js"
   },
   "scripts": {
     "test": "node --test",
