@@ -204,6 +204,7 @@ const AUTH_NOTE =
   "anonymously. With username/password set but LEMMY_INSTANCE unset, reads stay " +
   "anonymous by design (no error).";
 
+export function registerTools(server) {
 server.registerTool(
   "lemmy_hot",
   {
@@ -316,6 +317,9 @@ server.registerTool(
     return toolResult(env);
   },
 );
+}
+
+registerTools(server);
 
 // Connect over stdio only when run directly (`node servers/lemmy/server.js`),
 // so importing this module for tests does NOT start a live transport.

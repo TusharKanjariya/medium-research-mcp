@@ -199,6 +199,39 @@ const SORT = z.enum(["hot", "votes", "week", "month", "activity"]);
 // tool surface honest — a declared `sort` is passed through, never silently dropped.
 const SEARCH_SORT = z.enum(["relevance", "votes", "activity", "creation"]);
 
+/**
+ * Fetch one SE question and its answers, mapped to { item, comments } (D-02).
+ *
+ * This is a GENUINE sequential double-fetch (question, THEN answers), so it is the
+ * one path that can trip SE's self-inflicted throttle/ban if the first response
+ * carries a `backoff`. WR-02: honor `seThrottle(raw)` BETWEEN the two fetches —
+ * after the question response, before the answers request — which is exactly the
+ * contract seThrottle was written for ("honor the wait BEFORE any follow-up SE
+ * request"). `get`/`sleep` are injectable so the throttle-between-fetches wiring is
+ * observable offline (no network, no real wait); production uses getJson/realSleep.
+ */
+export async function fetchQuestionDetail(
+  { id, site = "stackoverflow" },
+  { get = getJson, sleep = realSleep } = {},
+) {
+  const encId = encodeURIComponent(id);
+  const q = seUrl(`/questions/${encId}`, { site });
+  const raw = await get(q.url, { cacheKey: q.cacheKey });
+  // SE answers HTTP 200 { items: [] } for a missing id — guard before mapping.
+  const question = requireSeQuestion(raw?.items?.[0], id, site);
+  // WR-02: honor SE's backoff / surface quota-zero BEFORE the follow-up answers
+  // fetch — the real sequential path the throttle exists to protect.
+  await seThrottle(raw, { sleep });
+  const a = seUrl(`/questions/${encId}/answers`, {
+    site,
+    sort: "votes",
+    order: "desc",
+  });
+  const answers = await get(a.url, { cacheKey: a.cacheKey });
+  return mapSeDetail(question, answers?.items ?? []);
+}
+
+export function registerTools(server) {
 server.registerTool(
   "so_hot_questions",
   {
@@ -267,38 +300,6 @@ server.registerTool(
   },
 );
 
-/**
- * Fetch one SE question and its answers, mapped to { item, comments } (D-02).
- *
- * This is a GENUINE sequential double-fetch (question, THEN answers), so it is the
- * one path that can trip SE's self-inflicted throttle/ban if the first response
- * carries a `backoff`. WR-02: honor `seThrottle(raw)` BETWEEN the two fetches —
- * after the question response, before the answers request — which is exactly the
- * contract seThrottle was written for ("honor the wait BEFORE any follow-up SE
- * request"). `get`/`sleep` are injectable so the throttle-between-fetches wiring is
- * observable offline (no network, no real wait); production uses getJson/realSleep.
- */
-export async function fetchQuestionDetail(
-  { id, site = "stackoverflow" },
-  { get = getJson, sleep = realSleep } = {},
-) {
-  const encId = encodeURIComponent(id);
-  const q = seUrl(`/questions/${encId}`, { site });
-  const raw = await get(q.url, { cacheKey: q.cacheKey });
-  // SE answers HTTP 200 { items: [] } for a missing id — guard before mapping.
-  const question = requireSeQuestion(raw?.items?.[0], id, site);
-  // WR-02: honor SE's backoff / surface quota-zero BEFORE the follow-up answers
-  // fetch — the real sequential path the throttle exists to protect.
-  await seThrottle(raw, { sleep });
-  const a = seUrl(`/questions/${encId}/answers`, {
-    site,
-    sort: "votes",
-    order: "desc",
-  });
-  const answers = await get(a.url, { cacheKey: a.cacheKey });
-  return mapSeDetail(question, answers?.items ?? []);
-}
-
 server.registerTool(
   "so_get_question",
   {
@@ -361,6 +362,9 @@ server.registerTool(
     return toolResult(env);
   },
 );
+}
+
+registerTools(server);
 
 // Connect over stdio only when run directly (`node servers/stackexchange/server.js`),
 // so importing this module for tests does NOT start a live transport.

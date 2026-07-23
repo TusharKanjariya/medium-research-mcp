@@ -226,6 +226,7 @@ export function ghTrendingQualifiers({
     .join(" ");
 }
 
+export function registerTools(server) {
 server.registerTool(
   "gh_trending_repos",
   {
@@ -358,6 +359,9 @@ server.registerTool(
     );
   },
 );
+}
+
+registerTools(server);
 
 // Connect over stdio only when run directly (`node servers/github/server.js`), so
 // importing this module for tests does NOT start a live transport.

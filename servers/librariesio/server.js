@@ -135,6 +135,7 @@ const SORT = z.enum([
   "created_at",
 ]);
 
+export function registerTools(server) {
 server.registerTool(
   "librariesio_search",
   {
@@ -206,6 +207,9 @@ server.registerTool(
     return toolResult(env);
   },
 );
+}
+
+registerTools(server);
 
 // Connect over stdio only when run directly (`node servers/librariesio/server.js`),
 // so importing this module for tests does NOT start a live transport.

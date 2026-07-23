@@ -167,6 +167,7 @@ export const server = new McpServer({ name: "producthunt", version: "1.0.0" });
 
 const PERIOD = z.enum(["today", "week"]);
 
+export function registerTools(server) {
 server.registerTool(
   "producthunt_launches",
   {
@@ -239,6 +240,9 @@ server.registerTool(
     return toolResult(env);
   },
 );
+}
+
+registerTools(server);
 
 // Connect over stdio only when run directly (`node servers/producthunt/server.js`),
 // so importing this module for tests does NOT start a live transport.

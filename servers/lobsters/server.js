@@ -104,6 +104,7 @@ export function mapLobstersDetail(story) {
 
 export const server = new McpServer({ name: "lobsters", version: "1.0.0" });
 
+export function registerTools(server) {
 server.registerTool(
   "lobsters_hottest",
   {
@@ -209,6 +210,9 @@ server.registerTool(
     return toolResult(env);
   },
 );
+}
+
+registerTools(server);
 
 // Connect over stdio only when run directly (`node servers/lobsters/server.js`),
 // so importing this module for tests does NOT start a live transport.

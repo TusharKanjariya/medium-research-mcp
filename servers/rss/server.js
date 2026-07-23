@@ -512,6 +512,7 @@ export async function fetchSubstackArchive(
 
 export const server = new McpServer({ name: "rss", version: "1.0.0" });
 
+export function registerTools(server) {
 server.registerTool(
   "rss_fetch",
   {
@@ -665,6 +666,9 @@ server.registerTool(
     return toolResult(env);
   },
 );
+}
+
+registerTools(server);
 
 // Connect over stdio only when run directly (`node servers/rss/server.js`), so
 // importing this module for tests does NOT start a live transport.

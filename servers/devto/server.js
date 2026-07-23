@@ -166,6 +166,7 @@ export function devtoTopUrl({ mode = "top", days, tag, limit } = {}) {
 
 export const server = new McpServer({ name: "devto", version: "1.0.0" });
 
+export function registerTools(server) {
 server.registerTool(
   "devto_top",
   {
@@ -292,6 +293,9 @@ server.registerTool(
     return toolResult(env);
   },
 );
+}
+
+registerTools(server);
 
 // Connect over stdio only when run directly (`node servers/devto/server.js`),
 // so importing this module for tests does NOT start a live transport.

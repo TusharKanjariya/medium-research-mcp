@@ -17,6 +17,16 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { isEntry } from "../../shared/main.js";
 import { registerTools as hn } from "../hn/server.js";
+import { registerTools as stackexchange } from "../stackexchange/server.js";
+import { registerTools as lobsters } from "../lobsters/server.js";
+import { registerTools as lemmy } from "../lemmy/server.js";
+import { registerTools as devto } from "../devto/server.js";
+import { registerTools as github } from "../github/server.js";
+import { registerTools as librariesio } from "../librariesio/server.js";
+import { registerTools as producthunt } from "../producthunt/server.js";
+import { registerTools as rss } from "../rss/server.js";
+import { registerTools as discourse } from "../discourse/server.js";
+import { registerTools as mastodon } from "../mastodon/server.js";
 
 export const server = new McpServer({
   name: "medium-research-all",
@@ -25,8 +35,22 @@ export const server = new McpServer({
 
 // Mount every source. Union is collision-free by D-01 prefixes; registerTool
 // throws loudly on a real duplicate, so no dedup/collision code is needed
-// (research Pitfall 2). Task 2 extends this list to all 11 sources.
-for (const registerTools of [hn]) {
+// (research Pitfall 2). D-02: keyed sources (librariesio, producthunt) are
+// mounted unconditionally — they keep their fail-loud "set X" behavior at call
+// time, not at mount time.
+for (const registerTools of [
+  hn,
+  stackexchange,
+  lobsters,
+  lemmy,
+  devto,
+  github,
+  librariesio,
+  producthunt,
+  rss,
+  discourse,
+  mastodon,
+]) {
   registerTools(server);
 }
 

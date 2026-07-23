@@ -244,6 +244,7 @@ const INSTANCE_NOTE =
   "The target instance is a per-call `instance` base URL (scheme defaults to " +
   "https), so this tool is keyless — no credentials. ";
 
+export function registerTools(server) {
 server.registerTool(
   "mastodon_public",
   {
@@ -371,6 +372,9 @@ server.registerTool(
     return toolResult(env);
   },
 );
+}
+
+registerTools(server);
 
 // Connect over stdio only when run directly (`node servers/mastodon/server.js`),
 // so importing this module for tests does NOT start a live transport.

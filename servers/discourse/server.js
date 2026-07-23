@@ -231,6 +231,7 @@ const PAGE_NOTE =
   "Returns the most recent page only (single fetch, `limit`-truncated; no deep " +
   "pagination). ";
 
+export function registerTools(server) {
 server.registerTool(
   "discourse_latest",
   {
@@ -331,6 +332,9 @@ server.registerTool(
     }
   },
 );
+}
+
+registerTools(server);
 
 // Connect over stdio only when run directly (`node servers/discourse/server.js`),
 // so importing this module for tests does NOT start a live transport.
