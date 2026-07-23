@@ -40,29 +40,36 @@ Upgraded the suite from 9 to 11 normalized-contract servers, made it writer-awar
 ## Phase Details
 
 ### Phase 9: Aggregator & One-Shot Installer
+
 **Goal**: One config entry or one command gets a user every source — the aggregator server and installer live inside the existing package, using only Node stdlib + existing shared modules
 **Depends on**: Phase 8 (published package shape: 11 bins, files whitelist, `.mcpb` bundles — all unchanged by this phase)
 **Requirements**: AGG-01, INST-01
 **Success Criteria** (what must be TRUE):
+
   1. A user who adds ONE config entry (`medium-research-all`) sees every source's tools in their MCP client, with tool names and the output contract identical to the 11 single-purpose servers
   2. A user runs `npx medium-research-mcp install` and it detects their MCP client(s) among Claude Desktop, OpenCode, Codex, and Cursor — including each client's config format (JSON vs TOML, `env` vs `environment`, Windows `cmd /c` wrapper)
   3. The installer backs up the existing config file before writing and merges all 11 server entries without removing or altering any unrelated server entry already in the config
   4. The installer prompts for the 2 required keys (LIBRARIESIO_KEY, PRODUCTHUNT_TOKEN) and each prompt can be skipped — skipping leaves those servers configured keyless with their existing fail-loudly behavior
   5. The 11 single-purpose bins and `.mcpb` bundles behave exactly as before — the full existing test suite still passes with zero contract changes
-**Plans**: 2 plans
-- [ ] 09-01-PLAN.md — Aggregator (AGG-01): `registerTools` seam + `medium-research-all` server exposing the full 37-tool union (wave 1)
+
+**Plans**: 1/2 plans executed
+
+- [x] 09-01-PLAN.md — Aggregator (AGG-01): `registerTools` seam + `medium-research-all` server exposing the full 37-tool union (wave 1)
 - [ ] 09-02-PLAN.md — Installer (INST-01): `npx medium-research-mcp install` — detect 4 clients, backup + non-destructive merge, skippable key prompts (wave 2)
 
 ### Phase 10: Publish & Install-Path Docs
+
 **Goal**: Anyone on any machine can install via npm or GitHub with the documented commands — no clone, no local-path hacks
 **Depends on**: Phase 9 (aggregator + installer must be in the tarball; publishing before them forces a second release)
 **Requirements**: PKG-04, PKG-05, DOC-02
 **Checkpoint**: `npm publish` is human-gated (npm login + INSTALL.md manual release checklist: version bump, `npm pack --dry-run` tarball inspection, `--ignore-scripts` install verification, files whitelist intact). Execution pauses for the operator — do not automate.
 **Success Criteria** (what must be TRUE):
+
   1. On a machine with no clone of this repo, `npx -y medium-research-<source>` starts any of the 11 servers from the public npm registry
   2. A user without npm-registry access runs the documented `npx github:<owner>/medium-research-mcp` command and gets a working install path (verified live, not just documented)
   3. The published tarball contains the aggregator and installer (verified via `npm pack --dry-run` before publish) so no second release is needed
   4. A user can follow INSTALL.md end-to-end for each of the four install paths (npm, GitHub, one-shot installer, aggregator), and the temp `docs/claude_desktop_config.all-servers.json` local-path file is gone
+
 **Plans**: TBD
 
 ## Future / Deferred (v2+)
@@ -93,7 +100,7 @@ Not part of the v1.2 milestone. Tracked for a later milestone (start via `/gsd-n
 | 6. Author-Blog Awareness | v1.1 | 3/3 | Complete | 2026-07-14 |
 | 7. Universal Sources & Parameterization Audit | v1.1 | 4/4 | Complete | 2026-07-14 |
 | 8. Universal Distribution | v1.1 | 4/4 | Complete | 2026-07-17 |
-| 9. Aggregator & One-Shot Installer | v1.2 | 0/? | Not started | - |
+| 9. Aggregator & One-Shot Installer | v1.2 | 1/2 | In Progress|  |
 | 10. Publish & Install-Path Docs | v1.2 | 0/? | Not started | - |
 
 ---

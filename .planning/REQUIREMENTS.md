@@ -11,6 +11,7 @@ no contract changes. Prior milestone requirements live in PROJECT.md § Validate
       `npx -y medium-research-<source>` — the package is published to npm
       (publish flow follows INSTALL.md's manual release checklist; version bump,
       `--ignore-scripts` install verification, files whitelist intact)
+
 - [ ] **PKG-05**: User can install without the npm registry via
       `npx github:<owner>/medium-research-mcp` — the GitHub path is verified
       working and documented alongside npm
@@ -26,7 +27,7 @@ no contract changes. Prior milestone requirements live in PROJECT.md § Validate
 
 ### Aggregator (AGG)
 
-- [ ] **AGG-01**: User can add ONE config entry — a `medium-research-all` bin
+- [x] **AGG-01**: User can add ONE config entry — a `medium-research-all` bin
       exposes every source's tools from a single process; tool names and the
       output contract are unchanged; the 11 single-purpose servers remain the
       primary shape and `.mcpb` bundles are unaffected
@@ -47,8 +48,10 @@ no contract changes. Prior milestone requirements live in PROJECT.md § Validate
 
 - Publishing individual per-source npm packages — one package with 11 bins
   stays; per-source packages multiply release overhead for zero UX gain
+
 - Windows installer executables / MSI — npx is the floor, everything runs on
   the Node runtime Claude Desktop already needs
+
 - Remote/hosted server variants — local stdio only, per the v1.0 premise
 
 ## Traceability
@@ -58,5 +61,5 @@ no contract changes. Prior milestone requirements live in PROJECT.md § Validate
 | PKG-04 | Phase 10 | Pending |
 | PKG-05 | Phase 10 | Pending |
 | INST-01 | Phase 9 | Pending |
-| AGG-01 | Phase 9 | Pending |
+| AGG-01 | Phase 9 | Complete |
 | DOC-02 | Phase 10 | Pending |
