@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-07-24T12:30:41.996Z",
+  "phase": "10",
+  "phase_name": "Publish & Install-Path Docs",
+  "phase_dir": ".planning/phases/10-publish-install-path-docs",
+  "plan": 2,
+  "task": 3,
+  "total_tasks": 3,
+  "status": "phase_complete",
+  "milestone": "v1.2 One-Shot Install — COMPLETE (Phase 10 was the last phase)",
+  "completed_tasks": [
+    {"id": "10-01", "name": "Release prep: 1.2.0 + metadata, four-path INSTALL.md, delete temp file, git-history secret scan", "status": "done"},
+    {"id": "10-02", "name": "Publish npm (1.2.0->1.2.1) + repo public flip + push + SC1/SC2 live-verify", "status": "done"}
+  ],
+  "remaining_tasks": [
+    {"id": "milestone-close", "name": "Optional: /gsd-complete-milestone (archive v1.2) or /gsd-ship (PR/review)", "status": "not_started"}
+  ],
+  "blockers": [],
+  "async_jobs": [],
+  "human_actions_pending": [
+    {"action": "Product Hunt token rotation", "context": "Leaked token was scrubbed from history + repo made public; user confirmed rotation at the release gate", "blocking": false}
+  ],
+  "decisions": [
+    {"decision": "Publish unscoped public medium-research-mcp; MIT license; bump to 1.2.1", "rationale": "npm name was free; MIT is standard for public npm; 1.2.1 patched the SC1 bug", "phase": "10"},
+    {"decision": "Invoke source servers as `npx -y -p medium-research-mcp medium-research-<source>`", "rationale": "The 11 servers + aggregator are bins INSIDE the single medium-research-mcp package, not standalone packages; bare `npx -y medium-research-<source>` 404s. Caught by SC1 live-verify, fixed in 1.2.1 across bin/install.js + docs/INSTALL.md", "phase": "10"},
+    {"decision": "Scrub leaked credential from git history with git filter-repo before flipping repo public", "rationale": "A real Product Hunt token (rotated; value not recorded here) was committed in phase-08 .planning process docs; force-pushed cleaned master + v1.1 tag to origin, verified 0 occurrences, then flipped public", "phase": "10"}
+  ],
+  "uncommitted_files": ["(only user's untracked root *.skill files, unrelated to phase 10)"],
+  "next_action": "Milestone v1.2 is complete. Optionally `git push` is already done (0 unpushed). Run /gsd-complete-milestone to archive v1.2, or /gsd-ship for a PR/review pass. Nothing is mid-flight.",
+  "context_notes": "Phase 10 fully complete and verified (4/4 must-haves, VERIFICATION.md passed). Package live on public npm @1.2.1; GitHub repo public with cleaned history. Pre-scrub backup bundle saved in the session scratchpad. Full test suite 462/0."
+}
