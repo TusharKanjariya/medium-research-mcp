@@ -47,7 +47,23 @@ Bumped the package to 1.2.0 with npm provenance metadata, rewrote docs/INSTALL.m
 - **README.md** — Install section leads with the `npx medium-research-mcp install` one-liner and keeps the docs/INSTALL.md pointer.
 - **docs/claude_desktop_config.all-servers.json** — DELETED. It was git-untracked (never committed), so `rm` is complete; zero references in README.md or docs/ (verified). No tracked git change results.
 
-## Secret Scan Result: FAIL (blocks the 10-02 public flip)
+## Secret Scan Result: FAIL → REMEDIATED (history scrubbed post-execution)
+
+> **UPDATE (orchestrator, same session):** The leaked token has been **scrubbed from all
+> git history** via `git filter-repo --replace-text` (HEAD rewritten `89f404e`→`ec9ffe3`;
+> 288 commits reprocessed). Verification: the real token value now has **0 occurrences in
+> `git log -p --all`**; the redaction marker `***PRODUCTHUNT-TOKEN-REDACTED***` is present
+> where it used to be. The residual `secret-hits=7` from the crude grep are all **confirmed
+> test fixtures** — `SECRET_PW` is a `const` in `test/auth.test.js` holding obviously-fake
+> values (`"sup3r-secret-pw-REDDIT"`, `"pw-should-not-leak-401"`) that the leak-prevention
+> tests assert never appear in output; plus a `PRODUCTHUNT_TOKEN: undefined` empty-case test.
+> No real credential remains in history. A full backup bundle was taken before the rewrite.
+>
+> **Still required from the operator before the public flip (10-02):**
+> 1. **Rotate/revoke** the Product Hunt token on producthunt.com (it lived in local — and possibly private-origin — history; treat as compromised regardless of the scrub).
+> 2. **`git push --force origin master`** to overwrite the private origin, whose history still carries the old token, with the cleaned local history — BEFORE flipping the repo public.
+>
+> The original FAIL finding and triage are preserved below for the record.
 
 The full-history scan (`git log -p --all`) over every shared/credentials.js ENV_VAR reported 7 raw hits. Manual triage:
 
