@@ -12,9 +12,20 @@ executables — add only the sources you want; each runs as an isolated stdio pr
 
 ## Install
 
-See **[docs/INSTALL.md](docs/INSTALL.md)** for per-client setup (Claude Desktop, Cursor,
-Codex, OpenCode, and the Claude Code plugin path), per-OS spawn config, credential env
-blocks, the Windows `npx` and shell-env caveats, and the maintainer release checklist.
+One command, everything wired up:
+
+```bash
+npx medium-research-mcp install
+```
+
+The installer auto-detects your client (Claude Desktop, Cursor, Codex, OpenCode), backs up
+your config, non-destructively merges the `medium-research-all` aggregator entry, and
+prompts for the two optional keys.
+
+See **[docs/INSTALL.md](docs/INSTALL.md)** for the other three install paths (aggregator
+manual entry, per-source npm, GitHub), per-client setup (Claude Desktop, Cursor, Codex,
+OpenCode, and the Claude Code plugin path), per-OS spawn config, credential env blocks, the
+Windows `npx` and shell-env caveats, and the maintainer release checklist.
 
 ## Cross-source sweep
 

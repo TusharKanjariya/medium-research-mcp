@@ -26,6 +26,87 @@ give the exact config for each client, **Windows first** (then macOS/Linux).
 
 ---
 
+# Install paths
+
+There are four ways to install, easiest first:
+
+1. **One-shot installer (recommended)** — `npx medium-research-mcp install` does everything.
+2. **Aggregator — one manual config entry** — a single `medium-research-all` server exposing every source.
+3. **Per-source npm — manual client config** — add each `medium-research-<source>` you want by hand.
+4. **GitHub (no npm registry)** — install straight from the repo with `npx github:…`.
+
+---
+
+## 1. One-shot installer (recommended)
+
+The fastest path. From any terminal:
+
+```bash
+npx medium-research-mcp install
+```
+
+This runs the bundled installer (`bin/install.js`), which:
+
+- **Auto-detects your client** — Claude Desktop, Cursor, Codex CLI, and OpenCode; it
+  finds the right config file for whichever you have installed.
+- **Backs up your existing config** before touching it, so a bad run is trivially undone.
+- **Non-destructively merges** a single `medium-research-all` aggregator entry into your
+  `mcpServers` (existing servers are left untouched — nothing is overwritten).
+- **Prompts for the two optional keys** — `LIBRARIESIO_KEY` and `PRODUCTHUNT_TOKEN`.
+  Both prompts are **skippable**: press Enter to leave them unset and the Libraries.io
+  and Product Hunt tools simply return a clear "set X" error until you add a key later;
+  every other source works with no credential.
+
+After it finishes, restart your client. That's the whole install — the three paths below
+are manual alternatives for people who want per-source control or can't use npm.
+
+---
+
+## 2. Aggregator — one manual config entry
+
+If you'd rather edit config yourself but still want every source from a single entry, add
+the **`medium-research-all`** aggregator (the same server the installer wires up). One
+entry, all 11 sources:
+
+```jsonc
+// Claude Desktop / Cursor — Windows
+"mcpServers": {
+  "medium-research-all": {
+    "command": "cmd",
+    "args": ["/c", "npx", "-y", "medium-research-all"],
+    "env": {
+      "LIBRARIESIO_KEY": "your-libraries-io-key",
+      "PRODUCTHUNT_TOKEN": "your-product-hunt-token"
+    }
+  }
+}
+```
+
+```jsonc
+// Claude Desktop / Cursor — macOS / Linux (drop the cmd /c wrapper)
+"mcpServers": {
+  "medium-research-all": {
+    "command": "npx",
+    "args": ["-y", "medium-research-all"],
+    "env": {
+      "LIBRARIESIO_KEY": "your-libraries-io-key",
+      "PRODUCTHUNT_TOKEN": "your-product-hunt-token"
+    }
+  }
+}
+```
+
+The two `env` keys are optional — omit them and only Libraries.io / Product Hunt degrade.
+For Codex `config.toml` and OpenCode `opencode.json`, use the same per-client shapes shown
+in path 3 below, just with the single bin name `medium-research-all`.
+
+---
+
+## 3. Per-source npm — manual client config
+
+Add only the individual `medium-research-<source>` servers you want. The sections below
+give the exact per-client config, **Windows first**. Read the two rules first.
+
 ## Two rules that apply to every client (read these first)
 
 **1. Always use `-y`, and expect a slow first run.** Every snippet spawns
@@ -214,6 +295,30 @@ prefer the explicit `--env` form above (or the Claude Desktop `.mcpb`) over a bu
 
 ---
 
+## 4. GitHub (no npm registry)
+
+You can install straight from the repo without the npm registry — useful before/without a
+published release, or to run an unreleased commit. Two forms:
+
+```bash
+# Run the one-shot installer straight from GitHub (mirrors path 1):
+npx github:TusharKanjariya/medium-research-mcp install
+
+# Run one specific server over GitHub (note the --package flag):
+npx --package=github:TusharKanjariya/medium-research-mcp medium-research-hn
+npx --package=github:TusharKanjariya/medium-research-mcp medium-research-all
+```
+
+**Why the bare command runs the installer, not a server.** When you give `npx` a package
+with multiple bins and no explicit command, npm picks the bin whose name matches the
+package name. The package is `medium-research-mcp` and it has a `medium-research-mcp` bin
+(`bin/install.js`), so `npx github:TusharKanjariya/medium-research-mcp` runs the
+**installer**. To start a specific server over GitHub you must name it with
+`npx --package=github:… medium-research-<source>` as shown above. In a client config,
+substitute the `--package` form for the `-y medium-research-<source>` args.
+
+---
+
 ## Credentials reference
 
 | Server | Env var | Required? | Where to get it |
@@ -272,43 +377,81 @@ https://meta.discourse.org https://mastodon.social`). See
 ## Publishing (maintainer, manual — do NOT automate)
 
 These steps are run **by hand by the maintainer**. Nothing in this repo publishes,
-tags, or uploads automatically — that is a deliberate release gate.
+tags, or uploads automatically — that is a deliberate release gate. The version bump to
+`1.2.0` is already in `package.json`; edit the version string directly on future bumps —
+do **not** run `npm version minor` (it also commits + tags, colliding with the manual
+`git tag` step below).
 
-1. **Inspect the tarball before publishing.** Confirm `servers/` and `shared/` are
+1. **Re-confirm the npm name is still free** immediately before publishing (an unscoped
+   public name is first-come — verify it's still unclaimed):
+
+   ```bash
+   npm view medium-research-mcp version   # expect: 404 / "not found" for a first publish
+   ```
+
+2. **Inspect the tarball before publishing.** Confirm `servers/` and `shared/` are
    present and no secrets or `test/` / `.planning/` files leak in:
 
    ```bash
-   npm pack --dry-run    # lists exactly what would ship
-   npm pack              # writes medium-research-mcp-1.1.0.tgz to inspect
+   npm pack --dry-run    # lists exactly what would ship (expect 34 files)
+   npm pack              # writes medium-research-mcp-1.2.0.tgz to inspect
    ```
 
-2. **Smoke-test the tarball install on Windows** (the primary target platform): install
+3. **Smoke-test the tarball install on Windows** (the primary target platform): install
    the packed `.tgz` into a scratch project and confirm at least one bin spawns:
 
    ```bash
-   npm i -g ./medium-research-mcp-1.1.0.tgz
+   npm i -g ./medium-research-mcp-1.2.0.tgz
    npx -y medium-research-hn </dev/null   # should start and wait on stdio, not ENOENT
    ```
 
-3. **Publish to npm** (only after 1–2 pass):
+4. **Publish to npm** (only after 1–3 pass):
 
    ```bash
+   npm login
    npm publish
    ```
 
-4. **Build the `.mcpb` bundles** for the Claude Desktop one-click path:
+5. **Make the GitHub repo public and push latest** so the `npx github:…` path resolves
+   the current commit:
+
+   ```bash
+   gh repo edit --visibility public    # or GitHub web UI → Settings → Danger Zone
+   git push origin master
+   ```
+
+6. **Live-verify BOTH install paths from a clean dir OUTSIDE the repo** with a fresh npm
+   cache (a warm cache or running inside the repo tree resolves the local copy and gives a
+   false pass):
+
+   ```bash
+   # npm path — after publish
+   mkdir /tmp/verify-npm && cd /tmp/verify-npm
+   npm_config_cache=$(mktemp -d) npx -y medium-research-hn </dev/null      # starts on stdio, not 404
+   npm_config_cache=$(mktemp -d) npx -y medium-research-all </dev/null     # aggregator
+
+   # github path — after public + push
+   mkdir /tmp/verify-gh && cd /tmp/verify-gh
+   npm_config_cache=$(mktemp -d) npx --package=github:TusharKanjariya/medium-research-mcp medium-research-hn </dev/null
+   npx github:TusharKanjariya/medium-research-mcp install                  # runs bin/install.js (default bin)
+   ```
+
+   On Windows, run these from a folder outside the repo (e.g. `%TEMP%\verify-npm`);
+   `npx --ignore-existing` is an alternative to a fresh cache dir.
+
+7. **Build the `.mcpb` bundles** for the Claude Desktop one-click path:
 
    ```bash
    npm run build:mcpb    # writes dist/medium-research-<source>.mcpb
    ```
 
-5. **Tag the release and attach the bundles.** Create the git tag and upload every
+8. **Tag the release and attach the bundles.** Create the git tag and upload every
    `dist/*.mcpb` to the corresponding GitHub release:
 
    ```bash
-   git tag v1.1.0
-   git push origin v1.1.0
-   # then attach dist/*.mcpb to the v1.1.0 GitHub release (gh release create v1.1.0 dist/*.mcpb)
+   git tag v1.2.0
+   git push origin v1.2.0
+   # then attach dist/*.mcpb to the v1.2.0 GitHub release (gh release create v1.2.0 dist/*.mcpb)
    ```
 
 Do not wire any of the above into CI or a repo script — publish, tag, and upload stay
