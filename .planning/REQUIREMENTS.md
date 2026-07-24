@@ -8,9 +8,11 @@ no contract changes. Prior milestone requirements live in PROJECT.md § Validate
 ### Distribution (PKG)
 
 - [x] **PKG-04**: User can configure any server on any machine with
-      `npx -y medium-research-<source>` — the package is published to npm
-      (publish flow follows INSTALL.md's manual release checklist; version bump,
-      `--ignore-scripts` install verification, files whitelist intact)
+      `npx -y -p medium-research-mcp medium-research-<source>` — the package is
+      published to npm (delivered as `medium-research-mcp@1.2.1`; the sources are
+      bins inside the single package, so the `-p medium-research-mcp` package flag
+      is required — bare `npx -y medium-research-<source>` 404s, caught by the SC1
+      live-verify and fixed in 1.2.1)
 
 - [x] **PKG-05**: User can install without the npm registry via
       `npx github:<owner>/medium-research-mcp` — the GitHub path is verified

@@ -65,7 +65,7 @@ Upgraded the suite from 9 to 11 normalized-contract servers, made it writer-awar
 **Checkpoint**: `npm publish` is human-gated (npm login + INSTALL.md manual release checklist: version bump, `npm pack --dry-run` tarball inspection, `--ignore-scripts` install verification, files whitelist intact). Execution pauses for the operator — do not automate.
 **Success Criteria** (what must be TRUE):
 
-  1. On a machine with no clone of this repo, `npx -y medium-research-<source>` starts any of the 11 servers from the public npm registry
+  1. On a machine with no clone of this repo, `npx -y -p medium-research-mcp medium-research-<source>` starts any of the 11 servers from the public npm registry (delivered `medium-research-mcp@1.2.1`; the `-p` package flag is required since sources are bins inside one package — bare form 404s, fixed in 1.2.1)
   2. A user without npm-registry access runs the documented `npx github:<owner>/medium-research-mcp` command and gets a working install path (verified live, not just documented)
   3. The published tarball contains the aggregator and installer (verified via `npm pack --dry-run` before publish) so no second release is needed
   4. A user can follow INSTALL.md end-to-end for each of the four install paths (npm, GitHub, one-shot installer, aggregator), and the temp `docs/claude_desktop_config.all-servers.json` local-path file is gone
