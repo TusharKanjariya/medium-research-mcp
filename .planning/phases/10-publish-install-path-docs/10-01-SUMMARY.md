@@ -52,7 +52,7 @@ Bumped the package to 1.2.0 with npm provenance metadata, rewrote docs/INSTALL.m
 The full-history scan (`git log -p --all`) over every shared/credentials.js ENV_VAR reported 7 raw hits. Manual triage:
 
 **REAL credential (HIGH — blocking):**
-- **Product Hunt Developer Token** `***PRODUCTHUNT-TOKEN-REDACTED***` committed in git history in `.planning/` process docs. Present in commits:
+- **Product Hunt Developer Token** `dgT8qU…BDpak` (value redacted from this file — treat as compromised, rotate) committed in git history in `.planning/` process docs. Present in commits:
   - `b2071b9851e0820194129be257e1e478238825c9` — `.planning/phases/08-universal-distribution/.continue-here.md`
   - `de63eb67be73a97d9a9d6870c0671df3a1b3638e` — `.planning/HANDOFF.json`
   - `9613e25376c32eb9006ee899be053c582cd39cdb` — `.planning/phases/08-universal-distribution/.continue-here.md`
