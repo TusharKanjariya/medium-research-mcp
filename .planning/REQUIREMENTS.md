@@ -34,7 +34,7 @@ no contract changes. Prior milestone requirements live in PROJECT.md § Validate
 
 ### Docs (DOC)
 
-- [ ] **DOC-02**: User can follow INSTALL.md for all four install paths
+- [x] **DOC-02**: User can follow INSTALL.md for all four install paths
       (npm, GitHub, one-shot installer, aggregator); the temp
       `docs/claude_desktop_config.all-servers.json` local-path file is retired
 
@@ -62,4 +62,4 @@ no contract changes. Prior milestone requirements live in PROJECT.md § Validate
 | PKG-05 | Phase 10 | Pending |
 | INST-01 | Phase 9 | Complete |
 | AGG-01 | Phase 9 | Complete |
-| DOC-02 | Phase 10 | Pending |
+| DOC-02 | Phase 10 | Complete |

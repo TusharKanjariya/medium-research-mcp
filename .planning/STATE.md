@@ -5,15 +5,15 @@ milestone_name: One-Shot Install
 current_phase: 10
 current_phase_name: Publish & Install-Path Docs
 status: executing
-stopped_at: Phase 10 context gathered
-last_updated: "2026-07-23T11:00:36.396Z"
-last_activity: 2026-07-23
-last_activity_desc: Phase 09 complete, transitioned to Phase 10
+stopped_at: Completed 10-01-PLAN.md (secret scan FAIL — blocks 10-02)
+last_updated: "2026-07-24T07:13:36.762Z"
+last_activity: 2026-07-24
+last_activity_desc: Phase 10 execution started
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 4
-  completed_plans: 2
+  completed_plans: 3
   percent: 50
 ---
 
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-20)
 
 **Core value:** Uniform normalized output across every source, so `medium-blog-pro` consumes any source with zero per-source logic.
-**Current focus:** Phase 09 — Aggregator & One-Shot Installer
+**Current focus:** Phase 10 — Publish & Install-Path Docs
 
 ## Current Position
 
-Phase: 10 — Publish & Install-Path Docs
-Plan: Not started
+Phase: 10 (Publish & Install-Path Docs) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-07-23 — Phase 09 complete, transitioned to Phase 10
+Last activity: 2026-07-24 — Phase 10 execution started
 
-Progress: [██████████] 100% (0/2 phases)
+Progress: [████████░░] 75% (0/2 phases)
 
 ## Performance Metrics
 
@@ -92,6 +92,7 @@ Progress: [██████████] 100% (0/2 phases)
 | Phase 08 P04 | 15min | 2 tasks | 3 files |
 | Phase 09 P01 | 18min | 2 tasks | 13 files |
 | Phase 09 P02 | 30min | 3 tasks | 3 files |
+| Phase 10 P01 | 20m | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -149,6 +150,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 09 P01]: Aggregator merge seam is registerTools(server) exported per server; aggregator calls all 11 against one McpServer (public SDK API only, no private _registeredTools). medium-research-all exposes the full 37-tool union; keyed sources mounted unconditionally, fail-loud at call time (D-02).
 - [Phase ?]: Installer is stdlib-only (node:readline/promises + fs/path/os); zero new deps — inquirer and TOML parser both rejected, we generate our own TOML tables and never parse user TOML.
 - [Phase ?]: Default install writes the single medium-research-all aggregator entry (both keys on one env block); --separate writes the 11 with keys only on librariesio/producthunt. Backup-first, non-destructive merge for all 4 client formats.
+- [Phase ?]: 10-01: package.json bumped to 1.2.0 + repository/homepage/bugs provenance; no license key (deferred to 10-02 operator IP decision)
+- [Phase ?]: 10-01: git-history secret scan FAILED — real Product Hunt token in history blocks the 10-02 public flip until rotated + scrubbed
 
 ### Pending Todos
 
@@ -156,7 +159,9 @@ None yet.
 
 ### Blockers/Concerns
 
-None yet.
+yet.
+
+- SECRET SCAN FAIL (10-01): real Product Hunt Developer Token in git history (commits b2071b9, de63eb6, 9613e25 — .planning/HANDOFF.json + 08 .continue-here.md). Blocks 10-02 repo public flip. Operator must rotate the token + scrub history, then re-run scan to secret-hits=0 before flipping public.
 
 ### Quick Tasks Completed
 
@@ -179,9 +184,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-23T10:31:59.050Z
-Stopped at: Phase 10 context gathered
-Resume file: .planning/phases/10-publish-install-path-docs/10-CONTEXT.md
+Last session: 2026-07-24T07:13:17.099Z
+Stopped at: Completed 10-01-PLAN.md (secret scan FAIL — blocks 10-02)
+Resume file: None
 
 ## Operator Next Steps
 
