@@ -10,6 +10,7 @@
   "bugs": {
     "url": "https://github.com/TusharKanjariya/medium-research-mcp/issues"
   },
+  "license": "MIT",
   "type": "module",
   "engines": {
     "node": ">=18"
