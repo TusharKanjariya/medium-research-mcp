@@ -7,12 +7,12 @@ no contract changes. Prior milestone requirements live in PROJECT.md § Validate
 
 ### Distribution (PKG)
 
-- [ ] **PKG-04**: User can configure any server on any machine with
+- [x] **PKG-04**: User can configure any server on any machine with
       `npx -y medium-research-<source>` — the package is published to npm
       (publish flow follows INSTALL.md's manual release checklist; version bump,
       `--ignore-scripts` install verification, files whitelist intact)
 
-- [ ] **PKG-05**: User can install without the npm registry via
+- [x] **PKG-05**: User can install without the npm registry via
       `npx github:<owner>/medium-research-mcp` — the GitHub path is verified
       working and documented alongside npm
 
@@ -58,8 +58,8 @@ no contract changes. Prior milestone requirements live in PROJECT.md § Validate
 
 | REQ | Phase | Status |
 |-----|-------|--------|
-| PKG-04 | Phase 10 | Pending |
-| PKG-05 | Phase 10 | Pending |
+| PKG-04 | Phase 10 | Complete |
+| PKG-05 | Phase 10 | Complete |
 | INST-01 | Phase 9 | Complete |
 | AGG-01 | Phase 9 | Complete |
 | DOC-02 | Phase 10 | Complete |
