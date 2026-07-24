@@ -1,7 +1,15 @@
 {
   "name": "medium-research-mcp",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A suite of MCP servers pulling normalized blog-topic research from developer sources",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TusharKanjariya/medium-research-mcp.git"
+  },
+  "homepage": "https://github.com/TusharKanjariya/medium-research-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/TusharKanjariya/medium-research-mcp/issues"
+  },
   "type": "module",
   "engines": {
     "node": ">=18"
