@@ -81,13 +81,16 @@ export function mergeJson(cfgPath, containerKey, entries, whenAbsent = {}) {
 // --- Platform-aware entry builders -------------------------------------------
 
 /**
- * stdio entry for Claude / Cursor / Codex: `cmd /c npx -y <bin>` on win32 (npx is a
- * `.cmd` shim → bare "npx" gives spawn ENOENT), bare `npx -y <bin>` elsewhere.
+ * stdio entry for Claude / Cursor / Codex. The bins (`medium-research-<source>`,
+ * `medium-research-all`) live INSIDE the `medium-research-mcp` package — they are not
+ * standalone packages — so `npx` must be told the package with `-p medium-research-mcp`
+ * and then the bin to run; bare `npx -y medium-research-all` 404s on the registry.
+ * win32 wraps in `cmd /c` (npx is a `.cmd` shim → bare "npx" gives spawn ENOENT).
  */
 export function stdioEntry(bin, platform = process.platform) {
   return platform === "win32"
-    ? { command: "cmd", args: ["/c", "npx", "-y", bin] }
-    : { command: "npx", args: ["-y", bin] };
+    ? { command: "cmd", args: ["/c", "npx", "-y", "-p", "medium-research-mcp", bin] }
+    : { command: "npx", args: ["-y", "-p", "medium-research-mcp", bin] };
 }
 
 /**
@@ -100,8 +103,8 @@ export function opencodeEntry(bin, platform = process.platform) {
     type: "local",
     command:
       platform === "win32"
-        ? ["cmd", "/c", "npx", "-y", bin]
-        : ["npx", "-y", bin],
+        ? ["cmd", "/c", "npx", "-y", "-p", "medium-research-mcp", bin]
+        : ["npx", "-y", "-p", "medium-research-mcp", bin],
     enabled: true,
   };
 }
@@ -137,7 +140,7 @@ export function escapeTomlString(s) {
  */
 export function tomlBlock(name, bin, envObj, platform = process.platform) {
   const command = platform === "win32" ? "cmd" : "npx";
-  const args = platform === "win32" ? ["/c", "npx", "-y", bin] : ["-y", bin];
+  const args = platform === "win32" ? ["/c", "npx", "-y", "-p", "medium-research-mcp", bin] : ["-y", "-p", "medium-research-mcp", bin];
   const argsStr = args.map((a) => `"${escapeTomlString(a)}"`).join(", ");
   let block = `[mcp_servers.${name}]\ncommand = "${command}"\nargs = [${argsStr}]\n`;
   const envKeys = envObj ? Object.keys(envObj) : [];

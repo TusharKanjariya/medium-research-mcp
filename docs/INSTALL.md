@@ -21,7 +21,7 @@ The 11 servers:
 | `medium-research-discourse` | Any public Discourse forum | none |
 | `medium-research-mastodon` | Any public Mastodon instance | none |
 
-Every server runs the same way: `npx -y medium-research-<source>`. The sections below
+Every server runs the same way: `npx -y -p medium-research-mcp medium-research-<source>`. The sections below
 give the exact config for each client, **Windows first** (then macOS/Linux).
 
 ---
@@ -73,7 +73,7 @@ entry, all 11 sources:
 "mcpServers": {
   "medium-research-all": {
     "command": "cmd",
-    "args": ["/c", "npx", "-y", "medium-research-all"],
+    "args": ["/c", "npx", "-y", "-p", "medium-research-mcp", "medium-research-all"],
     "env": {
       "LIBRARIESIO_KEY": "your-libraries-io-key",
       "PRODUCTHUNT_TOKEN": "your-product-hunt-token"
@@ -87,7 +87,7 @@ entry, all 11 sources:
 "mcpServers": {
   "medium-research-all": {
     "command": "npx",
-    "args": ["-y", "medium-research-all"],
+    "args": ["-y", "-p", "medium-research-mcp", "medium-research-all"],
     "env": {
       "LIBRARIESIO_KEY": "your-libraries-io-key",
       "PRODUCTHUNT_TOKEN": "your-product-hunt-token"
@@ -110,13 +110,13 @@ give the exact per-client config, **Windows first**. Read the two rules first.
 ## Two rules that apply to every client (read these first)
 
 **1. Always use `-y`, and expect a slow first run.** Every snippet spawns
-`npx -y medium-research-<source>`. The `-y` is not optional: without it, the first
+`npx -y -p medium-research-mcp medium-research-<source>`. The `-y` is not optional: without it, the first
 `npx` run stops at an interactive "Ok to proceed?" install prompt — and because these
 are **stdio** servers with no TTY, that prompt hangs the connection forever with no
 error. The **first** run also downloads the package and its deps (typically 5–30s); a
 client with a short spawn timeout (e.g. Codex's `startup_timeout_sec`, default 10) may
 give up before that finishes. If a first connection times out, run
-`npx -y medium-research-hn </dev/null` once in a terminal to warm the npm cache, then
+`npx -y -p medium-research-mcp medium-research-hn </dev/null` once in a terminal to warm the npm cache, then
 retry — or point the client at a globally installed copy (`npm i -g medium-research-mcp`)
 with an absolute path.
 
@@ -141,11 +141,11 @@ Edit via **Settings → Developer → Edit Config**. Keyless server and a creden
 "mcpServers": {
   "medium-research-hn": {
     "command": "cmd",
-    "args": ["/c", "npx", "-y", "medium-research-hn"]
+    "args": ["/c", "npx", "-y", "-p", "medium-research-mcp", "medium-research-hn"]
   },
   "medium-research-librariesio": {
     "command": "cmd",
-    "args": ["/c", "npx", "-y", "medium-research-librariesio"],
+    "args": ["/c", "npx", "-y", "-p", "medium-research-mcp", "medium-research-librariesio"],
     "env": { "LIBRARIESIO_KEY": "your-libraries-io-key" }
   }
 }
@@ -156,11 +156,11 @@ Edit via **Settings → Developer → Edit Config**. Keyless server and a creden
 "mcpServers": {
   "medium-research-hn": {
     "command": "npx",
-    "args": ["-y", "medium-research-hn"]
+    "args": ["-y", "-p", "medium-research-mcp", "medium-research-hn"]
   },
   "medium-research-librariesio": {
     "command": "npx",
-    "args": ["-y", "medium-research-librariesio"],
+    "args": ["-y", "-p", "medium-research-mcp", "medium-research-librariesio"],
     "env": { "LIBRARIESIO_KEY": "your-libraries-io-key" }
   }
 }
@@ -187,11 +187,11 @@ Same `mcpServers` `{ command, args, env }` schema as Claude Desktop:
 "mcpServers": {
   "medium-research-hn": {
     "command": "cmd",
-    "args": ["/c", "npx", "-y", "medium-research-hn"]
+    "args": ["/c", "npx", "-y", "-p", "medium-research-mcp", "medium-research-hn"]
   },
   "medium-research-producthunt": {
     "command": "cmd",
-    "args": ["/c", "npx", "-y", "medium-research-producthunt"],
+    "args": ["/c", "npx", "-y", "-p", "medium-research-mcp", "medium-research-producthunt"],
     "env": { "PRODUCTHUNT_TOKEN": "your-product-hunt-token" }
   }
 }
@@ -202,7 +202,7 @@ Same `mcpServers` `{ command, args, env }` schema as Claude Desktop:
 "mcpServers": {
   "medium-research-hn": {
     "command": "npx",
-    "args": ["-y", "medium-research-hn"]
+    "args": ["-y", "-p", "medium-research-mcp", "medium-research-hn"]
   }
 }
 ```
@@ -220,12 +220,12 @@ TOML, not JSON. Env goes in a **nested `[mcp_servers.<name>.env]` sub-table**:
 ```toml
 [mcp_servers.medium-research-hn]
 command = "npx"
-args = ["-y", "medium-research-hn"]
-# Windows: command = "cmd"; args = ["/c", "npx", "-y", "medium-research-hn"]
+args = ["-y", "-p", "medium-research-mcp", "medium-research-hn"]
+# Windows: command = "cmd"; args = ["/c", "npx", "-y", "-p", "medium-research-mcp", "medium-research-hn"]
 
 [mcp_servers.medium-research-librariesio]
 command = "npx"
-args = ["-y", "medium-research-librariesio"]
+args = ["-y", "-p", "medium-research-mcp", "medium-research-librariesio"]
 [mcp_servers.medium-research-librariesio.env]
 LIBRARIESIO_KEY = "your-libraries-io-key"
 ```
@@ -233,7 +233,7 @@ LIBRARIESIO_KEY = "your-libraries-io-key"
 Or add one from the CLI:
 
 ```bash
-codex mcp add medium-research-librariesio --env LIBRARIESIO_KEY=your-key -- npx -y medium-research-librariesio
+codex mcp add medium-research-librariesio --env LIBRARIESIO_KEY=your-key -- npx -y -p medium-research-mcp medium-research-librariesio
 ```
 
 Transport is derived from `command` vs `url` (there is no transport key). Because the
@@ -253,12 +253,12 @@ the env key is **`"environment"`, not `"env"`**:
   "mcp": {
     "medium-research-hn": {
       "type": "local",
-      "command": ["npx", "-y", "medium-research-hn"],
+      "command": ["npx", "-y", "-p", "medium-research-mcp", "medium-research-hn"],
       "enabled": true
     },
     "medium-research-producthunt": {
       "type": "local",
-      "command": ["npx", "-y", "medium-research-producthunt"],
+      "command": ["npx", "-y", "-p", "medium-research-mcp", "medium-research-producthunt"],
       "enabled": true,
       "environment": { "PRODUCTHUNT_TOKEN": "your-product-hunt-token" }
     }
@@ -267,7 +267,7 @@ the env key is **`"environment"`, not `"env"`**:
 ```
 
 On Windows, prefix the array with the shell shim: `["cmd", "/c", "npx", "-y",
-"medium-research-hn"]`. `{env:NAME}` substitutes a host env var inside `environment`.
+"-p", "medium-research-mcp", "medium-research-hn"]`. `{env:NAME}` substitutes a host env var inside `environment`.
 
 ---
 
@@ -276,10 +276,10 @@ On Windows, prefix the array with the shell shim: `["cmd", "/c", "npx", "-y",
 You can also register a server with the Claude Code CLI:
 
 ```bash
-claude mcp add --transport stdio medium-research-hn -- npx -y medium-research-hn
+claude mcp add --transport stdio medium-research-hn -- npx -y -p medium-research-mcp medium-research-hn
 
 # with a credential (the --env flag goes BEFORE the server name):
-claude mcp add --transport stdio --env LIBRARIESIO_KEY=your-key medium-research-librariesio -- npx -y medium-research-librariesio
+claude mcp add --transport stdio --env LIBRARIESIO_KEY=your-key medium-research-librariesio -- npx -y -p medium-research-mcp medium-research-librariesio
 ```
 
 Scopes: `local` (default, per-project in `~/.claude.json`), `user` (global), `project`
@@ -378,7 +378,7 @@ https://meta.discourse.org https://mastodon.social`). See
 
 These steps are run **by hand by the maintainer**. Nothing in this repo publishes,
 tags, or uploads automatically — that is a deliberate release gate. The version bump to
-`1.2.0` is already in `package.json`; edit the version string directly on future bumps —
+`1.2.1` is already in `package.json`; edit the version string directly on future bumps —
 do **not** run `npm version minor` (it also commits + tags, colliding with the manual
 `git tag` step below).
 
@@ -394,15 +394,15 @@ do **not** run `npm version minor` (it also commits + tags, colliding with the m
 
    ```bash
    npm pack --dry-run    # lists exactly what would ship (expect 34 files)
-   npm pack              # writes medium-research-mcp-1.2.0.tgz to inspect
+   npm pack              # writes medium-research-mcp-1.2.1.tgz to inspect
    ```
 
 3. **Smoke-test the tarball install on Windows** (the primary target platform): install
    the packed `.tgz` into a scratch project and confirm at least one bin spawns:
 
    ```bash
-   npm i -g ./medium-research-mcp-1.2.0.tgz
-   npx -y medium-research-hn </dev/null   # should start and wait on stdio, not ENOENT
+   npm i -g ./medium-research-mcp-1.2.1.tgz
+   npx -y -p medium-research-mcp medium-research-hn </dev/null   # should start and wait on stdio, not ENOENT
    ```
 
 4. **Publish to npm** (only after 1–3 pass):
@@ -427,8 +427,8 @@ do **not** run `npm version minor` (it also commits + tags, colliding with the m
    ```bash
    # npm path — after publish
    mkdir /tmp/verify-npm && cd /tmp/verify-npm
-   npm_config_cache=$(mktemp -d) npx -y medium-research-hn </dev/null      # starts on stdio, not 404
-   npm_config_cache=$(mktemp -d) npx -y medium-research-all </dev/null     # aggregator
+   npm_config_cache=$(mktemp -d) npx -y -p medium-research-mcp medium-research-hn </dev/null      # starts on stdio, not 404
+   npm_config_cache=$(mktemp -d) npx -y -p medium-research-mcp medium-research-all </dev/null     # aggregator
 
    # github path — after public + push
    mkdir /tmp/verify-gh && cd /tmp/verify-gh
@@ -449,9 +449,9 @@ do **not** run `npm version minor` (it also commits + tags, colliding with the m
    `dist/*.mcpb` to the corresponding GitHub release:
 
    ```bash
-   git tag v1.2.0
-   git push origin v1.2.0
-   # then attach dist/*.mcpb to the v1.2.0 GitHub release (gh release create v1.2.0 dist/*.mcpb)
+   git tag v1.2.1
+   git push origin v1.2.1
+   # then attach dist/*.mcpb to the v1.2.1 GitHub release (gh release create v1.2.1 dist/*.mcpb)
    ```
 
 Do not wire any of the above into CI or a repo script — publish, tag, and upload stay

@@ -79,7 +79,7 @@ test("mergeJson preserves an unrelated server entry and adds medium-research-all
   // Our entry added.
   assert.deepEqual(after.mcpServers["medium-research-all"], {
     command: "npx",
-    args: ["-y", "medium-research-all"],
+    args: ["-y", "-p", "medium-research-mcp", "medium-research-all"],
   });
 });
 
@@ -134,15 +134,15 @@ test("mergeJson throws (not silent no-op) when the container key holds a non-obj
 test("stdioEntry emits cmd /c npx on win32 and bare npx elsewhere", () => {
   assert.deepEqual(stdioEntry("medium-research-all", "win32"), {
     command: "cmd",
-    args: ["/c", "npx", "-y", "medium-research-all"],
+    args: ["/c", "npx", "-y", "-p", "medium-research-mcp", "medium-research-all"],
   });
   assert.deepEqual(stdioEntry("medium-research-all", "linux"), {
     command: "npx",
-    args: ["-y", "medium-research-all"],
+    args: ["-y", "-p", "medium-research-mcp", "medium-research-all"],
   });
   assert.deepEqual(stdioEntry("medium-research-all", "darwin"), {
     command: "npx",
-    args: ["-y", "medium-research-all"],
+    args: ["-y", "-p", "medium-research-mcp", "medium-research-all"],
   });
 });
 
@@ -164,12 +164,12 @@ test("envFor keeps only provided keys; a skipped key is absent", () => {
 test("opencodeEntry uses an array command, type:local, enabled:true", () => {
   assert.deepEqual(opencodeEntry("medium-research-all", "linux"), {
     type: "local",
-    command: ["npx", "-y", "medium-research-all"],
+    command: ["npx", "-y", "-p", "medium-research-mcp", "medium-research-all"],
     enabled: true,
   });
   assert.deepEqual(opencodeEntry("medium-research-all", "win32"), {
     type: "local",
-    command: ["cmd", "/c", "npx", "-y", "medium-research-all"],
+    command: ["cmd", "/c", "npx", "-y", "-p", "medium-research-mcp", "medium-research-all"],
     enabled: true,
   });
 });
@@ -181,7 +181,7 @@ test("OpenCode merge seeds $schema when absent and puts keys under environment",
   mergeJson(cfg, "mcp", { "medium-research-all": entry }, { $schema: "https://opencode.ai/config.json", mcp: {} });
   const obj = JSON.parse(fs.readFileSync(cfg, "utf8"));
   assert.equal(obj.$schema, "https://opencode.ai/config.json");
-  assert.deepEqual(obj.mcp["medium-research-all"].command, ["npx", "-y", "medium-research-all"]);
+  assert.deepEqual(obj.mcp["medium-research-all"].command, ["npx", "-y", "-p", "medium-research-mcp", "medium-research-all"]);
   assert.equal(obj.mcp["medium-research-all"].type, "local");
   assert.equal(obj.mcp["medium-research-all"].enabled, true);
   assert.deepEqual(obj.mcp["medium-research-all"].environment, { LIBRARIESIO_KEY: "k" });
@@ -256,7 +256,7 @@ test("aggregatorEntries is one medium-research-all entry carrying both provided 
   assert.deepEqual(Object.keys(e), ["medium-research-all"]);
   assert.deepEqual(e["medium-research-all"], {
     command: "npx",
-    args: ["-y", "medium-research-all"],
+    args: ["-y", "-p", "medium-research-mcp", "medium-research-all"],
     env: { LIBRARIESIO_KEY: "L", PRODUCTHUNT_TOKEN: "P" },
   });
   // No keys → no env block at all.
@@ -276,7 +276,7 @@ test("separateEntries is 11 entries with keys only on librariesio/producthunt", 
 
 test("separateEntries in opencode format uses environment (not env) and array command", () => {
   const e = separateEntries({ LIBRARIESIO_KEY: "L" }, "linux", "opencode");
-  assert.deepEqual(e["medium-research-librariesio"].command, ["npx", "-y", "medium-research-librariesio"]);
+  assert.deepEqual(e["medium-research-librariesio"].command, ["npx", "-y", "-p", "medium-research-mcp", "medium-research-librariesio"]);
   assert.deepEqual(e["medium-research-librariesio"].environment, { LIBRARIESIO_KEY: "L" });
   assert.equal(e["medium-research-librariesio"].env, undefined);
 });
